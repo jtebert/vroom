@@ -11,6 +11,7 @@ class Node(object):
         self.isObstacle = False
         self.isVisited = False
         self.dirt = -1
+        self.label = None
         self.value = 0
 
 
@@ -54,21 +55,26 @@ class RobotMap(object):
                 if environment != None:
                     if environment.map[y][x].value == -1:
                         pygame.draw.rect(screen,(0,0,0),r,0)
-                    if environment.map[y][x].value == 0:
+                    elif environment.map[y][x].value == 0:
                         pygame.draw.rect(screen,(255,255,255),r,0)
+                    elif environment.map[y][x].value > 0:
+                        d = environment.map[y][x].value
+                        pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
                         
                 else:
                     if self.map[y][x].isObstacle:
                         pygame.draw.rect(screen,(0,0,0),r,0)
+                    elif (self.map[y][x].dirt > 0):
+                        d = self.map[y][x].dirt
+                        pygame.draw.rect(screen,(0,0,255-(60*3)),r,0)
                     elif self.map[y][x].isVisited:
                         pygame.draw.rect(screen,(255,255,255),r,0)
-
-        #pygame.draw.rect(screen,(255,0,0),pygame.Rect((sx*(bminx-minx),sy*(bminy-miny)), (sx*(bmaxx-bminx),sy*(bmaxy-bminy))),int(1.*self.scale))
 
 
     def drawRobot (self,screen,robot):
         
-         
+        #TODO this is a gross approach for handling this...
+        #Currently the robot updates its map in sensor updates, it should do this there
         self.map[robot.pos[1]][robot.pos[0]].isVisited = True
         self.map[robot.pos[1]-1][robot.pos[0]].isVisited = True
         self.map[robot.pos[1]+1][robot.pos[0]].isVisited = True

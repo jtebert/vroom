@@ -63,18 +63,21 @@ class RobotSimulator(object):
             if self.action != None:
                 #check bumper 
                 bumpReadings = self.robot.bumpSensor(self.action,self.environment)
+                dirtReading = self.robot.dirtSensor(self.environment)
+
+                if (dirtReading > 0):
+                    print "maping dirt value: ",dirtReading
+                    self.map.map[self.robot.pos[1]][self.robot.pos[0]].dirt = dirtReading
+
                 if(not(self.robot.isBump(bumpReadings))):
                     self.robot.takeAction(self.action)
                 else:
                     for reading in bumpReadings:
                         self.map.map[reading[1]][reading[0]].isObstacle = True
+                    
                 self.action = None
 
-            #rect = pygame.Rect(0,0,300,300)
-            #pygame.draw.rect(screen,(200,100,20),rect,1)
-
             screen.fill((204,204,204))  
-
             
             if self.showEnvironment:
                 self.map.draw(screen,environment = self.environment)
@@ -151,11 +154,13 @@ class Robot(object):
             
 
 
-    def dirtSensor(self):
+    def dirtSensor(self,environment):
         d = -1
 
-        if self.environment[self.pos] > 0:
-            d = self.environment[self.pos]
+        if environment.map[self.pos[1]][self.pos[0]].value > 0:
+            d = environment.map[self.pos[1]][self.pos[0]].value
+            
+            print "found dirt : ",d
         
         return d
 
