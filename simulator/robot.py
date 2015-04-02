@@ -1,5 +1,5 @@
 
-from simulator.map import *
+from map import *
 
 
 class RobotSimulator(object):
@@ -107,7 +107,6 @@ class Robot(object):
             for pos in bumpCoordinates:
                 if environment.map[pos[1]][pos[0]].value == -1:
                     b.append(pos)
-
         return b
 
     def isBump(self, bumpSensor):
