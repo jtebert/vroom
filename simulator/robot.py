@@ -1,8 +1,5 @@
 
-from map import *
-from math import sin,cos,pi
-
-
+from simulator.map import *
 
 
 class RobotSimulator(object):
