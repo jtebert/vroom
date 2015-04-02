@@ -115,7 +115,8 @@ class Environment(object):
         self.boundingBox = ((w/2,h/2),(w/2,h/2))
         self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
-        self.importEnviroment('../assets/maps/test.csv')
+
+        self.importEnviroment('./../assets/maps/test.csv')
 
 
     def importEnviroment(self,csvFile):
