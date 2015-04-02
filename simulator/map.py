@@ -85,22 +85,24 @@ class RobotMap(object):
                                 min((robot.pos[1]*self.cellYSize)+(robot.size)/2,self.height))
         
         
-        
+        robotLeftCornerX = ((robot.pos[0]-2)*self.cellXSize)
+        robotLeftCornerY = ((robot.pos[1]-2)*self.cellXSize)
         robotCenterX = (robot.pos[0]*self.cellXSize)+(self.cellXSize/2)
         robotCenterY = (robot.pos[1]*self.cellXSize)+(self.cellYSize/2)
 
-        pygame.draw.circle(screen,(0,0,0),(robotCenterX,robotCenterY),(robot.size)/2, 1)
+        r = pygame.Rect(robotLeftCornerX,robotLeftCornerY, robot.size, robot.size)
+        pygame.draw.rect(screen,(0,0,0),r, 1)
 
         if robot.heading == 'North':
-            pygame.draw.line(screen,(0,0,255),(robotCenterX,robotCenterY),(robotCenterX,robotCenterY-robot.size))
+            pygame.draw.line(screen,(255,0,0),(robotCenterX,robotCenterY),(robotCenterX,robotCenterY-robot.size))
         if robot.heading == 'South':
-            pygame.draw.line(screen,(0,0,255),(robotCenterX,robotCenterY),(robotCenterX,robotCenterY+robot.size))
+            pygame.draw.line(screen,(255,0,0),(robotCenterX,robotCenterY),(robotCenterX,robotCenterY+robot.size))
         
         if robot.heading == 'East':
-            pygame.draw.line(screen,(0,0,255),(robotCenterX,robotCenterY),(robotCenterX+robot.size,robotCenterY))
+            pygame.draw.line(screen,(255,0,0),(robotCenterX,robotCenterY),(robotCenterX+robot.size,robotCenterY))
 
         if robot.heading == 'West':
-            pygame.draw.line(screen,(0,0,255),(robotCenterX,robotCenterY),(robotCenterX-robot.size,robotCenterY))
+            pygame.draw.line(screen,(255,0,0),(robotCenterX,robotCenterY),(robotCenterX-robot.size,robotCenterY))
 
 
 class Environment(object):

@@ -52,10 +52,12 @@ class RobotSimulator(object):
         pygame.display.set_mode((700,700),pygame.RESIZABLE)
         pygame.display.update()
 
-
         while(True):
             self.listenControls()
             screen = pygame.display.get_surface()
+
+            #bumpReadings
+            
 
             if self.action != None:
                 #check bumper 
@@ -78,7 +80,7 @@ class RobotSimulator(object):
             
             if self.showEnvironment:
                 self.map.draw(screen,environment = self.environment)
-                self.map.drawRobot
+                self.map.drawRobot(screen,self.robot)
             else:
                 self.map.draw(screen)
                 self.map.drawRobot(screen,self.robot)
