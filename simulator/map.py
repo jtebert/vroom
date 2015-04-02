@@ -66,7 +66,7 @@ class RobotMap(object):
                         pygame.draw.rect(screen,(0,0,0),r,0)
                     elif (self.map[y][x].dirt > 0):
                         d = self.map[y][x].dirt
-                        pygame.draw.rect(screen,(0,0,255-(60*3)),r,0)
+                        pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
                     elif self.map[y][x].isVisited:
                         pygame.draw.rect(screen,(255,255,255),r,0)
 
