@@ -73,29 +73,10 @@ class RobotMap(object):
 
     def drawRobot (self,screen,robot):
         
-        #TODO this is a gross approach for handling this...
-        #Currently the robot updates its map in sensor updates, it should do this there
-        self.map[robot.pos[1]][robot.pos[0]].isVisited = True
-        self.map[robot.pos[1]-1][robot.pos[0]].isVisited = True
-        self.map[robot.pos[1]+1][robot.pos[0]].isVisited = True
-        self.map[robot.pos[1]-2][robot.pos[0]].isVisited = True
-        self.map[robot.pos[1]+2][robot.pos[0]].isVisited = True
-        self.map[robot.pos[1]][robot.pos[0]+1].isVisited = True
-        self.map[robot.pos[1]-1][robot.pos[0]+1].isVisited = True
-        self.map[robot.pos[1]+1][robot.pos[0]+1].isVisited = True
-        self.map[robot.pos[1]-2][robot.pos[0]+1].isVisited = True
-        self.map[robot.pos[1]+2][robot.pos[0]+1].isVisited = True
-        self.map[robot.pos[1]][robot.pos[0]-1].isVisited = True
-        self.map[robot.pos[1]-1][robot.pos[0]-1].isVisited = True
-        self.map[robot.pos[1]+1][robot.pos[0]-1].isVisited = True
-        self.map[robot.pos[1]-2][robot.pos[0]-1].isVisited = True
-        self.map[robot.pos[1]+2][robot.pos[0]-1].isVisited = True
-        self.map[robot.pos[1]][robot.pos[0]-2].isVisited = True
-        self.map[robot.pos[1]-1][robot.pos[0]-2].isVisited = True
-        self.map[robot.pos[1]+1][robot.pos[0]-2].isVisited = True
-        self.map[robot.pos[1]][robot.pos[0]+2].isVisited = True
-        self.map[robot.pos[1]-1][robot.pos[0]+2].isVisited = True
-        self.map[robot.pos[1]+1][robot.pos[0]+2].isVisited = True
+            
+        for x in range(-2,3,1):
+            for y in range (-2,3,1): 
+                self.map[robot.pos[1]+x][robot.pos[0]+y].isVisited = True
 
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),
@@ -135,8 +116,6 @@ class Environment(object):
         self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
         self.importEnviroment('../assets/maps/test.csv')
-
-
 
 
     def importEnviroment(self,csvFile):

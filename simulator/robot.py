@@ -60,11 +60,11 @@ class RobotSimulator(object):
             if self.action != None:
                 #check bumper 
                 bumpReadings = self.robot.bumpSensor(self.action,self.environment)
-                dirtReading = self.robot.dirtSensor(self.environment)
+                dirtReadings = self.robot.dirtSensor(self.environment)
 
-                if (dirtReading > 0):
-                    print "maping dirt value: ",dirtReading
-                    self.map.map[self.robot.pos[1]][self.robot.pos[0]].dirt = dirtReading
+                if len(dirtReadings):
+                    for dirtReading in dirtReadings:
+                        self.map.map[dirtReading[1]][dirtReading[0]].dirt = dirtReading[2]
 
                 if(not(self.robot.isBump(bumpReadings))):
                     self.robot.takeAction(self.action)
@@ -148,17 +148,20 @@ class Robot(object):
 
         return coords
             
-
+        
 
     def dirtSensor(self,environment):
-        d = -1
+        dValues = []
 
-        if environment.map[self.pos[1]][self.pos[0]].value > 0:
-            d = environment.map[self.pos[1]][self.pos[0]].value
+        #the whole robot is a vacuum!
+        for x in range(-2,3,1):
+            for y in range (-2,3,1): 
             
-            print "found dirt : ",d
+                if environment.map[self.pos[1]+x][self.pos[0]+y].value > 0:
+                    d = environment.map[self.pos[1]+x][self.pos[0]+y].value
+                    dValues.append([self.pos[0]+y,self.pos[1]+x,d])
         
-        return d
+        return dValues
 
 
     def takeAction(self,action):
