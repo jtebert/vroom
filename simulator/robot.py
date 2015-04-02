@@ -52,12 +52,62 @@ class RobotSimulator(object):
         pygame.display.set_mode((700,700),pygame.RESIZABLE)
         pygame.display.update()
 
+        self.turning = False
+        self.turningDistance = 0
+        self.turnDirection = None
+        self.bump = None
+        self.cleanDirection = 'Down'
+
         while(True):
-            self.listenControls()
+            #self.listenControls()
             screen = pygame.display.get_surface()
 
-            #bumpReadings
-            
+            bumpReadings = self.robot.bumpSensor(self.robot.heading,self.environment)
+            if (self.bump and (not self.turning)):
+                self.bump = False
+                self.turning = True
+                self.turningDistance = 0
+
+                if (self.cleanDirection == 'Down'):
+                    if(self.robot.heading == 'East'):
+                        self.action = "TurnRight"
+                        self.turnDirection = self.action
+                    else: 
+                        self.action = "TurnLeft"
+                        self.turnDirection = self.action
+                else:
+                    if(self.robot.heading == 'East'):
+                        self.action = "TurnLeft"
+                        self.turnDirection = self.action
+                    else: 
+                        self.action = "TurnRight"
+                        self.turnDirection = self.action
+
+            elif ((self.turningDistance == 5)):
+                self.action = self.turnDirection
+                self.turningDistance = 0
+                self.turning = False
+            elif (self.turning):
+                if (self.bump):
+                    
+                    print "bumped while turning!: ,",self.turningDistance
+                    if (self.turningDistance <= 2):
+                        print "changing cleaning direction!"
+                        if self.cleanDirection == 'Down':
+                            self.cleanDirection == 'Up'
+
+                    self.action = self.turnDirection
+                    self.turningDistance = 0
+                    self.turning = False
+                    self.bump = False
+                else:
+                    self.turningDistance += 1
+                    self.action = self.robot.heading
+
+            else:
+                self.action = self.robot.heading
+                
+
 
             if self.action != None:
                 #check bumper 
@@ -71,6 +121,7 @@ class RobotSimulator(object):
                 if(not(self.robot.isBump(bumpReadings))):
                     self.robot.takeAction(self.action)
                 else:
+                    self.bump = True
                     for reading in bumpReadings:
                         self.map.map[reading[1]][reading[0]].isObstacle = True
                     
@@ -97,8 +148,8 @@ class Robot(object):
     def __init__(self,environment):
 
         self.size = 50   #5x5 cells
-        self.pos = [10,10]
-        self.heading = 'North'
+        self.pos = [5,4]
+        self.heading = 'East'
 
     def bumpSensor(self, action, environment):
         b = []
@@ -126,27 +177,29 @@ class Robot(object):
                 coords = [[self.pos[0],self.pos[1]-3], 
                           [self.pos[0]-1,self.pos[1]-3],
                           [self.pos[0]+1,self.pos[1]-3],
-                          [self.pos[0]-2,self.pos[1]-2],
-                          [self.pos[0]+2,self.pos[1]-2]]
+                          [self.pos[0]-2,self.pos[1]-3],
+                          [self.pos[0]+2,self.pos[1]-3]]
 
             if action == 'South':
                 coords = [[self.pos[0]+1,self.pos[1]+3],
                           [self.pos[0],self.pos[1]+3], 
                           [self.pos[0]-1,self.pos[1]+3],
-                          [self.pos[0]-2,self.pos[1]+2],
-                          [self.pos[0]+2,self.pos[1]+2]]
+                          [self.pos[0]-2,self.pos[1]+3],
+                          [self.pos[0]+2,self.pos[1]+3]]
 
             if action == 'East':
                 coords = [[self.pos[0]+3,self.pos[1]], 
                           [self.pos[0]+3,self.pos[1]-1],
                           [self.pos[0]+3,self.pos[1]+1],
-                          [self.pos[0]+2,self.pos[1]-2],
-                          [self.pos[0]+2,self.pos[1]+2]]
+                          [self.pos[0]+3,self.pos[1]-2],
+                          [self.pos[0]+3,self.pos[1]+2]]
 
             if action == 'West':
                 coords = [[self.pos[0]-3,self.pos[1]], 
                           [self.pos[0]-3,self.pos[1]-1],
-                          [self.pos[0]-3,self.pos[1]+1]]
+                          [self.pos[0]-3,self.pos[1]+1],
+                          [self.pos[0]-3,self.pos[1]-2],
+                          [self.pos[0]-3,self.pos[1]+2]]
 
         return coords
             
@@ -168,7 +221,9 @@ class Robot(object):
 
     def takeAction(self,action):
         
-        if self.heading == action:
+        
+
+        if (self.heading == action):
             #drive forwards
             if action == 'North':
                 #north is negative
@@ -195,27 +250,27 @@ class Robot(object):
             heading = action
 
         if self.heading == 'North':
-            if action == 'East':
+            if (action == 'East') or (action == 'TurnRight'):
                 heading = 'East'
-            if action == 'West':
+            if (action == 'West') or (action == 'TurnLeft'):
                 heading = 'West'
 
         if self.heading == 'East':
-            if action == 'South':
+            if (action == 'South') or (action == 'TurnRight'):
                 heading = 'South'
-            if action == 'North':
+            if (action == 'North') or (action == 'TurnLeft'):
                 heading = 'North'
 
         if self.heading == 'South':
-            if action == 'West':
+            if (action == 'West') or (action == 'TurnRight'):
                 heading = 'West'
-            if action == 'East':
+            if (action == 'East') or (action == 'TurnLeft'):
                 heading = 'East'
                 
         if self.heading == 'West':
-            if action == 'North':
+            if (action == 'North') or (action == 'TurnRight'):
                 heading = 'North'
-            if action == 'South':
+            if (action == 'South') or (action == 'TurnLeft'):
                 heading = 'South'
 
         return heading

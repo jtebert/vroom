@@ -131,7 +131,8 @@ class Environment(object):
                 for column in row:
                     if j > (self.width/self.cellXSize):
                         break
-                    self.map[i][j].value = int(column)
+                    if(column != ''):
+                        self.map[i][j].value = int(column)
                     j += 1
                 j = 0
                 i += 1
