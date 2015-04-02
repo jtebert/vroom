@@ -1,7 +1,5 @@
-#Robot Overlords AI project
+# VROOM, by your Robot Overlords
 
-Current robot vacuum cleaners meander aimlessly. We're simulating a smart vacuum cleaner that learns where dirt accumulates to clean efficiently.
+## Vacuum Robot Overcoming Obstacles and Messes
 
-Our vacuum cleaners are smarter. We are the Vacuum Overlords.
-
-![Vacuum Overlords](https://raw.githubusercontent.com/butane-/robotoverlords/master/assets/vacuum_logo.png)
+![Vacuum Overlords](https://raw.githubusercontent.com/butane-/robotoverlords/master/assets/vroom_logo.png)
