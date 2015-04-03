@@ -68,12 +68,14 @@ class RobotSimulator(object):
         '''
         while(not self.start):
             self.listenControls()
+        '''
+
 
         while(True):
             self.listenControls()
             screen = pygame.display.get_surface()
 
-            
+            '''
             time.sleep(0.05)
 
             bumpReadings = self.robot.bumpSensor(self.robot.heading,self.environment)
