@@ -1,6 +1,7 @@
 
 from map import *
 
+import time
 
 class RobotSimulator(object):
 
@@ -17,6 +18,7 @@ class RobotSimulator(object):
         self.k = None
         self.action = None
 
+        self.start = False
     
     def listenControls(self):
         for event in pygame.event.get():
@@ -31,6 +33,8 @@ class RobotSimulator(object):
                 self.k = None
                 self.action = 'None'
             if self.k != None:
+                if self.k == pygame.K_q:
+                    self.start = True
                 if self.k == pygame.K_UP:
                     self.action = 'North'
                 if self.k == pygame.K_DOWN:
@@ -58,9 +62,19 @@ class RobotSimulator(object):
         self.bump = None
         self.cleanDirection = 'Down'
 
+        #time.sleep(15)
+        
+
+        '''
+        while(not self.start):
+            self.listenControls()
+
         while(True):
-            #self.listenControls()
+            self.listenControls()
             screen = pygame.display.get_surface()
+
+            
+            time.sleep(0.05)
 
             bumpReadings = self.robot.bumpSensor(self.robot.heading,self.environment)
             if (self.bump and (not self.turning)):
@@ -106,26 +120,31 @@ class RobotSimulator(object):
 
             else:
                 self.action = self.robot.heading
-                
-
+            
+            '''
 
             if self.action != None:
                 #check bumper 
                 bumpReadings = self.robot.bumpSensor(self.action,self.environment)
+                proxReadings = self.robot.proximitySensor(self.environment)
                 dirtReadings = self.robot.dirtSensor(self.environment)
 
                 if len(dirtReadings):
                     for dirtReading in dirtReadings:
                         self.map.map[dirtReading[1]][dirtReading[0]].dirt = dirtReading[2]
 
+                if len(proxReadings):
+                    for prox in proxReadings:
+                        self.map.map[prox[1]][prox[0]].isObstacle = True
+
                 if(not(self.robot.isBump(bumpReadings))):
                     self.robot.takeAction(self.action)
                 else:
                     self.bump = True
-                    for reading in bumpReadings:
-                        self.map.map[reading[1]][reading[0]].isObstacle = True
                     
                 self.action = None
+            
+
 
             screen.fill((204,204,204))  
             
@@ -150,6 +169,40 @@ class Robot(object):
         self.size = 50   #5x5 cells
         self.pos = [5,4]
         self.heading = 'East'
+
+    def proximitySensor(self, environment):
+        #checks immediate suroundings for obstacles
+
+        #TODO This assumes a robot size of 5, make it adaptable
+        
+        pos = self.pos
+        
+        obsLocations = []
+
+
+        #check for sides
+        for i in range(-2,3,1):
+            if environment.map[pos[1]-3][pos[0]+i].value == -1:
+                obsLocations.append([pos[0]+i,pos[1]-3])
+            if environment.map[pos[1]+3][pos[0]+i].value == -1:
+                obsLocations.append([pos[0]+i,pos[1]+3])
+            if environment.map[pos[1]+i][pos[0]+3].value == -1:
+                obsLocations.append([pos[0]+3,pos[1]+i])
+            if environment.map[pos[1]+i][pos[0]-3].value == -1:
+                obsLocations.append([pos[0]-3,pos[1]+i])
+
+        #check for corners        
+        if environment.map[pos[1]-3][pos[0]-3].value == -1:
+            obsLocations.append([pos[0]-3,pos[1]-3])
+        if environment.map[pos[1]-3][pos[0]+3].value == -1:
+            obsLocations.append([pos[0]+3,pos[1]-3])
+        if environment.map[pos[1]+3][pos[0]-3].value == -1:
+            obsLocations.append([pos[0]-3,pos[1]+3])
+        if environment.map[pos[1]+3][pos[0]+3].value == -1:
+            obsLocations.append([pos[0]+3,pos[1]+3])
+
+        return obsLocations
+        
 
     def bumpSensor(self, action, environment):
         b = []
