@@ -41,6 +41,17 @@ class Grid:
         self.grid_size = grid_size
         self.grid = [[0 for _ in range(grid_size)] for _ in range(grid_size)]
 
+    def __str__(self):
+        print_str = ""
+        for row in range(self.grid_size):
+            for col in range(self.grid_size):
+                print_str += (str(self.grid[row][col]) + " ")
+            print_str += "\n"
+        return print_str
+
+    def __repr__(self):
+        return str(self)
+
     def pos(self, x, y):
         """
         Get the value of the grid at position [x][y]
@@ -55,6 +66,7 @@ class Grid:
         Check if all explorable cells have been explored (no 0s)
         :return: Boolean, fully explored or not)
         """
+        print self
         return all([all(x) for x in self.grid])
 
     def mark_unreachable(self, pos):
@@ -81,6 +93,11 @@ class Grid:
                 if self.grid[x][y] == 0:
                     unexp.append((x, y))
         return unexp
+
+    def copy(self):
+        g = Grid(self.grid_size)
+        g.grid = [x[:] for x in self.grid]
+        return g
 
 
 def manhattan_distance(p1, p2):

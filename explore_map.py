@@ -13,8 +13,8 @@ class MapEnvironmentProblem:
     A search state is a tuple of (RobotState, Grid)
     """
 
-    def __init__(self, start_state):
-        self.start = (start_state, utils.Grid())
+    def __init__(self, start_state, grid_size=100):
+        self.start = (start_state, utils.Grid(grid_size))
 
     @staticmethod
     def is_goal_state(state):
@@ -27,16 +27,18 @@ class MapEnvironmentProblem:
         :param state: Current robot position & exploration grid
         :return: List of (state, action) tuples
         """
+        #print "BEFORE\n", state[1]
         robot_state = state[0]
         actions = robot_state.getLegalActions()
         successors = []
         for action in actions:
-            next_state = robot_state.getSuccessor(action)
+            next_state = robot_state.generateSuccessor(action)
             next_x, next_y = next_state.getRobotPosition()
             next_grid = state[1].copy()
             # Mark next cell as explored
             next_grid.mark_explored((next_x, next_y))
-            successors.append((next_state, action))
+            #print "AFTER:", action, "\n", next_grid
+            successors.append(( (next_state, next_grid), action))
         return successors
 
     def get_cost_of_actions(self, actions):
@@ -45,14 +47,14 @@ class MapEnvironmentProblem:
         :param actions: List of actions
         :return: Numerical cost of actions
         """
-        state = self.start[0]
+        robot_state = self.start[0]
         cost = 0
         for action in actions:
             # Check if legal
-            legal = state.getLegalActions()
+            legal = robot_state.getLegalActions()
             if not action in legal:
                 return 999999
-            state = state.getSuccessor(action)
+            robot_state = robot_state.generateSuccessor(action)
             cost += 1
         return cost
 
