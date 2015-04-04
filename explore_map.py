@@ -164,3 +164,8 @@ def a_star_search(problem, heuristic):
                         frontier_states.index(next_node.state)] > next_node.cost):
                 frontier.push(next_node, next_node.cost)
     return ["None"]
+
+
+# Run the search:
+#problem = MapEnvironmentProblem(robot_start_state)
+#a_star_search(problem, exploration_heuristic)
