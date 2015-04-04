@@ -284,9 +284,6 @@ class RobotState:
         #create copy of the current state
         state = RobotState(self.r, self.map, self.r.environment)
 
-        actions = self.getLegalActions()
-
-        #TODO need a reference to the environment for the sensors
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)
@@ -305,14 +302,15 @@ class RobotState:
                     
                     if (prox not in state.map.obstacles):
                         state.map.obstacles.append(prox)
+                    
+                    if (prox in state.map.unvisitedCells):
+                        state.map.unvisitedCells.remove(prox)
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)
             else:
                 self.bump = True
 
-        dirt = self.getDirt()
-        print dirt
                 
         return state
 

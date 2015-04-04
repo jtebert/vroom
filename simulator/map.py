@@ -30,7 +30,7 @@ class RobotMap(object):
         self.dirtCells = []
         self.visitedCells = []
         self.obstacles = []
-        
+
         #TODO to get unvisited cells to work right we need the map cells
         #depend on the input environment
         self.unvisitedCells = []
@@ -38,7 +38,7 @@ class RobotMap(object):
         self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
     def draw(self,screen, environment = None):
-        
+
         s = screen.get_size()
         sx = self.scale*float(s[0])/self.width
         sy = self.scale*float(s[1])/self.height
@@ -55,7 +55,7 @@ class RobotMap(object):
 
         cellXMax = self.width/self.cellXSize
         cellYMax = self.height/self.cellYSize
-         
+
         for x in xrange(0,int(cellXMax)):
             for y in xrange(0,int(cellYMax)):
                 cellCornerX = x*self.cellXSize
@@ -70,7 +70,7 @@ class RobotMap(object):
                     elif environment.map[y][x].value > 0:
                         d = environment.map[y][x].value
                         pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
-                        
+
                 else:
                     if self.map[y][x].isObstacle:
                         pygame.draw.rect(screen,(0,0,0),r,0)
@@ -82,15 +82,15 @@ class RobotMap(object):
 
 
     def drawRobot (self,screen,robot):
-        
-            
+
+
         for x in range(-2,3,1):
-            for y in range (-2,3,1): 
+            for y in range (-2,3,1):
                 self.map[robot.pos[1]+x][robot.pos[0]+y].isVisited = True
-                
+
                 if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
                     self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
-                    
+
 
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),
