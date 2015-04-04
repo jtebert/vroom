@@ -25,6 +25,16 @@ class RobotMap(object):
         self.width = w
         self.height = h
         self.boundingBox = ((w/2,h/2),(w/2,h/2))
+        self.xCells = w/cellXSize
+        self.yCells = h/cellYSize
+        self.dirtCells = []
+        self.visitedCells = []
+        self.obstacles = []
+        
+        #TODO to get unvisited cels to work right we need the map cells
+        #depend on the input environment
+        self.unvisitedCells = []
+
         self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
     def draw(self,screen, environment = None):
@@ -77,6 +87,10 @@ class RobotMap(object):
         for x in range(-2,3,1):
             for y in range (-2,3,1): 
                 self.map[robot.pos[1]+x][robot.pos[0]+y].isVisited = True
+                
+                if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
+                    self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
+                    
 
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),

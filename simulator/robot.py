@@ -64,7 +64,7 @@ class RobotSimulator(object):
         self.bump = None
         self.cleanDirection = 'Down'
 
-        state = RobotState(self.robot,self.map)
+        state = RobotState(self.robot,self.map, self.environment)
         agent = None  #TODO replace with agent selection
 
         while(True):
@@ -77,7 +77,7 @@ class RobotSimulator(object):
                 
             screen = pygame.display.get_surface()
 
-            state = state.generateSuccessor(self.action, self.environment)
+            state = state.generateSuccessor(self.action)
             
             #update Screen
             screen.fill((204,204,204))  
@@ -103,8 +103,9 @@ class Robot(object):
         self.size = 50   #5x5 cells
         self.pos = [5,4]
         self.heading = 'East'
+        self.environment = environment
 
-    def proximitySensor(self, environment):
+    def proximitySensor(self):
         #checks immediate suroundings for obstacles
 
         #TODO This assumes a robot size of 5, make it adaptable
@@ -116,36 +117,36 @@ class Robot(object):
 
         #check for sides
         for i in range(-2,3,1):
-            if environment.map[pos[1]-3][pos[0]+i].value == -1:
+            if self.environment.map[pos[1]-3][pos[0]+i].value == -1:
                 obsLocations.append([pos[0]+i,pos[1]-3])
-            if environment.map[pos[1]+3][pos[0]+i].value == -1:
+            if self.environment.map[pos[1]+3][pos[0]+i].value == -1:
                 obsLocations.append([pos[0]+i,pos[1]+3])
-            if environment.map[pos[1]+i][pos[0]+3].value == -1:
+            if self.environment.map[pos[1]+i][pos[0]+3].value == -1:
                 obsLocations.append([pos[0]+3,pos[1]+i])
-            if environment.map[pos[1]+i][pos[0]-3].value == -1:
+            if self.environment.map[pos[1]+i][pos[0]-3].value == -1:
                 obsLocations.append([pos[0]-3,pos[1]+i])
 
         #check for corners        
-        if environment.map[pos[1]-3][pos[0]-3].value == -1:
+        if self.environment.map[pos[1]-3][pos[0]-3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]-3])
-        if environment.map[pos[1]-3][pos[0]+3].value == -1:
+        if self.environment.map[pos[1]-3][pos[0]+3].value == -1:
             obsLocations.append([pos[0]+3,pos[1]-3])
-        if environment.map[pos[1]+3][pos[0]-3].value == -1:
+        if self.environment.map[pos[1]+3][pos[0]-3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]+3])
-        if environment.map[pos[1]+3][pos[0]+3].value == -1:
+        if self.environment.map[pos[1]+3][pos[0]+3].value == -1:
             obsLocations.append([pos[0]+3,pos[1]+3])
 
         return obsLocations
         
 
-    def bumpSensor(self, action, environment):
+    def bumpSensor(self, action):
         b = []
         
         bumpCoordinates = self.getBumpCoordinates(action)
 
         if bumpCoordinates != None:
             for pos in bumpCoordinates:
-                if environment.map[pos[1]][pos[0]].value == -1:
+                if self.environment.map[pos[1]][pos[0]].value == -1:
                     b.append(pos)
         return b
 
@@ -192,15 +193,15 @@ class Robot(object):
             
         
 
-    def dirtSensor(self,environment):
+    def dirtSensor(self):
         dValues = []
 
         #the whole robot is a vacuum!
         for x in range(-2,3,1):
             for y in range (-2,3,1): 
             
-                if environment.map[self.pos[1]+x][self.pos[0]+y].value > 0:
-                    d = environment.map[self.pos[1]+x][self.pos[0]+y].value
+                if self.environment.map[self.pos[1]+x][self.pos[0]+y].value > 0:
+                    d = self.environment.map[self.pos[1]+x][self.pos[0]+y].value
                     dValues.append([self.pos[0]+y,self.pos[1]+x,d])
         
         return dValues
@@ -226,8 +227,8 @@ class Robot(object):
             #turn torwards requested action
             self.heading = self.evaluateTurn(action)
 
-        print "robot pos: ",self.pos
-        print "robot heading: ",self.heading
+        #print "robot pos: ",self.pos
+        #print "robot heading: ",self.heading
 
     def evaluateTurn(self,action):
         
@@ -264,35 +265,54 @@ class Robot(object):
 
 
 class RobotState:
-    
-    def getLegalActions( self ):
-        return 0
 
-    def generateSuccessor( self, action , environment):
+
+    def getLegalActions( self ):
+
+        possibleActions = ['North','South','East','West','None']
+        legalActions = []
+
+        for action in possibleActions:
+            bumpReadings = self.r.bumpSensor(action)
+            if (len(bumpReadings) == 0):
+                legalActions.append(action)
+        
+        return legalActions
+
+    def generateSuccessor( self, action ):
         
         #create copy of the current state
-        state = RobotState(self.r, self.map)
+        state = RobotState(self.r, self.map, self.r.environment)
 
+        actions = self.getLegalActions()
 
         #TODO need a reference to the environment for the sensors
         if action != None:
             #check bumper 
-            bumpReadings = state.r.bumpSensor(action,environment)
-            proxReadings = state.r.proximitySensor(environment)
-            dirtReadings = state.r.dirtSensor(environment)
+            bumpReadings = state.r.bumpSensor(action)
+            proxReadings = state.r.proximitySensor()
+            dirtReadings = state.r.dirtSensor()
             
             if len(dirtReadings):
                 for dirtReading in dirtReadings:
                     state.map.map[dirtReading[1]][dirtReading[0]].dirt = dirtReading[2]
+                    if (dirtReading not in state.map.dirtCells):
+                        state.map.dirtCells.append(dirtReading)
                 
             if len(proxReadings):
                 for prox in proxReadings:
                     state.map.map[prox[1]][prox[0]].isObstacle = True
+                    
+                    if (prox not in state.map.obstacles):
+                        state.map.obstacles.append(prox)
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)
             else:
                 self.bump = True
+
+        dirt = self.getDirt()
+        print dirt
                 
         return state
 
@@ -301,20 +321,22 @@ class RobotState:
         return self.r.pos
         
     def getDirt( self ):
-        return 0
+
+        return self.map.dirtCells
 
     def getUnvisited( self ):
-        return 0
+        return self.map.unvisitedCells
 
     def getVisited( self ):
-        return 0
+        return self.map.visitedCells
 
     def getObstacles( self ):
-        return 0
+        return self.map.obstacles
 
-    def __init__ ( self, robot , robotMap ):
+    def __init__ ( self, robot , robotMap , environment):
 
         self.r = robot
+        self.r.environment
         self.map = robotMap
 
 if __name__ == "__main__":
