@@ -146,7 +146,16 @@ class Environment(object):
                     if j > (self.width/self.cellXSize):
                         break
                     if(column != ''):
-                        self.map[i][j].value = int(column)
+                        if '[' in column:
+                            column = column.replace('[','')
+                            column = column.split(',')
+                            self.map[i][j].value = int(column[0])
+                            self.map[i][j].label = column[1]
+                        else:
+                            self.map[i][j].value = int(column)
+
+
+
                     j += 1
                 j = 0
                 i += 1
