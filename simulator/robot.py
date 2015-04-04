@@ -311,8 +311,6 @@ class RobotState:
             else:
                 self.bump = True
 
-        dirt = self.getDirt()
-        print dirt
                 
         return state
 

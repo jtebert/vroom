@@ -10,6 +10,7 @@ class Node(object):
     def __init__(self):
         self.isObstacle = False
         self.isVisited = False
+        self.isReachable = True
         self.dirt = -1
         self.label = None
         self.value = 0
@@ -30,12 +31,12 @@ class RobotMap(object):
         self.dirtCells = []
         self.visitedCells = []
         self.obstacles = []
-        
-        #TODO to get unvisited cels to work right we need the map cells
-        #depend on the input environment
+
         self.unvisitedCells = []
 
         self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+        self.map.unvisitedCells.append([x,y] for x in xrange(self.width/cellXSize) for y in xrange(self.height/cellYSize)
+
 
     def draw(self,screen, environment = None):
         
