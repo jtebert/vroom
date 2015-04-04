@@ -34,20 +34,20 @@ class MapEnvironmentProblem:
         for action in actions:
             next_state = robot_state.generateSuccessor(action)
             next_x, next_y = next_state.getRobotPosition()
-            print "action: ",action 
-            print "pos:",robot_state.r.pos
-            print "heading:",robot_state.r.heading
-            print "next pos:",next_state.r.pos
-            print ""
+            #print "action: ",action 
+            #print "pos:",robot_state.r.pos
+            #print "heading:",robot_state.r.heading
+            #print "next pos:",next_state.r.pos
+            #print ""
             next_grid = state[1].copy()
             # Mark next cell as explored
             next_grid.mark_explored((next_x, next_y))
             #print "AFTER:", action, "\n", next_grid
             successors.append(( (next_state, next_grid), action))
 
-        print ""
-        print ""
-        print ""
+        #print ""
+        #print ""
+        #print ""
 
         return successors
 

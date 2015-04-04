@@ -119,6 +119,24 @@ class RobotMap(object):
             pygame.draw.line(screen,(255,0,0),(robotCenterX,robotCenterY),(robotCenterX-robot.size,robotCenterY))
 
 
+
+    def copy (self):
+        mapcp = RobotMap()
+        mapcp.dirtCells = list(self.dirtCells)
+        mapcp.visitedCells = list(self.visitedCells)
+        mapcp.obstacles = list(self.obstacles)
+        mapcp.unvisitedCells = list(self.unvisitedCells)
+
+        cellXMax = self.width/self.cellXSize
+        cellYMax = self.height/self.cellYSize
+
+        for x in xrange(0,int(cellXMax)):
+            for y in xrange(0,int(cellYMax)):
+                mapcp.map[x][y] = self.map[x][y]
+        
+        
+        return mapcp
+
 class Environment(object):
     center = (0,0)
 
@@ -166,3 +184,5 @@ class Environment(object):
                 
     
     
+
+ 

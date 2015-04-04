@@ -1,4 +1,4 @@
-
+\
 from map import *
 
 import os,sys,inspect
@@ -70,30 +70,32 @@ class RobotSimulator(object):
         self.bump = None
         self.cleanDirection = 'Down'
 
-        state = RobotState(self.robot,self.map, self.environment)
+        state = RobotState(self.robot,self.map )
         agent = None  #TODO replace with agent selection
 
-
+        '''
         #TODO defaults to run exploration and then shows results
         problem = MapEnvironmentProblem(state, 70)
         heuristic = exploration_heuristic
         actions = a_star_search(problem, heuristic)
+        '''
 
         while(True):
 
-            '''
+            
             if (agent == None):
                 self.listenControls()
                 #self.action is set directly by self.listenControls
             else:
                 self.action = agent.getAction(state)
+            
             '''
 
             if len(actions):
                 self.action = actions.pop(0)
             else:
                 self.action = 'None'
-                
+            '''    
                 
             screen = pygame.display.get_surface()
 
@@ -284,6 +286,12 @@ class Robot(object):
         return heading
 
 
+    def copy(self):
+        r = Robot(self.environment)
+        r.pos = self.pos
+        r.heading = self.heading
+        return r
+
 class RobotState:
 
 
@@ -304,11 +312,9 @@ class RobotState:
         #create copy of the current state
         #need to make a copy of the map
         #does the environment need to be coppied?
-        robotCp = Robot(self.r.environment, self.r.pos, self.r.heading)
-        robotCp.pos[0] = self.r.pos[0]
-        robotCp.pos[1] = self.r.pos[1]
-        robotCp.heading = str(self.r.heading)
-        state = RobotState(robotCp, self.map, robotCp.environment)
+        robotCp = self.r.copy()
+        mapCp = self.map.copy()
+        state = RobotState(robotCp, mapCp )
        
         if action != None:
             #check bumper 
@@ -357,10 +363,9 @@ class RobotState:
     def getObstacles( self ):
         return self.map.obstacles
 
-    def __init__ ( self, robot , robotMap , environment):
+    def __init__ ( self, robot , robotMap ):
 
         self.r = robot
-        self.r.environment
         self.map = robotMap
 
 if __name__ == "__main__":
