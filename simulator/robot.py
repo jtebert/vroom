@@ -302,6 +302,9 @@ class RobotState:
                     
                     if (prox not in state.map.obstacles):
                         state.map.obstacles.append(prox)
+                    
+                    if (prox in state.map.unvisitedCells):
+                        state.map.unvisitedCells.remove(prox)
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)
