@@ -31,7 +31,7 @@ class RobotMap(object):
         self.visitedCells = []
         self.obstacles = []
         
-        #TODO to get unvisited cels to work right we need the map cells
+        #TODO to get unvisited cells to work right we need the map cells
         #depend on the input environment
         self.unvisitedCells = []
 

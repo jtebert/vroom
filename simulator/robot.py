@@ -106,7 +106,7 @@ class Robot(object):
         self.environment = environment
 
     def proximitySensor(self):
-        #checks immediate suroundings for obstacles
+        #checks immediate surroundings for obstacles
 
         #TODO This assumes a robot size of 5, make it adaptable
         
