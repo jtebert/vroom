@@ -1,58 +1,8 @@
-import utils
-
 # Functions to explore and map an unknown environment
 
+import utils
 
-# Maximum estimated grid size?
-# Check if there are unreachable position? (eliminate from search)
-
-
-class Grid:
-
-    def __init__(self, grid_size=100):
-        self.grid_size = grid_size
-        self.grid = [[0 for _ in range(grid_size)] for _ in range(grid_size)]
-
-    def pos(self, x, y):
-        """
-        Get the value of the grid at position [x][y]
-        :param x: x position
-        :param y: y position
-        :return: -1, 0, 1
-        """
-        return self.grid[x][y]
-
-    def are_all_explored(self):
-        """
-        Check if all explorable cells have been explored (no 0s)
-        :return: Boolean, fully explored or not)
-        """
-        return all([all(x) for x in self.grid])
-
-    def mark_unreachable(self, pos):
-        """
-        Mark the cell at the pos as unreachable (-1)
-        """
-        x, y = pos
-        self.grid[x][y] = -1
-
-    def mark_explored(self, pos):
-        """
-        Mark the cell at the pos as explored (1)
-        """
-        x, y = pos
-        self.grid[x][y] = 1
-
-    def list_unexplored(self):
-        """
-        Create a list of all unexplored cells in the grid
-        """
-        unexp = []
-        for x in range(self.grid_size):
-            for y in range(self.grid_size):
-                if self.grid[x][y] == 0:
-                    unexp.append((x, y))
-        return unexp
+# TODO: Check if there are unreachable position? (eliminate from search)
 
 
 class MapEnvironmentProblem:
@@ -64,14 +14,14 @@ class MapEnvironmentProblem:
     """
 
     def __init__(self, start_state):
-        init_grid_size = 50
-        init_grid = [[0 for _ in range(init_grid_size)] for _ in range(init_grid_size)]
-        self.start = (start_state, init_grid)
+        self.start = (start_state, utils.Grid())
 
-    def is_goal_state(self, state):
+    @staticmethod
+    def is_goal_state(state):
         return state[1].are_all_explored()
 
-    def get_successors(self, state):
+    @staticmethod
+    def get_successors(state):
         """
         Returns successor states, the actions they require
         :param state: Current robot position & exploration grid
@@ -126,12 +76,91 @@ def exploration_heuristic(state, problem):
     return max_cost
 
 
-"""
-class ExplorationSearchAgent:
-    "Agent to explore the map with A* search"
-    def __init__(self):
-        self.search_function = lambda prob: search.AStarSearch(prob, exploration_heuristic)
-        self.search_type = MapEnvironmentProblem
-"""
+class Node:
+    """
+    This class contains a state, cost to reach that state (from parent or general?), last action, and reference to
+    parent Node
+    """
+
+    def __init__(self, state, prev_action, parent, problem, heuristic):
+        self.state = state
+        self.prev_action = prev_action
+        self.parent = parent
+        self.heuristic = heuristic
+        self.cost = self.get_cost_estimate(problem)
+
+    def __str__(self):
+        return str(self.state)
+
+    def has_parent(self):
+        """
+        Check if parent node is None
+        """
+        return self.parent is not None
+
+    def get_path_reversed(self):
+        """
+        Get the path to this Node (directions) based on parent Nodes, until no more parents (Batman!)
+        Comes out in the wrong order for Pacman so needs to be reversed
+        """
+        path = []
+        if self.has_parent():
+            path.append(self.prev_action)
+            path.extend(self.parent.get_path_reversed())
+        return path
+
+    def get_path(self):
+        """
+        Reverse the result of getPathReversed to make Pacman happy
+        """
+        path = self.get_path_reversed()
+        path.reverse()
+        return path
+
+    def get_path_cost(self, problem):
+        """
+        Get the cost from the starting position to the current Node
+        """
+        path = self.get_path()
+        return problem.get_cost_of_actions(path)
+
+    def get_cost_estimate(self, problem):
+        """
+        Get the estimated cost based on cost (from start) and heuristic (estimate to goal)
+        """
+        path_cost = self.get_path_cost(problem)
+        heuristic_cost = self.heuristic(self.state, problem)
+        return path_cost + heuristic_cost
 
 
+def a_star_search(problem, heuristic):
+    """
+    Search the problem with the heuristic to find lowest cost option
+    :param problem: Problem, e.g. MapEnvironmentProblem
+    :param heuristic: e.g. exploration_heuristic
+    :return: Actions to take
+    """
+    n0 = Node(problem.start, None, None, problem, heuristic)
+    if problem.is_goal_state(n0.state):
+        return ['None']
+    frontier = utils.PriorityQueue()
+    frontier.push(n0, n0.cost)
+    explored = set()
+    while not frontier.is_empty():
+        node = frontier.pop()
+        explored.add(node.state)
+        if problem.is_goal_state(node.state):
+            return node.getPath()
+        next_states = problem.get_successors(node.state)
+        frontier_costs = []
+        frontier_states = []
+        for n in frontier.heap:
+            frontier_states.append(n[2].state)
+            frontier_costs.append(n[2].cost)
+        for next_state in next_states:
+            next_node = Node(next_state[0], next_state[1], node, problem, heuristic)
+            if (next_node.state not in explored and next_node.state not in frontier_states) or \
+                    (next_node.state in frontier_states and frontier_costs[
+                        frontier_states.index(next_node.state)] > next_node.cost):
+                frontier.push(next_node, next_node.cost)
+    return ["None"]
