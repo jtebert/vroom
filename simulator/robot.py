@@ -331,6 +331,34 @@ class Robot(object):
         return heading
 
 
+class RobotState:
+    
+    def getLegalActions( self ):
+        return 0
+
+    def generateSuccessor( self, action):
+        return 0
+
+    def getRobotPosition( self ):
+        return 0
+        
+    def getDirt( self ):
+        return 0
+
+    def getUnvisited( self ):
+        return 0
+
+    def getVisited( self ):
+        return 0
+
+    def getObstacles( self ):
+        return 0
+
+    def __init__ ( self, robot , robotMap ):
+
+        self.r = robot
+        self.map = robotMap
+
 if __name__ == "__main__":
     
     #TODO add option to import environment
