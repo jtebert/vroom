@@ -19,6 +19,8 @@ class RobotSimulator(object):
         self.action = None
 
         self.start = False
+
+        
     
     def listenControls(self):
         for event in pygame.event.get():
@@ -62,100 +64,30 @@ class RobotSimulator(object):
         self.bump = None
         self.cleanDirection = 'Down'
 
-        #time.sleep(15)
-        
-
-        '''
-        while(not self.start):
-            self.listenControls()
-        '''
-
+        state = RobotState(self.robot,self.map)
+        agent = None  #TODO replace with agent selection
 
         while(True):
-            self.listenControls()
+
+            if (agent == None):
+                self.listenControls()
+                #self.action is set directly by self.listenControls
+            else:
+                self.action = agent.getAction(state)
+                
             screen = pygame.display.get_surface()
 
-            '''
-            time.sleep(0.05)
-
-            bumpReadings = self.robot.bumpSensor(self.robot.heading,self.environment)
-            if (self.bump and (not self.turning)):
-                self.bump = False
-                self.turning = True
-                self.turningDistance = 0
-
-                if (self.cleanDirection == 'Down'):
-                    if(self.robot.heading == 'East'):
-                        self.action = "TurnRight"
-                        self.turnDirection = self.action
-                    else: 
-                        self.action = "TurnLeft"
-                        self.turnDirection = self.action
-                else:
-                    if(self.robot.heading == 'East'):
-                        self.action = "TurnLeft"
-                        self.turnDirection = self.action
-                    else: 
-                        self.action = "TurnRight"
-                        self.turnDirection = self.action
-
-            elif ((self.turningDistance == 5)):
-                self.action = self.turnDirection
-                self.turningDistance = 0
-                self.turning = False
-            elif (self.turning):
-                if (self.bump):
-                    
-                    print "bumped while turning!: ,",self.turningDistance
-                    if (self.turningDistance <= 2):
-                        print "changing cleaning direction!"
-                        if self.cleanDirection == 'Down':
-                            self.cleanDirection == 'Up'
-
-                    self.action = self.turnDirection
-                    self.turningDistance = 0
-                    self.turning = False
-                    self.bump = False
-                else:
-                    self.turningDistance += 1
-                    self.action = self.robot.heading
-
-            else:
-                self.action = self.robot.heading
+            state = state.generateSuccessor(self.action)
             
-            '''
-
-            if self.action != None:
-                #check bumper 
-                bumpReadings = self.robot.bumpSensor(self.action,self.environment)
-                proxReadings = self.robot.proximitySensor(self.environment)
-                dirtReadings = self.robot.dirtSensor(self.environment)
-
-                if len(dirtReadings):
-                    for dirtReading in dirtReadings:
-                        self.map.map[dirtReading[1]][dirtReading[0]].dirt = dirtReading[2]
-
-                if len(proxReadings):
-                    for prox in proxReadings:
-                        self.map.map[prox[1]][prox[0]].isObstacle = True
-
-                if(not(self.robot.isBump(bumpReadings))):
-                    self.robot.takeAction(self.action)
-                else:
-                    self.bump = True
-                    
-                self.action = None
-            
-
-
+            #update Screen
             screen.fill((204,204,204))  
             
             if self.showEnvironment:
-                self.map.draw(screen,environment = self.environment)
-                self.map.drawRobot(screen,self.robot)
+                state.map.draw(screen,environment = self.environment)
+                state.map.drawRobot(screen,state.r)
             else:
-                self.map.draw(screen)
-                self.map.drawRobot(screen,self.robot)
+                state.map.draw(screen)
+                state.map.drawRobot(screen,state.r)
             
 
             
@@ -337,7 +269,32 @@ class RobotState:
         return 0
 
     def generateSuccessor( self, action):
-        return 0
+        
+        #create copy of the current state
+        state = RobotState(self.r, self.map)
+
+
+        #TODO need a reference to the environment for the sensors
+        if self.action != None:
+            #check bumper 
+            bumpReadings = state.r.bumpSensor(action,self.environment)
+            proxReadings = state.r.proximitySensor(self.environment)
+            dirtReadings = state.r.dirtSensor(self.environment)
+            
+            if len(dirtReadings):
+                for dirtReading in dirtReadings:
+                    state.map.map[dirtReading[1]][dirtReading[0]].dirt = dirtReading[2]
+                
+            if len(proxReadings):
+                for prox in proxReadings:
+                    state.map.map[prox[1]][prox[0]].isObstacle = True
+
+            if(not(state.r.isBump(bumpReadings))):
+                state.r.takeAction(self.action)
+            else:
+                self.bump = True
+                
+        return state
 
     def getRobotPosition( self ):
         return 0
