@@ -77,7 +77,7 @@ class RobotSimulator(object):
                 
             screen = pygame.display.get_surface()
 
-            state = state.generateSuccessor(self.action)
+            state = state.generateSuccessor(self.action, self.environment)
             
             #update Screen
             screen.fill((204,204,204))  
@@ -268,18 +268,18 @@ class RobotState:
     def getLegalActions( self ):
         return 0
 
-    def generateSuccessor( self, action):
+    def generateSuccessor( self, action , environment):
         
         #create copy of the current state
         state = RobotState(self.r, self.map)
 
 
         #TODO need a reference to the environment for the sensors
-        if self.action != None:
+        if action != None:
             #check bumper 
-            bumpReadings = state.r.bumpSensor(action,self.environment)
-            proxReadings = state.r.proximitySensor(self.environment)
-            dirtReadings = state.r.dirtSensor(self.environment)
+            bumpReadings = state.r.bumpSensor(action,environment)
+            proxReadings = state.r.proximitySensor(environment)
+            dirtReadings = state.r.dirtSensor(environment)
             
             if len(dirtReadings):
                 for dirtReading in dirtReadings:
@@ -290,14 +290,15 @@ class RobotState:
                     state.map.map[prox[1]][prox[0]].isObstacle = True
 
             if(not(state.r.isBump(bumpReadings))):
-                state.r.takeAction(self.action)
+                state.r.takeAction(action)
             else:
                 self.bump = True
                 
         return state
 
     def getRobotPosition( self ):
-        return 0
+        
+        return self.r.pos
         
     def getDirt( self ):
         return 0
