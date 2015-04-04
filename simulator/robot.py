@@ -1,5 +1,6 @@
 
 from map import *
+from explore_map import *
 
 import time
 
@@ -67,13 +68,27 @@ class RobotSimulator(object):
         state = RobotState(self.robot,self.map, self.environment)
         agent = None  #TODO replace with agent selection
 
+
+        #TODO defaults to run exploration and then shows results
+        problem = MapEnvironmentProblem(state)
+        heuristic = exploration_heuristic
+        actions = a_start_search(problem, heuristic)
+
         while(True):
 
+            '''
             if (agent == None):
                 self.listenControls()
                 #self.action is set directly by self.listenControls
             else:
                 self.action = agent.getAction(state)
+            '''
+
+            if len(actions):
+                self.action = actions.pop(0)
+            else:
+                self.action = 'None'
+                
                 
             screen = pygame.display.get_surface()
 
