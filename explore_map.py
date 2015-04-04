@@ -34,11 +34,21 @@ class MapEnvironmentProblem:
         for action in actions:
             next_state = robot_state.generateSuccessor(action)
             next_x, next_y = next_state.getRobotPosition()
+            print "action: ",action 
+            print "pos:",robot_state.r.pos
+            print "heading:",robot_state.r.heading
+            print "next pos:",next_state.r.pos
+            print ""
             next_grid = state[1].copy()
             # Mark next cell as explored
             next_grid.mark_explored((next_x, next_y))
             #print "AFTER:", action, "\n", next_grid
             successors.append(( (next_state, next_grid), action))
+
+        print ""
+        print ""
+        print ""
+
         return successors
 
     def get_cost_of_actions(self, actions):
@@ -160,6 +170,7 @@ def a_star_search(problem, heuristic):
             frontier_states.append(n[2].state)
             frontier_costs.append(n[2].cost)
         for next_state in next_states:
+    
             next_node = Node(next_state[0], next_state[1], node, problem, heuristic)
             if (next_node.state not in explored and next_node.state not in frontier_states) or \
                     (next_node.state in frontier_states and frontier_costs[

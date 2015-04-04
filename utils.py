@@ -66,7 +66,7 @@ class Grid:
         Check if all explorable cells have been explored (no 0s)
         :return: Boolean, fully explored or not)
         """
-        print self
+        #print self
         return all([all(x) for x in self.grid])
 
     def mark_unreachable(self, pos):

@@ -5,7 +5,7 @@ from pygame. locals import *
 from math import ceil, floor, atan2, degrees, radians, sqrt
 import csv
 
-class Node(object):
+class MapNode(object):
     
     def __init__(self):
         self.isObstacle = False
@@ -35,7 +35,7 @@ class RobotMap(object):
         #depend on the input environment
         self.unvisitedCells = []
 
-        self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+        self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
     def draw(self,screen, environment = None):
 
@@ -129,7 +129,7 @@ class Environment(object):
         self.width = w
         self.height = h
         self.boundingBox = ((w/2,h/2),(w/2,h/2))
-        self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+        self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
 
         self.importEnviroment('./../assets/maps/test.csv')

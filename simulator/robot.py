@@ -1,5 +1,10 @@
 
 from map import *
+
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir) 
 from explore_map import *
 
 import time
@@ -113,11 +118,11 @@ class RobotSimulator(object):
 
 class Robot(object):
 
-    def __init__(self,environment):
+    def __init__(self,environment, pos=[5,4],heading='East'):
 
         self.size = 50   #5x5 cells
         self.pos = [5,4]
-        self.heading = 'East'
+        self.heading = heading
         self.environment = environment
 
     def proximitySensor(self):
@@ -297,8 +302,14 @@ class RobotState:
     def generateSuccessor( self, action ):
         
         #create copy of the current state
-        state = RobotState(self.r, self.map, self.r.environment)
-
+        #need to make a copy of the map
+        #does the environment need to be coppied?
+        robotCp = Robot(self.r.environment, self.r.pos, self.r.heading)
+        robotCp.pos[0] = self.r.pos[0]
+        robotCp.pos[1] = self.r.pos[1]
+        robotCp.heading = str(self.r.heading)
+        state = RobotState(robotCp, self.map, robotCp.environment)
+       
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)
