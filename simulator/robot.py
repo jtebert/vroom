@@ -284,9 +284,6 @@ class RobotState:
         #create copy of the current state
         state = RobotState(self.r, self.map, self.r.environment)
 
-        actions = self.getLegalActions()
-
-        #TODO need a reference to the environment for the sensors
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)

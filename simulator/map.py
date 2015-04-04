@@ -35,7 +35,7 @@ class RobotMap(object):
         self.unvisitedCells = []
 
         self.map = [[Node() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
-        self.map.unvisitedCells.append([x,y] for x in xrange(self.width/cellXSize) for y in xrange(self.height/cellYSize)
+        self.unvisitedCells.append([x,y] for x in xrange(self.width/cellXSize) for y in xrange(self.height/cellYSize))
 
 
     def draw(self,screen, environment = None):
@@ -92,6 +92,9 @@ class RobotMap(object):
                 if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
                     self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
                     
+                if ((robot.pos[0]+x,robot.pos[1]+y) in self.unvisitedCells):
+                    self.unvisitedCells.remove((robot.pos[0]+x,robot.pos[1]+y))
+                                       
 
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),
