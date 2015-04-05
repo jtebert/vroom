@@ -5,6 +5,16 @@ from pygame. locals import *
 from math import ceil, floor, atan2, degrees, radians, sqrt
 import csv
 
+
+openCellDist = { "0" : [.1,0,0,0,0] , "1" : [.20,.01,.01,.01,] , "2" : [.20, .05,.05,.05,.05] , "3" : [.0,.2,.2,.2,.2] }
+doorwayDist =  { "0" : [.8,0,0,0,0] , "1" : [.20,0,0,0,0] , "2" : [.20, .05,.05,.05,.05] , "3" : [.0,.2,.2,.2,.2] }
+garbageCanDist = { "0" : [.8,0,0,0,0] , "1" : [.20,0,0,0,0] , "2" : [.20, .05,.05,.05,.05] , "3" : [.0,.2,.2,.2,.2] }
+chairDist = { "0" : [.8,0,0,0,0] , "1" : [.20,0,0,0,0] , "2" : [.20, .05,.05,.05,.05] , "3" : [.0,.2,.2,.2,.2] }
+litterBoxDist = { "0" : [.8,0,0,0,0] , "1" : [.20,0,0,0,0] , "2" : [.20, .05,.05,.05,.05] , "3" : [.0,.2,.2,.2,.2] }
+houseEntranceDist = { "0" : [.8,0,0,0,0] , "1" : [.20,0,0,0,0] , "2" : [.20, .05,.05,.05,.05] , "3" : [.0,.2,.2,.2,.2] }
+
+labelDict = { "openCell": openCellDist, "doorway": doorwayDist, "garbageCan": garbageCanDist, "chair": chairDist, "litterBox": litterBoxDist, "houseEntrance" : houseEntranceDist }
+
 class MapNode(object):
     
     def __init__(self):
@@ -147,6 +157,7 @@ class Environment(object):
         self.width = w
         self.height = h
         self.boundingBox = ((w/2,h/2),(w/2,h/2))
+        self.label = ''
         self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
 
@@ -184,5 +195,9 @@ class Environment(object):
                 
     
     
+
+ 
+
+
 
  
