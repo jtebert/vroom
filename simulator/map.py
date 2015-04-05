@@ -5,7 +5,7 @@ from pygame. locals import *
 from math import ceil, floor, atan2, degrees, radians, sqrt
 import csv
 
-
+MAX_DIRT = 3
 openCellDist = { "0" : [.1,0] , "1" : [.20,.01] , "2" : [.20, .05] , "3" : [.0,.2] }
 doorwayDist =  { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
 garbageCanDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
@@ -163,18 +163,65 @@ class Environment(object):
 
         self.importEnviroment('./../assets/maps/test.csv')
 
+    def copy (self):
+        mapcp = Environment()
+        mapcp.dirtCells = list(self.dirtCells)
+        mapcp.obstacles = list(self.obstacles)
+
+        cellXMax = self.width/self.cellXSize
+        cellYMax = self.height/self.cellYSize
+
+        for x in xrange(0,int(cellXMax)):
+            for y in xrange(0,int(cellYMax)):
+                mapcp.map[x][y] = self.map[x][y]
+        return mapcp
+
+    def adjacent(self, x, y):
+        # Returns the adjacent cells to one cell (the other ones that will impact the amount of dirt in a given cell)
+        return [(self[x + 1][y]), (self[x - 1][y]), (self[x][y + 1]), (self[x][y - 1])]
+
+    def addDirt(currentDirt, newDirt):
+        # Returns amount of dirt after adding newDirt to currentDirt
+        return min(MAX_DIRT, currentDirt + newDirt)
+
     def updateDirt(self):
+        # Updates dirt by adding more based on however much is there to begin with and the adjacent cells
+        #Todo: seeding
+        import random
+
+        mapCopy = self.copy() #Check copy so dirt doesn't cascade across the map from earlier checks
+
         for y in self.height:
             for x in self.width:
-                if self.map[y][x].isObstacle():
+
+                if self.mapCopy[x][y].isObstacle():
                     #Obstacle that can't be cleaned
-                    pass
-                elif self.map[y][x].label == None:
-                    #Default dirt generation
-                    pass
+                    continue
+
+                elif self.mapCopy[x][y].label == None:
+                    #Own cell: default dirt generation
+                    if random.random() >= openCellDist[str(self.mapCopy[x][y].dirt)]:
+                        self[x][y].dirt = self.addDirt(self[x][y].dirt, 1)
+
                 else:
-                    #Generation based on label
-                    pass
+                    #Own cell: Generation based on label
+                    if random.random() >= labelDict[str(self.mapCopy[x][y].label)][str(self.mapCopy[x][y].dirt)]:
+                        self[x][y].dirt = self.addDirt(self[x][y].dirt, 1)
+
+                #Dirt generation from adjacent cells
+                for cell in mapCopy.adjacent(x, y):
+                    if cell.isObstacle():
+                        continue
+
+                    elif cell.label == None:
+                        #Adjacent cell: default dirt generation
+                        if random.random() >= openCellDist[str(self.mapCopy[x][y].dirt)]:
+                            self[x][y].dirt = self.addDirt(self[x][y].dirt, 1)
+
+                    else:
+                        #Adjacent cell: Generation based on label
+                        if random.random() >= labelDict[str(self.mapCopy[x][y].label)][str(self.mapCopy[x][y].dirt)]:
+                            self[x][y].dirt = self.addDirt(self[x][y].dirt, 1)
 
     def importEnviroment(self,csvFile):
 
