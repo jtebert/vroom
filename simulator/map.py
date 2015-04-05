@@ -163,6 +163,18 @@ class Environment(object):
 
         self.importEnviroment('./../assets/maps/test.csv')
 
+    def updateDirt(self):
+        for y in self.height:
+            for x in self.width:
+                if self.map[y][x].isObstacle():
+                    #Obstacle that can't be cleaned
+                    pass
+                elif self.map[y][x].label == None:
+                    #Default dirt generation
+                    pass
+                else:
+                    #Generation based on label
+                    pass
 
     def importEnviroment(self,csvFile):
 
