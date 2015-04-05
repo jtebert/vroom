@@ -1,4 +1,3 @@
-\
 from map import *
 
 import os,sys,inspect
