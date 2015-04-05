@@ -1,6 +1,6 @@
 from map import *
 
-import os,sys,inspect
+import os,sys,inspect, getopt
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
@@ -10,13 +10,28 @@ import time
 
 class RobotSimulator(object):
 
-    def __init__(self):
+    def __init__(self, argv):
+
+        try: 
+            opts,args = getopt.getopt(argv,"e:")
+        except getopt.GetoptError:
+            print "robot.py -e <environmentPath>"
+            sys.exit(2)
+        
+
+        environmentCSV = './../assets/maps/test.csv'
+        for opt,arg in opts:
+            if opt == '-e':
+                environmentCSV = arg
+            
+        
+        # the world
+        self.environment = Environment(environmentCSV)
 
         # what the robot knows
         self.map = RobotMap()
-        
-        # the world
-        self.environment = Environment()
+
+        # the robot needs the environment so the sensors can reference it for readings
         self.robot = Robot(self.environment)
 
         self.showEnvironment = False
@@ -72,12 +87,12 @@ class RobotSimulator(object):
         state = RobotState(self.robot,self.map )
         agent = None  #TODO replace with agent selection
 
-        '''
+        
         #TODO defaults to run exploration and then shows results
-        problem = MapEnvironmentProblem(state, 70)
-        heuristic = exploration_heuristic
-        actions = a_star_search(problem, heuristic)
-        '''
+        #problem = MapEnvironmentProblem(state, 70)
+        #heuristic = exploration_heuristic
+        #actions = a_star_search(problem, heuristic)
+        
 
         while(True):
 
@@ -88,8 +103,8 @@ class RobotSimulator(object):
             else:
                 self.action = agent.getAction(state)
             
+            
             '''
-
             if len(actions):
                 self.action = actions.pop(0)
             else:
@@ -372,5 +387,5 @@ if __name__ == "__main__":
     #TODO add option to import environment
     #TODO add option for real vs simulated robot
 
-    r = RobotSimulator()
+    r = RobotSimulator(sys.argv[1:])
     r.run()

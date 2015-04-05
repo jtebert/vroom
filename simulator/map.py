@@ -151,7 +151,7 @@ class Environment(object):
     center = (0,0)
 
 
-    def __init__(self,w=700,h=700,cellXSize=10,cellYSize=10):
+    def __init__(self,environmentCSV,w=700,h=700,cellXSize=10,cellYSize=10):
         self.cellXSize = cellXSize
         self.cellYSize = cellYSize
         self.width = w
@@ -161,7 +161,7 @@ class Environment(object):
         self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
 
-        self.importEnviroment('./../assets/maps/test.csv')
+        self.importEnviroment(environmentCSV)
 
     def copy (self):
         mapcp = Environment()
@@ -240,7 +240,10 @@ class Environment(object):
                             self.map[i][j].value = int(column[0])
                             self.map[i][j].label = column[1]
                         else:
+                            
                             self.map[i][j].value = int(column)
+                            #except:
+                            #    continue
 
 
 
