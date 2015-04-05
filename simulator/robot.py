@@ -89,27 +89,27 @@ class RobotSimulator(object):
 
         
         #TODO defaults to run exploration and then shows results
-        problem = MapEnvironmentProblem(state, 70)
-        heuristic = exploration_heuristic
-        actions = a_star_search(problem, heuristic)
+        #problem = MapEnvironmentProblem(state, 70)
+        #heuristic = exploration_heuristic
+        #actions = a_star_search(problem, heuristic)
         
 
         while(True):
 
-            '''
+            
             if (agent == None):
                 self.listenControls()
                 #self.action is set directly by self.listenControls
             else:
                 self.action = agent.getAction(state)
-            '''
             
-
+            
+            '''
             if len(actions):
                 self.action = actions.pop(0)
             else:
                 self.action = 'None'
-                
+            '''    
                 
             screen = pygame.display.get_surface()
 
