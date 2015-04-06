@@ -153,23 +153,23 @@ class Robot(object):
 
         #check for sides
         for i in range(-2,3,1):
-            if self.environment.map[pos[1]-3][pos[0]+i].value == -1:
-                obsLocations.append([pos[0]+i,pos[1]-3])
-            if self.environment.map[pos[1]+3][pos[0]+i].value == -1:
-                obsLocations.append([pos[0]+i,pos[1]+3])
-            if self.environment.map[pos[1]+i][pos[0]+3].value == -1:
-                obsLocations.append([pos[0]+3,pos[1]+i])
-            if self.environment.map[pos[1]+i][pos[0]-3].value == -1:
+            if self.environment.map[pos[0]-3][pos[1]+i].value == -1:
                 obsLocations.append([pos[0]-3,pos[1]+i])
+            if self.environment.map[pos[0]+3][pos[1]+i].value == -1:
+                obsLocations.append([pos[0]+3,pos[1]+i])
+            if self.environment.map[pos[0]+i][pos[1]+3].value == -1:
+                obsLocations.append([pos[0]+i,pos[1]+3])
+            if self.environment.map[pos[0]+i][pos[1]-3].value == -1:
+                obsLocations.append([pos[0]+i,pos[1]-3])
 
         #check for corners        
-        if self.environment.map[pos[1]-3][pos[0]-3].value == -1:
+        if self.environment.map[pos[0]-3][pos[1]-3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]-3])
-        if self.environment.map[pos[1]-3][pos[0]+3].value == -1:
-            obsLocations.append([pos[0]+3,pos[1]-3])
-        if self.environment.map[pos[1]+3][pos[0]-3].value == -1:
+        if self.environment.map[pos[0]-3][pos[1]+3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]+3])
-        if self.environment.map[pos[1]+3][pos[0]+3].value == -1:
+        if self.environment.map[pos[0]-3][pos[1]+3].value == -1:
+            obsLocations.append([pos[0]-3,pos[1]+3])
+        if self.environment.map[pos[0]+3][pos[1]+3].value == -1:
             obsLocations.append([pos[0]+3,pos[1]+3])
 
         return obsLocations
@@ -182,7 +182,7 @@ class Robot(object):
 
         if bumpCoordinates != None:
             for pos in bumpCoordinates:
-                if self.environment.map[pos[1]][pos[0]].value == -1:
+                if self.environment.map[pos[0]][pos[1]].value == -1:
                     b.append(pos)
         return b
 
@@ -236,9 +236,9 @@ class Robot(object):
         for x in range(-2,3,1):
             for y in range (-2,3,1): 
             
-                if self.environment.map[self.pos[1]+x][self.pos[0]+y].value > 0:
-                    d = self.environment.map[self.pos[1]+x][self.pos[0]+y].value
-                    dValues.append([self.pos[0]+y,self.pos[1]+x,d])
+                if self.environment.map[self.pos[0]+x][self.pos[1]+y].value > 0:
+                    d = self.environment.map[self.pos[0]+x][self.pos[1]+y].value
+                    dValues.append([self.pos[0]+x,self.pos[1]+y,d])
         
         return dValues
 
@@ -338,13 +338,13 @@ class RobotState:
             
             if len(dirtReadings):
                 for dirtReading in dirtReadings:
-                    state.map.map[dirtReading[1]][dirtReading[0]].dirt = dirtReading[2]
+                    state.map.map[dirtReading[0]][dirtReading[1]].dirt = dirtReading[2]
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
                 
             if len(proxReadings):
                 for prox in proxReadings:
-                    state.map.map[prox[1]][prox[0]].isObstacle = True
+                    state.map.map[prox[0]][prox[1]].isObstacle = True
                     
                     if (prox not in state.map.obstacles):
                         state.map.obstacles.append(prox)

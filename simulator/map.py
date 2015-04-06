@@ -73,21 +73,21 @@ class RobotMap(object):
                 r = pygame.Rect(cellCornerX, cellCornerY, self.cellXSize, self.cellYSize)
 
                 if environment != None:
-                    if environment.map[y][x].value == -1:
+                    if environment.map[x][y].value == -1:
                         pygame.draw.rect(screen,(0,0,0),r,0)
-                    elif environment.map[y][x].value == 0:
+                    elif environment.map[x][y].value == 0:
                         pygame.draw.rect(screen,(255,255,255),r,0)
-                    elif environment.map[y][x].value > 0:
-                        d = environment.map[y][x].value
+                    elif environment.map[x][y].value > 0:
+                        d = environment.map[x][y].value
                         pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
 
                 else:
-                    if self.map[y][x].isObstacle:
+                    if self.map[x][y].isObstacle:
                         pygame.draw.rect(screen,(0,0,0),r,0)
-                    elif (self.map[y][x].dirt > 0):
-                        d = self.map[y][x].dirt
+                    elif (self.map[x][y].dirt > 0):
+                        d = self.map[x][y].dirt
                         pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
-                    elif self.map[y][x].isVisited:
+                    elif self.map[x][y].isVisited:
                         pygame.draw.rect(screen,(255,255,255),r,0)
 
 
@@ -96,7 +96,7 @@ class RobotMap(object):
 
         for x in range(-2,3,1):
             for y in range (-2,3,1):
-                self.map[robot.pos[1]+x][robot.pos[0]+y].isVisited = True
+                self.map[robot.pos[0]+x][robot.pos[1]+y].isVisited = True
 
                 if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
                     self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
@@ -237,11 +237,11 @@ class Environment(object):
                         if '[' in column:
                             column = column.replace('[','')
                             column = column.split(',')
-                            self.map[i][j].value = int(column[0])
-                            self.map[i][j].label = column[1]
+                            self.map[j][i].value = int(column[0])
+                            self.map[j][i].label = column[1]
                         else:
                             
-                            self.map[i][j].value = int(column)
+                            self.map[j][i].value = int(column)
                             #except:
                             #    continue
 
