@@ -174,6 +174,7 @@ class Environment(object):
         for x in xrange(0,int(cellXMax)):
             for y in xrange(0,int(cellYMax)):
                 mapcp.map[x][y] = self.map[x][y]
+
         return mapcp
 
     def adjacent(self, x, y):
@@ -237,21 +238,17 @@ class Environment(object):
                         if '[' in column:
                             column = column.replace('[','')
                             column = column.split(',')
-                            self.map[j][i].value = int(column[0])
-                            self.map[j][i].label = column[1]
+                            self.map[i][j].value = int(column[0])
+                            self.map[i][j].label = column[1]
                         else:
                             
-                            self.map[j][i].value = int(column)
-                            #except:
-                            #    continue
+                            self.map[i][j].value = int(column)
 
+                    i += 1
+                i = 0
+                j += 1
 
-
-                    j += 1
-                j = 0
-                i += 1
-
-                if i > (self.height/self.cellYSize):
+                if j > (self.height/self.cellYSize):
                     break
             return
                 
