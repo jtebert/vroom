@@ -6,6 +6,9 @@ from math import ceil, floor, atan2, degrees, radians, sqrt
 import csv
 
 MAX_DIRT = 3
+
+#Probalistic Distributions per dirt level based on obstacle label
+# "dirtValue" : [ p(accum. dirt) , p(spreading) ]
 openCellDist = { "0" : [.1,0] , "1" : [.20,.01] , "2" : [.20, .05] , "3" : [.0,.2] }
 doorwayDist =  { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
 garbageCanDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
@@ -13,7 +16,12 @@ chairDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
 litterBoxDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
 houseEntranceDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
 
-labelDict = { "openCell": openCellDist, "doorway": doorwayDist, "garbageCan": garbageCanDist, "chair": chairDist, "litterBox": litterBoxDist, "houseEntrance" : houseEntranceDist }
+labelDict = { "openCell": openCellDist, 
+              "doorway": doorwayDist, 
+              "garbageCan": garbageCanDist, 
+              "chair": chairDist, 
+              "litterBox": litterBoxDist, 
+              "houseEntrance" : houseEntranceDist }
 
 class MapNode(object):
     
@@ -28,7 +36,7 @@ class MapNode(object):
 class RobotMap(object):
     center = (0,0)
 
-    def __init__(self,w=700,h=700,cellXSize=10,cellYSize=10):
+    def __init__(self,w=200,h=200,cellXSize=10,cellYSize=10):
         self.scale = 1.0
         self.cellXSize = cellXSize
         self.cellYSize = cellYSize
@@ -151,7 +159,7 @@ class Environment(object):
     center = (0,0)
 
 
-    def __init__(self,environmentCSV,w=700,h=700,cellXSize=10,cellYSize=10):
+    def __init__(self,environmentCSV,w=200,h=200,cellXSize=10,cellYSize=10):
         self.cellXSize = cellXSize
         self.cellYSize = cellYSize
         self.width = w
