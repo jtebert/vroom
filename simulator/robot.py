@@ -12,11 +12,11 @@ import time
 
 class RobotSimulator(object):
 
-    def __init__(self, environmentCSV):
+    def __init__(self, inputEnv):
             
         
         # the world
-        self.environment = Environment(environmentCSV)
+        self.environment = Environment(environmentCSV=inputEnv)
 
         # what the robot knows
         self.map = RobotMap()
@@ -57,6 +57,8 @@ class RobotSimulator(object):
                     self.action = 'West'
                 if self.k == pygame.K_e:
                     self.showEnvironment = (not self.showEnvironment)
+                if self.k == pygame.K_d:
+                    self.environment.updateDirt()
             
 
 
@@ -384,16 +386,16 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    environmentCSV = './../assets/maps/test.csv'
+    defaultEnvironmentCSV = './../assets/maps/test.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':
-            environmentCSV = arg
+            defaultEnvironmentCSV = arg
         if opt == '-i':
             saveMapEnvAtEnd = True
 
 
-    r = RobotSimulator(environmentCSV)
+    r = RobotSimulator(defaultEnvironmentCSV)
 
     if saveMapEnvAtEnd:
         try:
