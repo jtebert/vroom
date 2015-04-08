@@ -36,7 +36,7 @@ class MapNode(object):
 class RobotMap(object):
     center = (0,0)
 
-    def __init__(self,w=200,h=200,cellXSize=10,cellYSize=10):
+    def __init__(self,w=700,h=700,cellXSize=10,cellYSize=10):
         self.scale = 1.0
         self.cellXSize = cellXSize
         self.cellYSize = cellYSize
@@ -159,7 +159,7 @@ class Environment(object):
     center = (0,0)
 
 
-    def __init__(self,environmentCSV,w=200,h=200,cellXSize=10,cellYSize=10):
+    def __init__(self,environmentCSV,w=700,h=700,cellXSize=10,cellYSize=10):
         self.cellXSize = cellXSize
         self.cellYSize = cellYSize
         self.width = w

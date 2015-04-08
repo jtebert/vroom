@@ -1,6 +1,8 @@
 from map import *
 
 import os,sys,inspect, getopt
+
+
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
@@ -10,19 +12,7 @@ import time
 
 class RobotSimulator(object):
 
-    def __init__(self, argv):
-
-        try: 
-            opts,args = getopt.getopt(argv,"e:")
-        except getopt.GetoptError:
-            print "robot.py -e <environmentPath>"
-            sys.exit(2)
-        
-
-        environmentCSV = './../assets/maps/test.csv'
-        for opt,arg in opts:
-            if opt == '-e':
-                environmentCSV = arg
+    def __init__(self, environmentCSV):
             
         
         # the world
@@ -386,6 +376,46 @@ if __name__ == "__main__":
     
     #TODO add option to import environment
     #TODO add option for real vs simulated robot
+    
+    try: 
+        opts,args = getopt.getopt(sys.argv[1:],"ie:")
+    except getopt.GetoptError:
+        print "robot.py -e <environmentPath>"
+        sys.exit(2)
+        
 
-    r = RobotSimulator(sys.argv[1:])
-    r.run()
+    environmentCSV = './../assets/maps/test.csv'
+    saveMapEnvAtEnd = False
+    for opt,arg in opts:
+        if opt == '-e':
+            environmentCSV = arg
+        if opt == '-i':
+            saveMapEnvAtEnd = True
+
+
+    r = RobotSimulator(environmentCSV)
+
+    if saveMapEnvAtEnd:
+        try:
+            r.run()
+        except:
+                    
+            screen = pygame.display.get_surface()
+            #update Screen
+            screen.fill((204,204,204))  
+            r.map.draw(screen,environment = r.environment)
+            r.map.drawRobot(screen,r.robot)
+
+            pygame.image.save(screen, './endEnvironment.jpg')
+
+            #update Screen
+            screen.fill((204,204,204))  
+   
+            r.map.draw(screen)
+            r.map.drawRobot(screen,r.robot)
+            
+            pygame.image.save(screen, './endMap.jpg')
+            
+
+    else:
+        r.run()
