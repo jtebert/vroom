@@ -114,5 +114,6 @@ def readTrainingMap(fileName):
     csvReader = csv.reader(csvfile, delimiter=' ', quotechar='|')
     trainingMap = []
     for row in csvReader:
-        trainingMap.append(row[0].split(','))
+        line = row[0].split(',')
+        trainingMap.append(map(int, line))
     return trainingMap
