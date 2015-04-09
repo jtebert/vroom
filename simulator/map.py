@@ -85,8 +85,8 @@ class RobotMap(object):
                         pygame.draw.rect(screen,(0,0,0),r,0)
                     elif environment.map[x][y].value == 0:
                         pygame.draw.rect(screen,(255,255,255),r,0)
-                    elif environment.map[x][y].value > 0:
-                        d = environment.map[x][y].value
+                    elif environment.map[x][y].dirt > 0:
+                        d = environment.map[x][y].dirt
                         pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
 
                 else:
