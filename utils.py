@@ -1,7 +1,7 @@
 # Extra functions useful for a variety of things
 
 import heapq
-
+import csv
 
 class PriorityQueue:
     """
@@ -131,5 +131,16 @@ def manhattan_distance(p1, p2):
     """
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
+
 def null_heuristic(state, problem=None):
     return 0
+
+
+def readTrainingMap(fileName):
+    csvfile = open(fileName, 'r')
+    csvReader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+    trainingMap = []
+    for row in csvReader:
+        line = row[0].split(',')
+        trainingMap.append(map(int, line))
+    return trainingMap
