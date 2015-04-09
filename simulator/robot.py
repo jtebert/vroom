@@ -223,7 +223,40 @@ class Robot(object):
                           [self.pos[0]-3,self.pos[1]+2]]
 
         return coords
-            
+
+    def getEmptySpaceCoords(self, action):
+        coords = []
+        
+        if self.heading == action:
+            if action == 'North':
+                coords = [[self.pos[0],self.pos[1]-3], 
+                          [self.pos[0]-1,self.pos[1]-3],
+                          [self.pos[0]+1,self.pos[1]-3],
+                          [self.pos[0]-2,self.pos[1]-3],
+                          [self.pos[0]+2,self.pos[1]-3]]
+
+            if action == 'South':
+                coords = [[self.pos[0]+1,self.pos[1]+3],
+                          [self.pos[0],self.pos[1]+3], 
+                          [self.pos[0]-1,self.pos[1]+3],
+                          [self.pos[0]-2,self.pos[1]+3],
+                          [self.pos[0]+2,self.pos[1]+3]]
+
+            if action == 'East':
+                coords = [[self.pos[0]+3,self.pos[1]], 
+                          [self.pos[0]+3,self.pos[1]-1],
+                          [self.pos[0]+3,self.pos[1]+1],
+                          [self.pos[0]+3,self.pos[1]-2],
+                          [self.pos[0]+3,self.pos[1]+2]]
+
+            if action == 'West':
+                coords = [[self.pos[0]-3,self.pos[1]], 
+                          [self.pos[0]-3,self.pos[1]-1],
+                          [self.pos[0]-3,self.pos[1]+1],
+                          [self.pos[0]-3,self.pos[1]-2],
+                          [self.pos[0]-3,self.pos[1]+2]]
+
+        return coords
         
 
     def dirtSensor(self):
@@ -317,6 +350,19 @@ class RobotState:
                 legalActions.append(action)
         
         return legalActions
+                
+
+    def willVisitNewCell( self, action):
+        cellCoords = self.r.getEmptySpaceCoords(action)
+        result = False
+
+        unvisitedCells = self.getUnvisited()
+        
+        for coord in cellCoords:
+            if ((coord) in unvisitedCells):
+                result = True
+
+        return result
 
     def generateSuccessor( self, action ):
         
@@ -327,6 +373,8 @@ class RobotState:
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
        
+        print self.willVisitNewCell(action)
+
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)
@@ -348,6 +396,8 @@ class RobotState:
                     
                     if (prox in state.map.unvisitedCells):
                         state.map.unvisitedCells.remove(prox)
+
+            
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)

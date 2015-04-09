@@ -49,11 +49,14 @@ class RobotMap(object):
         self.visitedCells = []
         self.obstacles = []
 
-        #TODO to get unvisited cells to work right we need the map cells
-        #depend on the input environment
         self.unvisitedCells = []
-
+        
         self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+              
+        for x in xrange(0,int(self.xCells)):
+            for y in xrange(0,int(self.yCells)):
+                self.unvisitedCells.append([x,y])
+        
 
     def draw(self,screen, environment = None):
 
@@ -62,6 +65,7 @@ class RobotMap(object):
         sy = self.scale*float(s[1])/self.height
         center = (0,0)
 
+     
 
         halfWidthMap = ceil(self.width/(2.*self.scale))
         halfHeightMap = ceil(self.height/(2.*self.scale))
@@ -108,7 +112,10 @@ class RobotMap(object):
 
                 if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
                     self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
-
+                    
+                if ((robot.pos[0]+x,robot.pos[1]+y) in self.unvisitedCells):
+                    self.unvisitedCells.remove((robot.pos[0]+x,robot.pos[1]+y))
+                        
 
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),
