@@ -35,6 +35,23 @@ class PriorityQueue:
         return len(self.heap) == 0
 
 
+class Stack:
+    """
+    LIFO queue (based on Berkeley Pacman Project
+    """
+    def __init__(self):
+        self.list = []
+
+    def push(self, i):
+        self.list.append(i)
+
+    def pop(self):
+        return self.list.pop()
+
+    def is_empty(self):
+        return len(self.list) == 0
+
+
 class Grid:
 
     def __init__(self, grid_size=100):
@@ -79,9 +96,14 @@ class Grid:
     def mark_explored(self, pos):
         """
         Mark the cell at the pos as explored (1)
+        Plus 3 in every direction (7x7 grid)
         """
         x, y = pos
-        self.grid[x][y] = 1
+        for row in range(x - 3, x + 4):
+            if row >= 0 and row < self.grid_size:
+                for col in range(y - 3, y + 4):
+                    if col >= 0 and col < self.grid_size:
+                        self.grid[row][col] = 1
 
     def list_unexplored(self):
         """
@@ -108,3 +130,6 @@ def manhattan_distance(p1, p2):
     :return: Distance
     """
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+def null_heuristic(state, problem=None):
+    return 0

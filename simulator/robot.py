@@ -79,9 +79,9 @@ class RobotSimulator(object):
 
         
         #TODO defaults to run exploration and then shows results
-        #problem = MapEnvironmentProblem(state, 70)
-        #heuristic = exploration_heuristic
-        #actions = a_star_search(problem, heuristic)
+        problem = MapEnvironmentProblem(state, 70)
+        heuristic = exploration_heuristic
+        #actions = depth_first_search(problem)
         
 
         while(True):

@@ -2,6 +2,7 @@
 
 import utils
 
+
 # TODO: Check if there are unreachable position? (eliminate from search)
 
 
@@ -20,35 +21,30 @@ class MapEnvironmentProblem:
     def is_goal_state(state):
         return state[1].are_all_explored()
 
+    def is_goal_node(self, node):
+        """
+        Goal if no parent (starting node) and there are no successors
+        """
+        return len(self.get_successors(node.state)) == 0 and node.parent is None
+
     @staticmethod
     def get_successors(state):
         """
-        Returns successor states, the actions they require
+        Returns successor states (states where you'll explore something new), the actions they require
         :param state: Current robot position & exploration grid
         :return: List of (state, action) tuples
         """
-        #print "BEFORE\n", state[1]
         robot_state = state[0]
         actions = robot_state.getLegalActions()
         successors = []
         for action in actions:
-            next_state = robot_state.generateSuccessor(action)
-            next_x, next_y = next_state.getRobotPosition()
-            #print "action: ",action 
-            #print "pos:",robot_state.r.pos
-            #print "heading:",robot_state.r.heading
-            #print "next pos:",next_state.r.pos
-            #print ""
-            next_grid = state[1].copy()
-            # Mark next cell as explored
-            next_grid.mark_explored((next_x, next_y))
-            #print "AFTER:", action, "\n", next_grid
-            successors.append(( (next_state, next_grid), action))
-
-        #print ""
-        #print ""
-        #print ""
-
+            # TODO: Need to implement method willExploreNewSpace
+            if state[0].willExploreNewSpace(action):
+                next_state = robot_state.generateSuccessor(action)
+                next_x, next_y = next_state.getRobotPosition()
+                next_grid = state[1].copy()
+                next_grid.mark_explored((next_x, next_y))
+                successors.append(( (next_state, next_grid), action))
         return successors
 
     def get_cost_of_actions(self, actions):
@@ -94,7 +90,7 @@ class Node:
     parent Node
     """
 
-    def __init__(self, state, prev_action, parent, problem, heuristic):
+    def __init__(self, state, prev_action, parent, problem, heuristic=utils.null_heuristic):
         self.state = state
         self.prev_action = prev_action
         self.parent = parent
@@ -145,6 +141,7 @@ class Node:
         return path_cost + heuristic_cost
 
 
+#TODO: This is not relevant for mapping anymore. Hang onto for dirt search later
 def a_star_search(problem, heuristic):
     """
     Search the problem with the heuristic to find lowest cost option
@@ -178,6 +175,29 @@ def a_star_search(problem, heuristic):
                 frontier.push(next_node, next_node.cost)
     return ["None"]
 
+
+# Let's try this again...
+# Depth first search, with backtracking, minimizing revisiting of visited nodes
+# End when all explored or nothing else reachable (will backtrack to starting position and have nowhere else to go)
+def depth_first_search(problem):
+    """
+    Depth first search, with backtracking, minimizing revisiting of visited nodes
+    End when all explored or nothing else reachable (will backtrack to starting position and have nowhere else to go)
+    :param problem:
+    :return: Path of actions (list)
+    """
+    node = Node(problem.start, None, None, problem)
+    # TODO: Replace is_goal_node with is_goal_state
+    while not problem.is_goal_node(node):
+        next_states = problem.get_successors(node.state)
+        if len(next_states) == 0:
+            # Nothing new to explore from current location; backtrack
+            next_state = node.parent.state
+        else:
+            # TODO: Will always take first available action. May be a better option?
+            next_state = next_states[0]
+        node = Node(next_state[0], next_state[2]. node, problem)
+    return node.get_path()
 
 # Run the search:
 #problem = MapEnvironmentProblem(robot_start_state)
