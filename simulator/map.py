@@ -187,9 +187,16 @@ class Environment(object):
 
     def adjacent(self, x, y):
         # Returns the adjacent cells to one cell (the other ones that will impact the amount of dirt in a given cell)
-        return [(self.map[x + 1][y]), (self.map[x - 1][y]), (self.map[x][y + 1]), (self.map[x][y - 1])]
+        try:
+            adjCells = [(self.map[x + 1][y]), (self.map[x - 1][y]), (self.map[x][y + 1]), (self.map[x][y - 1])]
+        except:
+            print x
+            print y
+            raise
 
-    def addDirt(currentDirt, newDirt):
+        return adjCells
+
+    def addDirt(self,currentDirt, newDirt):
         # Returns amount of dirt after adding newDirt to currentDirt
         return min(MAX_DIRT, currentDirt + newDirt)
 
@@ -200,17 +207,29 @@ class Environment(object):
 
         mapCopy = self.copy() #Check copy so dirt doesn't cascade across the map from earlier checks
 
-        for y in xrange(0,int(mapCopy.heightCells)):
-            for x in xrange(0,int(mapCopy.widthCells)):
+
+        for y in xrange(0,int(mapCopy.heightCells-1)):
+            for x in xrange(0,int(mapCopy.widthCells-1)):
 
                 if mapCopy.map[x][y].isObstacle:
                     #Obstacle that can't be cleaned
                     continue
 
+                elif mapCopy.map[x][y].value == None:
+                    #its a cell not in the environment
+                    continue
+
                 elif mapCopy.map[x][y].label == None:
+                    randomVal = random.random()
+                    cellDist = openCellDist[str(mapCopy.map[x][y].dirt)]
+                    
                     #Own cell: default dirt generation
-                    if random.random() >= openCellDist[str(mapCopy.map[x][y].dirt)]:
+                    if random.random() < cellDist[0]:
+                        print "dirt before : ",self.map[x][y].dirt
                         self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+                        print "dirt after : ",self.map[x][y].dirt
+
+                
 
                 else:
                     #Own cell: Generation based on label
@@ -222,9 +241,17 @@ class Environment(object):
                     if cell.isObstacle:
                         continue
 
+                    elif cell.value == None:
+                        continue
+
                     elif cell.label == None:
+                        randomVal = random.random()
+                        cellDist = openCellDist[str(mapCopy.map[x][y].dirt)]
+                       
+                    
                         #Adjacent cell: default dirt generation
-                        if random.random() >= openCellDist[str(mapCopy.map[x][y].dirt)]:
+                        if randomVal < cellDist[1]:
+                            dirtAdd = self.addDirt(self.map[x][y].dirt, 1)
                             self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
 
                     else:
@@ -264,7 +291,8 @@ class Environment(object):
                                 self.map[i][j].isObstacle = True
 
                             self.map[i][j].value = int(column)
-
+                    else:
+                        self.map[i][j].value = None
                     i += 1
                 i = 0
                 j += 1

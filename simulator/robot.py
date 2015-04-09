@@ -29,6 +29,7 @@ class RobotSimulator(object):
         self.action = None
 
         self.start = False
+        self.updateDirt = False
 
         
     
@@ -58,7 +59,7 @@ class RobotSimulator(object):
                 if self.k == pygame.K_e:
                     self.showEnvironment = (not self.showEnvironment)
                 if self.k == pygame.K_d:
-                    self.environment.updateDirt()
+                    self.updateDirt = True
             
 
 
@@ -91,6 +92,10 @@ class RobotSimulator(object):
             
             if (agent == None):
                 self.listenControls()
+
+                if self.updateDirt:
+                    self.updateDirt = False
+                    self.environment.updateDirt()
                 #self.action is set directly by self.listenControls
             else:
                 self.action = agent.getAction(state)
