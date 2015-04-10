@@ -373,7 +373,7 @@ class RobotState:
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
        
-        print self.willVisitNewCell(action)
+        #print self.willVisitNewCell(action)
 
         if action != None:
             #check bumper 
