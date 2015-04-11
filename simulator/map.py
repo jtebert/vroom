@@ -111,14 +111,14 @@ class RobotMap(object):
             for y in range (-2,3,1):
                 self.map[robot.pos[0]+x][robot.pos[1]+y].isVisited = True
 
-                if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
-                    self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
+                if ([robot.pos[0]+x,robot.pos[1]+y] not in self.visitedCells):
+                    self.visitedCells.append([robot.pos[0]+x,robot.pos[1]+y])
                 
-                if ((robot.pos[0]+x,robot.pos[1]+y) in self.observedCells):
-                    self.observedCells.remove((robot.pos[0]+x,robot.pos[1]+y))
+                if ([robot.pos[0]+x,robot.pos[1]+y] in self.observedCells):
+                    self.observedCells.remove([robot.pos[0]+x,robot.pos[1]+y])
 
-                if ((robot.pos[0]+x,robot.pos[1]+y) in self.unvisitedCells):
-                    self.unvisitedCells.remove((robot.pos[0]+x,robot.pos[1]+y))
+                if ([robot.pos[0]+x,robot.pos[1]+y] in self.unvisitedCells):
+                    self.unvisitedCells.remove([robot.pos[0]+x,robot.pos[1]+y])
                 
                         
 

@@ -249,8 +249,9 @@ class Robot(object):
 
         return coords
 
-    def getEmptySpaceCoords(self, action):
+    def getEmptySpaceCoords(self,position, action):
         coords = []
+        pos = position
         
         if action == 'North':
             coords = [[self.pos[0],self.pos[1]-3], 
@@ -389,14 +390,15 @@ class RobotState:
                 
         
 
-    def willVisitNewCell( self, action):
-        cellCoords = self.r.getEmptySpaceCoords(action)
+    def willVisitNewCell( self, pos, action):
+        cellCoords = self.r.getEmptySpaceCoords(pos, action)
         result = False
 
         unvisitedCells = self.getUnvisited()
-        
+        #print len(unvisitedCells)
+
         for coord in cellCoords:
-            if ((coord) in unvisitedCells):
+            if (coord in unvisitedCells):
                 result = True
 
         return result
@@ -410,6 +412,7 @@ class RobotState:
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
        
+        print self.willVisitNewCell(self.r.pos, action) 
 
         if action != None:
             #check bumper 
