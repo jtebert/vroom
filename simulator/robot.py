@@ -83,8 +83,7 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        problem = MapEnvironmentProblem(state, 70)
-        heuristic = exploration_heuristic
+        problem = MapEnvironmentProblem(state, 10)
         #actions = depth_first_search(problem)
         
 

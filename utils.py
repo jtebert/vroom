@@ -56,7 +56,7 @@ class Grid:
 
     def __init__(self, grid_size=100):
         self.grid_size = grid_size
-        self.grid = [[0 for _ in range(grid_size)] for _ in range(grid_size)]
+        self.grid = [[GridCell((x,y)) for y in range(grid_size)] for x in range(grid_size)]
 
     def __str__(self):
         print_str = ""
@@ -69,57 +69,107 @@ class Grid:
     def __repr__(self):
         return str(self)
 
-    def pos(self, x, y):
+    def set_all_valid_actions(self, robot_state):
         """
-        Get the value of the grid at position [x][y]
-        :param x: x position
-        :param y: y position
-        :return: -1, 0, 1
+        Use the robot state to determine what actions are valid,
+        ONLY for cells that have been visited.
+        :param robot_state: RobotState (for the map)
+        :return: Nothing. Mutation, man.
         """
-        return self.grid[x][y]
-
-    def are_all_explored(self):
-        """
-        Check if all explorable cells have been explored (no 0s)
-        :return: Boolean, fully explored or not)
-        """
-        #print self
-        return all([all(x) for x in self.grid])
-
-    def mark_unreachable(self, pos):
-        """
-        Mark the cell at the pos as unreachable (-1)
-        """
-        x, y = pos
-        self.grid[x][y] = -1
-
-    def mark_explored(self, pos):
-        """
-        Mark the cell at the pos as explored (1)
-        Plus 3 in every direction (7x7 grid)
-        """
-        x, y = pos
-        for row in range(x - 3, x + 4):
-            if row >= 0 and row < self.grid_size:
-                for col in range(y - 3, y + 4):
-                    if col >= 0 and col < self.grid_size:
-                        self.grid[row][col] = 1
-
-    def list_unexplored(self):
-        """
-        Create a list of all unexplored cells in the grid
-        """
-        unexp = []
         for x in range(self.grid_size):
             for y in range(self.grid_size):
-                if self.grid[x][y] == 0:
-                    unexp.append((x, y))
-        return unexp
+                if self.grid[x][y].is_visited:
+                    self.grid[x][y].set_valid_actions(robot_state)
+
+    def is_visited(self, x, y):
+        """
+        Get whether the grid at position [x][y] has been explored
+        :param x: x position
+        :param y: y position
+        :return: Boolean
+        """
+        return self.grid[x][y].is_visited
+
+    def are_all_visited(self):
+        """
+        Check if all explorable cells have been explored.
+        If all visited, search mapping is complete
+        :return: Boolean, fully explored or not
+        """
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
+                if self.grid[x][y].are_any_valid_actions():
+                    return False
+        return True
+
+    def visit(self, pos):
+        """
+        Mark the cell at the pos as explored (1)
+        Plus 2 in every direction (5x5 grid)
+        """
+        g = 2
+        x, y = pos
+        for row in range(x - g, x + g + 1):
+            if row >= 0 and row < self.grid_size:
+                for col in range(y - g, y + g + 1):
+                    if col >= 0 and col < self.grid_size:
+                        self.grid[row][col].visit()
 
     def copy(self):
         g = Grid(self.grid_size)
         g.grid = [x[:] for x in self.grid]
         return g
+
+    def deepcopy(self):
+        g = Grid(self.grid_size)
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
+                g.grid[x][y] = self.grid[x][y].copy()
+        return g
+
+
+class GridCell(object):
+    """
+    Represents the current state of the cell (explored, unexplored)
+    and list of actions from the cell that will explore new cells
+    """
+
+    def __init__(self, coord):
+        self.coord = coord
+        self.is_visited = False
+        self.valid_actions = []
+
+    def __str__(self):
+        if self.is_visited:
+            return "1"
+        else:
+            return "0"
+
+    def set_valid_actions(self, robot_state):
+        """
+        Use the robot state to determine explorative actions from the current cell
+        """
+        # TODO: Not actually sure if robot_state is updated to have the correct info for checking this?
+        new_actions = []
+        # TODO: Change this back when getLegalActions is updated
+        #actions = robot_state.getLegalActions(self.coord)
+        actions = robot_state.getLegalActions()
+        for a in actions:
+            if robot_state.willVisitNewCell(self.coord, a):
+                new_actions.append(a)
+        self.valid_actions = new_actions
+
+    def visit(self):
+        self.is_visited = True
+
+    def are_any_valid_actions(self):
+        return len(self.valid_actions) > 0
+
+    def copy(self):
+        gc = GridCell(self.coord)
+        gc.is_visited = self.is_visited
+        gc.valid_actions = self.valid_actions
+        return gc
 
 
 def manhattan_distance(p1, p2):

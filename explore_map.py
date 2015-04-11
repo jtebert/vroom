@@ -15,17 +15,14 @@ class MapEnvironmentProblem:
     """
 
     def __init__(self, start_state, grid_size=100):
-        self.start = (start_state, utils.Grid(grid_size))
+        grid = utils.Grid(grid_size)
+        grid.visit(start_state.getRobotPosition())
+        grid.set_all_valid_actions(start_state)
+        self.start = (start_state, grid)
 
     @staticmethod
     def is_goal_state(state):
-        return state[1].are_all_explored()
-
-    def is_goal_node(self, node):
-        """
-        Goal if no parent (starting node) and there are no successors
-        """
-        return len(self.get_successors(node.state)) == 0 and node.parent is None
+        return state[1].are_all_visited()
 
     @staticmethod
     def get_successors(state):
@@ -38,12 +35,14 @@ class MapEnvironmentProblem:
         actions = robot_state.getLegalActions()
         successors = []
         for action in actions:
-            # TODO: Need to implement method willExploreNewSpace
-            if state[0].willExploreNewSpace(action):
+            if state[0].willVisitNewCell(action):
                 next_state = robot_state.generateSuccessor(action)
                 next_x, next_y = next_state.getRobotPosition()
-                next_grid = state[1].copy()
-                next_grid.mark_explored((next_x, next_y))
+                # Create new grid with newly visited cells and rechecking whether
+                # new cells will be visited
+                next_grid = state[1].deepcopy()
+                next_grid.mark_visited((next_x, next_y))
+                next_grid.set_all_valid_actions(state[0])
                 successors.append(( (next_state, next_grid), action))
         return successors
 
@@ -187,16 +186,14 @@ def depth_first_search(problem):
     :return: Path of actions (list)
     """
     node = Node(problem.start, None, None, problem)
-    # TODO: Replace is_goal_node with is_goal_state
-    while not problem.is_goal_node(node):
+    while not problem.is_goal_state(node.state):
         next_states = problem.get_successors(node.state)
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
             next_state = node.parent.state
         else:
-            # TODO: Will always take first available action. May be a better option?
             next_state = next_states[0]
-        node = Node(next_state[0], next_state[2]. node, problem)
+        node = Node(next_state[0], next_state[2], node, problem)
     return node.get_path()
 
 # Run the search:
