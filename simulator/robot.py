@@ -146,30 +146,55 @@ class Robot(object):
         pos = self.pos
         
         obsLocations = []
+        openLocations = []
 
 
         #check for sides
         for i in range(-2,3,1):
+
             if self.environment.map[pos[0]-3][pos[1]+i].value == -1:
                 obsLocations.append([pos[0]-3,pos[1]+i])
+            else:
+                openLocations.append([pos[0]-3,pos[1]+i])
+
             if self.environment.map[pos[0]+3][pos[1]+i].value == -1:
                 obsLocations.append([pos[0]+3,pos[1]+i])
+            else:
+                openLocations.append([pos[0]+3,pos[1]+i])
+
             if self.environment.map[pos[0]+i][pos[1]+3].value == -1:
                 obsLocations.append([pos[0]+i,pos[1]+3])
+            else:
+                openLocations.append([pos[0]+i,pos[1]+3])
+
             if self.environment.map[pos[0]+i][pos[1]-3].value == -1:
                 obsLocations.append([pos[0]+i,pos[1]-3])
+            else:
+                openLocations.append([pos[0]+i,pos[1]-3])
 
         #check for corners        
         if self.environment.map[pos[0]-3][pos[1]-3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]-3])
+        else:
+            openLocations.append([pos[0]-3,pos[1]-3])
+
         if self.environment.map[pos[0]-3][pos[1]+3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]+3])
-        if self.environment.map[pos[0]-3][pos[1]+3].value == -1:
-            obsLocations.append([pos[0]-3,pos[1]+3])
+        else:
+            openLocations.append([pos[0]-3,pos[1]+3])
+
+        if self.environment.map[pos[0]+3][pos[1]-3].value == -1:
+            obsLocations.append([pos[0]+3,pos[1]-3])
+        else:
+            openLocations.append([pos[0]+3,pos[1]-3])
+
         if self.environment.map[pos[0]+3][pos[1]+3].value == -1:
             obsLocations.append([pos[0]+3,pos[1]+3])
+        else:
+            openLocations.append([pos[0]+3,pos[1]+3])
+        
 
-        return obsLocations
+        return obsLocations,openLocations
         
 
     def bumpSensor(self, action):
@@ -350,7 +375,55 @@ class RobotState:
                 legalActions.append(action)
         
         return legalActions
+
+    def proxSensorCoords (self, action):
+        # For a given action, return the coordinates of the proximety sensor
+        # at that position
+        coords = []
+        pos = list(self.r.pos)
+        
+
+        if self.r.heading == action:
+            if action == 'North':
+                pos[1] -= 1
+            if action == 'South':
+                pos[1] += 1
+            if action == 'East':
+                pos[0] += 1
+            if action == 'West':
+                pos[0] -= 1
+        
                 
+        for i in range(-2,3,1):
+            coords.append([pos[0]-3,pos[1]+i])
+            coords.append([pos[0]+3,pos[1]+i])
+            coords.append([pos[0]+i,pos[1]-3])
+            coords.append([pos[0]+i,pos[1]+3])
+
+        #dont forget the corners :-)
+        coords.append([pos[0]+3,pos[1]+3])
+        coords.append([pos[0]-3,pos[1]+3])
+        coords.append([pos[0]+3,pos[1]-3])
+        coords.append([pos[0]-3,pos[1]-3])
+        
+        return coords
+                
+    def willExploreNewCell (self, action):
+        #if the robot will explore a new cell return true
+
+        coords = self.proxSensorCoords(action)
+        observedCells = self.getObserved()
+        result = False
+
+        #print observedCells
+
+        for coord in coords:
+            if coord in observedCells:
+                result = True
+
+        return result
+                
+        
 
     def willVisitNewCell( self, action):
         cellCoords = self.r.getEmptySpaceCoords(action)
@@ -373,12 +446,13 @@ class RobotState:
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
        
-        print self.willVisitNewCell(action)
-
+        #print self.willVisitNewCell(action)
+        #print self.willExploreNewCell(action)
+        
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)
-            proxReadings = state.r.proximitySensor()
+            proxReadings,openReadings = state.r.proximitySensor()
             dirtReadings = state.r.dirtSensor()
             
             if len(dirtReadings):
@@ -396,6 +470,15 @@ class RobotState:
                     
                     if (prox in state.map.unvisitedCells):
                         state.map.unvisitedCells.remove(prox)
+
+            #print "length of openreadings: ",len(openReadings)
+            if len(openReadings):
+                for openCell in openReadings:
+                    
+                    
+                    if openCell in state.map.unvisitedCells:
+                       # print "adding observed cell: ",openCell
+                        state.map.observedCells.append(openCell)
 
             
 
@@ -420,6 +503,9 @@ class RobotState:
 
     def getVisited( self ):
         return self.map.visitedCells
+
+    def getObserved ( self ):
+        return self.map.observedCells
 
     def getObstacles( self ):
         return self.map.obstacles

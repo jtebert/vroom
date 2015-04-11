@@ -50,6 +50,7 @@ class RobotMap(object):
         self.obstacles = []
 
         self.unvisitedCells = []
+        self.observedCells = []  #cells seen by the proximity sensor, but not visited
         
         self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
               
@@ -112,9 +113,13 @@ class RobotMap(object):
 
                 if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
                     self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
-                    
+                
+                if ((robot.pos[0]+x,robot.pos[1]+y) in self.observedCells):
+                    self.observedCells.remove((robot.pos[0]+x,robot.pos[1]+y))
+
                 if ((robot.pos[0]+x,robot.pos[1]+y) in self.unvisitedCells):
                     self.unvisitedCells.remove((robot.pos[0]+x,robot.pos[1]+y))
+                
                         
 
 
@@ -151,6 +156,7 @@ class RobotMap(object):
         mapcp.visitedCells = list(self.visitedCells)
         mapcp.obstacles = list(self.obstacles)
         mapcp.unvisitedCells = list(self.unvisitedCells)
+        mapcp.observedCells = list(self.observedCells)
 
         cellXMax = self.width/self.cellXSize
         cellYMax = self.height/self.cellYSize
@@ -232,9 +238,7 @@ class Environment(object):
                     
                     #Own cell: default dirt generation
                     if random.random() < cellDist[0]:
-                        print "dirt before : ",self.map[x][y].dirt
                         self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
-                        print "dirt after : ",self.map[x][y].dirt
 
                 
 
