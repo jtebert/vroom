@@ -198,10 +198,15 @@ class Robot(object):
         return obsLocations,openLocations
         
 
-    def bumpSensor(self, action):
+    def bumpSensor(self, action, position = None):
         b = []
         
-        bumpCoordinates = self.getBumpCoordinates(action)
+        if position == None:
+            pos = self.pos
+        else:
+            pos = position
+
+        bumpCoordinates = self.getBumpCoordinates(action, pos)
 
         if bumpCoordinates != None:
             for pos in bumpCoordinates:
@@ -215,37 +220,38 @@ class Robot(object):
             bump = True
         return bump
 
-    def getBumpCoordinates(self, action):
+    def getBumpCoordinates(self, action, position):
         
         coords = None
+        pos = position
         
         if action == 'North':
-            coords = [[self.pos[0],self.pos[1]-3], 
-                      [self.pos[0]-1,self.pos[1]-3],
-                      [self.pos[0]+1,self.pos[1]-3],
-                      [self.pos[0]-2,self.pos[1]-3],
-                      [self.pos[0]+2,self.pos[1]-3]]
+            coords = [[pos[0],pos[1]-3], 
+                      [pos[0]-1,pos[1]-3],
+                      [pos[0]+1,pos[1]-3],
+                      [pos[0]-2,pos[1]-3],
+                      [pos[0]+2,pos[1]-3]]
             
         if action == 'South':
-            coords = [[self.pos[0]+1,self.pos[1]+3],
-                      [self.pos[0],self.pos[1]+3], 
-                      [self.pos[0]-1,self.pos[1]+3],
-                      [self.pos[0]-2,self.pos[1]+3],
-                      [self.pos[0]+2,self.pos[1]+3]]
+            coords = [[pos[0]+1,pos[1]+3],
+                      [pos[0],pos[1]+3], 
+                      [pos[0]-1,pos[1]+3],
+                      [pos[0]-2,pos[1]+3],
+                      [pos[0]+2,pos[1]+3]]
 
         if action == 'East':
-            coords = [[self.pos[0]+3,self.pos[1]], 
-                      [self.pos[0]+3,self.pos[1]-1],
-                      [self.pos[0]+3,self.pos[1]+1],
-                      [self.pos[0]+3,self.pos[1]-2],
-                      [self.pos[0]+3,self.pos[1]+2]]
+            coords = [[pos[0]+3,pos[1]], 
+                      [pos[0]+3,pos[1]-1],
+                      [pos[0]+3,pos[1]+1],
+                      [pos[0]+3,pos[1]-2],
+                      [pos[0]+3,pos[1]+2]]
 
         if action == 'West':
-            coords = [[self.pos[0]-3,self.pos[1]], 
-                      [self.pos[0]-3,self.pos[1]-1],
-                      [self.pos[0]-3,self.pos[1]+1],
-                      [self.pos[0]-3,self.pos[1]-2],
-                      [self.pos[0]-3,self.pos[1]+2]]
+            coords = [[pos[0]-3,pos[1]], 
+                      [pos[0]-3,pos[1]-1],
+                      [pos[0]-3,pos[1]+1],
+                      [pos[0]-3,pos[1]-2],
+                      [pos[0]-3,pos[1]+2]]
 
         return coords
 
@@ -254,32 +260,32 @@ class Robot(object):
         pos = position
         
         if action == 'North':
-            coords = [[self.pos[0],self.pos[1]-3], 
-                      [self.pos[0]-1,self.pos[1]-3],
-                      [self.pos[0]+1,self.pos[1]-3],
-                      [self.pos[0]-2,self.pos[1]-3],
-                      [self.pos[0]+2,self.pos[1]-3]]
+            coords = [[pos[0],pos[1]-3], 
+                      [pos[0]-1,pos[1]-3],
+                      [pos[0]+1,pos[1]-3],
+                      [pos[0]-2,pos[1]-3],
+                      [pos[0]+2,pos[1]-3]]
             
         if action == 'South':
-            coords = [[self.pos[0]+1,self.pos[1]+3],
-                      [self.pos[0],self.pos[1]+3], 
-                      [self.pos[0]-1,self.pos[1]+3],
-                      [self.pos[0]-2,self.pos[1]+3],
-                      [self.pos[0]+2,self.pos[1]+3]]
+            coords = [[pos[0]+1,pos[1]+3],
+                      [pos[0],pos[1]+3], 
+                      [pos[0]-1,pos[1]+3],
+                      [pos[0]-2,pos[1]+3],
+                      [pos[0]+2,pos[1]+3]]
 
         if action == 'East':
-            coords = [[self.pos[0]+3,self.pos[1]], 
-                      [self.pos[0]+3,self.pos[1]-1],
-                      [self.pos[0]+3,self.pos[1]+1],
-                      [self.pos[0]+3,self.pos[1]-2],
-                      [self.pos[0]+3,self.pos[1]+2]]
+            coords = [[pos[0]+3,pos[1]], 
+                      [pos[0]+3,pos[1]-1],
+                      [pos[0]+3,pos[1]+1],
+                      [pos[0]+3,pos[1]-2],
+                      [pos[0]+3,pos[1]+2]]
 
         if action == 'West':
-            coords = [[self.pos[0]-3,self.pos[1]], 
-                      [self.pos[0]-3,self.pos[1]-1],
-                      [self.pos[0]-3,self.pos[1]+1],
-                      [self.pos[0]-3,self.pos[1]-2],
-                      [self.pos[0]-3,self.pos[1]+2]]
+            coords = [[pos[0]-3,pos[1]], 
+                      [pos[0]-3,pos[1]-1],
+                      [pos[0]-3,pos[1]+1],
+                      [pos[0]-3,pos[1]-2],
+                      [pos[0]-3,pos[1]+2]]
 
         return coords
         
@@ -330,13 +336,13 @@ class Robot(object):
 class RobotState:
 
 
-    def getLegalActions( self ):
+    def getLegalActions( self, pos):
 
         possibleActions = ['North','South','East','West','None']
         legalActions = []
 
         for action in possibleActions:
-            bumpReadings = self.r.bumpSensor(action)
+            bumpReadings = self.r.bumpSensor(action, position=pos)
             if (len(bumpReadings) == 0):
                 legalActions.append(action)
         
@@ -411,8 +417,9 @@ class RobotState:
         robotCp = self.r.copy()
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
-       
-        print self.willVisitNewCell(self.r.pos, action) 
+        
+        print self.getLegalActions(self.r.pos)
+        #print self.willVisitNewCell(self.r.pos, action) 
 
         if action != None:
             #check bumper 
