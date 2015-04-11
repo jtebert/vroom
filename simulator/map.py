@@ -30,7 +30,7 @@ class MapNode(object):
         self.isVisited = False
         self.dirt = 0
         self.label = None
-        self.value = 0
+        self.value = None
 
 
 class RobotMap(object):
@@ -224,9 +224,6 @@ class Environment(object):
         for y in xrange(0,int(mapCopy.heightCells-1)):
             for x in xrange(0,int(mapCopy.widthCells-1)):
 
-                #print "Square: ", x, " ", y
-                #print "Label: ", mapCopy.map[x][y].label
-
                 if mapCopy.map[x][y].isObstacle:
                     #Obstacle that can't be cleaned
                     continue
@@ -301,7 +298,7 @@ class Environment(object):
                             column = column.split(',')
 
                             value = int(column[0])
-                            if value > 0:
+                            if value >= 0:
                                 self.map[i][j].dirt = value
                             else:
                                 self.map[i][j].isObstacle = True
@@ -311,10 +308,8 @@ class Environment(object):
                         else:
                             
                             value = int(column)
-                            if value > 0:
+                            if value >= 0:
                                 self.map[i][j].dirt = value
-                            elif value == 0:
-                                self.map[i][j].isObstacle = False
                             else:
                                 self.map[i][j].isObstacle = True
 
