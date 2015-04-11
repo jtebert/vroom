@@ -80,6 +80,7 @@ class RobotSimulator(object):
         state = RobotState(self.robot,self.map )
         agent = None  #TODO replace with agent selection
 
+        #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
         problem = MapEnvironmentProblem(state, 70)
@@ -106,7 +107,7 @@ class RobotSimulator(object):
                 self.action = actions.pop(0)
             else:
                 self.action = 'None'
-            '''    
+            '''   
                 
             screen = pygame.display.get_surface()
 
@@ -218,68 +219,66 @@ class Robot(object):
         
         coords = None
         
-        if self.heading == action:
-            if action == 'North':
-                coords = [[self.pos[0],self.pos[1]-3], 
-                          [self.pos[0]-1,self.pos[1]-3],
-                          [self.pos[0]+1,self.pos[1]-3],
-                          [self.pos[0]-2,self.pos[1]-3],
-                          [self.pos[0]+2,self.pos[1]-3]]
+        if action == 'North':
+            coords = [[self.pos[0],self.pos[1]-3], 
+                      [self.pos[0]-1,self.pos[1]-3],
+                      [self.pos[0]+1,self.pos[1]-3],
+                      [self.pos[0]-2,self.pos[1]-3],
+                      [self.pos[0]+2,self.pos[1]-3]]
+            
+        if action == 'South':
+            coords = [[self.pos[0]+1,self.pos[1]+3],
+                      [self.pos[0],self.pos[1]+3], 
+                      [self.pos[0]-1,self.pos[1]+3],
+                      [self.pos[0]-2,self.pos[1]+3],
+                      [self.pos[0]+2,self.pos[1]+3]]
 
-            if action == 'South':
-                coords = [[self.pos[0]+1,self.pos[1]+3],
-                          [self.pos[0],self.pos[1]+3], 
-                          [self.pos[0]-1,self.pos[1]+3],
-                          [self.pos[0]-2,self.pos[1]+3],
-                          [self.pos[0]+2,self.pos[1]+3]]
+        if action == 'East':
+            coords = [[self.pos[0]+3,self.pos[1]], 
+                      [self.pos[0]+3,self.pos[1]-1],
+                      [self.pos[0]+3,self.pos[1]+1],
+                      [self.pos[0]+3,self.pos[1]-2],
+                      [self.pos[0]+3,self.pos[1]+2]]
 
-            if action == 'East':
-                coords = [[self.pos[0]+3,self.pos[1]], 
-                          [self.pos[0]+3,self.pos[1]-1],
-                          [self.pos[0]+3,self.pos[1]+1],
-                          [self.pos[0]+3,self.pos[1]-2],
-                          [self.pos[0]+3,self.pos[1]+2]]
-
-            if action == 'West':
-                coords = [[self.pos[0]-3,self.pos[1]], 
-                          [self.pos[0]-3,self.pos[1]-1],
-                          [self.pos[0]-3,self.pos[1]+1],
-                          [self.pos[0]-3,self.pos[1]-2],
-                          [self.pos[0]-3,self.pos[1]+2]]
+        if action == 'West':
+            coords = [[self.pos[0]-3,self.pos[1]], 
+                      [self.pos[0]-3,self.pos[1]-1],
+                      [self.pos[0]-3,self.pos[1]+1],
+                      [self.pos[0]-3,self.pos[1]-2],
+                      [self.pos[0]-3,self.pos[1]+2]]
 
         return coords
 
     def getEmptySpaceCoords(self, action):
         coords = []
         
-        if self.heading == action:
-            if action == 'North':
-                coords = [[self.pos[0],self.pos[1]-3], 
-                          [self.pos[0]-1,self.pos[1]-3],
-                          [self.pos[0]+1,self.pos[1]-3],
-                          [self.pos[0]-2,self.pos[1]-3],
-                          [self.pos[0]+2,self.pos[1]-3]]
+        if action == 'North':
+            coords = [[self.pos[0],self.pos[1]-3], 
+                      [self.pos[0]-1,self.pos[1]-3],
+                      [self.pos[0]+1,self.pos[1]-3],
+                      [self.pos[0]-2,self.pos[1]-3],
+                      [self.pos[0]+2,self.pos[1]-3]]
+            
+        if action == 'South':
+            coords = [[self.pos[0]+1,self.pos[1]+3],
+                      [self.pos[0],self.pos[1]+3], 
+                      [self.pos[0]-1,self.pos[1]+3],
+                      [self.pos[0]-2,self.pos[1]+3],
+                      [self.pos[0]+2,self.pos[1]+3]]
 
-            if action == 'South':
-                coords = [[self.pos[0]+1,self.pos[1]+3],
-                          [self.pos[0],self.pos[1]+3], 
-                          [self.pos[0]-1,self.pos[1]+3],
-                          [self.pos[0]-2,self.pos[1]+3],
-                          [self.pos[0]+2,self.pos[1]+3]]
+        if action == 'East':
+            coords = [[self.pos[0]+3,self.pos[1]], 
+                      [self.pos[0]+3,self.pos[1]-1],
+                      [self.pos[0]+3,self.pos[1]+1],
+                      [self.pos[0]+3,self.pos[1]-2],
+                      [self.pos[0]+3,self.pos[1]+2]]
 
-            if action == 'East':
-                coords = [[self.pos[0]+3,self.pos[1]], 
-                          [self.pos[0]+3,self.pos[1]-1],
-                          [self.pos[0]+3,self.pos[1]+1],
-                          [self.pos[0]+3,self.pos[1]-2],
-                          [self.pos[0]+3,self.pos[1]+2]]
-
-            if action == 'West':
-                coords = [[self.pos[0]-3,self.pos[1]], 
-                          [self.pos[0]-3,self.pos[1]-1],
-                          [self.pos[0]-3,self.pos[1]+1],
-                          [self.pos[0]-3,self.pos[1]-2],
-                          [self.pos[0]-3,self.pos[1]+2]]
+        if action == 'West':
+            coords = [[self.pos[0]-3,self.pos[1]], 
+                      [self.pos[0]-3,self.pos[1]-1],
+                      [self.pos[0]-3,self.pos[1]+1],
+                      [self.pos[0]-3,self.pos[1]-2],
+                      [self.pos[0]-3,self.pos[1]+2]]
 
         return coords
         
@@ -300,60 +299,26 @@ class Robot(object):
 
     def takeAction(self,action):
         
-        
-
-        if (self.heading == action):
-            #drive forwards
-            if action == 'North':
-                #north is negative
-                self.pos[1] -= 1
-            if action == 'East':
-                self.pos[0] += 1
-            if action == 'West':
-                self.pos[0] -= 1
-            if action == 'South':
-                self.pos[1] += 1
+        #drive forwards
+        if action == 'North':
+            #north is negative
+            self.pos[1] -= 1
+        if action == 'East':
+            self.pos[0] += 1
+        if action == 'West':
+            self.pos[0] -= 1
+        if action == 'South':
+            self.pos[1] += 1
                 
-        else:
-            #turn torwards requested action
-            self.heading = self.evaluateTurn(action)
+        if (action != 'None'):
+            self.heading = action
 
-        #print "robot pos: ",self.pos
-        #print "robot heading: ",self.heading
 
     def evaluateTurn(self,action):
-        
-        heading = self.heading
-
-        if self.heading == 'None':
-            heading = action
-
-        if self.heading == 'North':
-            if (action == 'East') or (action == 'TurnRight'):
-                heading = 'East'
-            if (action == 'West') or (action == 'TurnLeft'):
-                heading = 'West'
-
-        if self.heading == 'East':
-            if (action == 'South') or (action == 'TurnRight'):
-                heading = 'South'
-            if (action == 'North') or (action == 'TurnLeft'):
-                heading = 'North'
-
-        if self.heading == 'South':
-            if (action == 'West') or (action == 'TurnRight'):
-                heading = 'West'
-            if (action == 'East') or (action == 'TurnLeft'):
-                heading = 'East'
-                
-        if self.heading == 'West':
-            if (action == 'North') or (action == 'TurnRight'):
-                heading = 'North'
-            if (action == 'South') or (action == 'TurnLeft'):
-                heading = 'South'
-
-        return heading
-
+        #not needed anymore
+ 
+        raise Exception("evaluateTurn is not supported by simulator")
+    
 
     def copy(self):
         r = Robot(self.environment)
@@ -383,15 +348,14 @@ class RobotState:
         pos = list(self.r.pos)
         
 
-        if self.r.heading == action:
-            if action == 'North':
-                pos[1] -= 1
-            if action == 'South':
-                pos[1] += 1
-            if action == 'East':
-                pos[0] += 1
-            if action == 'West':
-                pos[0] -= 1
+        if action == 'North':
+            pos[1] -= 1
+        if action == 'South':
+            pos[1] += 1
+        if action == 'East':
+            pos[0] += 1
+        if action == 'West':
+            pos[0] -= 1
         
                 
         for i in range(-2,3,1):
