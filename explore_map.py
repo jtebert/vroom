@@ -59,22 +59,3 @@ class MapEnvironmentProblem:
             robot_state = robot_state.generateSuccessor(action)
             cost += 1
         return cost
-
-
-def exploration_heuristic(state, problem):
-    """
-    Heuristic to search all locations in the map
-    :param state: Current state of the robot/world
-    :param problem: Search problem to be completed (e.g., MapEnvironmentProblem)
-    :return: Heuristic value of the current state (RobotState, Grid)
-    """
-    robot_state, grid = state
-    unexplored = grid.list_unexplored()
-    cell_costs = []
-    for cell in unexplored:
-        cell_costs.append(utils.manhattan_distance(robot_state.getRobotPosition(), cell))
-    if len(cell_costs) > 0:
-        max_cost = max(cell_costs)
-    else:
-        max_cost = 0
-    return max_cost

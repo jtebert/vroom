@@ -92,9 +92,6 @@ def a_star_search(problem, heuristic):
     return ["None"]
 
 
-# Let's try this again...
-# Depth first search, with backtracking, minimizing revisiting of visited nodes
-# End when all explored or nothing else reachable (will backtrack to starting position and have nowhere else to go)
 def depth_first_search(problem):
     """
     Depth first search, with backtracking, minimizing revisiting of visited nodes
