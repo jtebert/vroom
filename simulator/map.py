@@ -239,15 +239,17 @@ class Environment(object):
                     cellDist = openCellDist[str(mapCopy.map[x][y].dirt)]
                     
                     #Own cell: default dirt generation
-                    if random.random() < cellDist[0]:
+                    if randomVal < cellDist[0]:
                         self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
                 
 
                 else:
                     #Own cell: Generation based on label
-                    if random.random() >= labelDict[str(mapCopy.map[x][y].label)][str(mapCopy.map[x][y].dirt)]:
+                    randomVal = random.random()
+                    labelDist = labelDict[str(mapCopy.map[x][y].label)]
+                    cellDist = labelDist[str(mapCopy.map[x][y].dirt)]
+                    if randomVal < cellDist[0]:
                         self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
-                        #self.map[x][y].value = self.map[x][y].dirt
 
 
                 #for i in mapCopy.adjacent(x, y):
@@ -271,14 +273,15 @@ class Environment(object):
                         #Adjacent cell: default dirt generation
                         if randomVal < cellDist[1]:
                             self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
-                            #self.map[x][y].value = self.map[x][y].dirt
 
                     else:
                         #print "Cell label"
                         #Adjacent cell: Generation based on label
-                        if random.random() >= labelDict[str(mapCopy.map[x][y].label)][str(mapCopy.map[x][y].dirt)]:
+                        randomVal = random.random()
+                        labelDist = labelDict[str(mapCopy.map[x][y].label)]
+                        cellDist = labelDist[str(mapCopy.map[x][y].dirt)]
+                        if randomVal < cellDist[1]:
                             self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
-                            #self.map[x][y].value = self.map[x][y].dirt
 
                 self.map[x][y].value = self.map[x][y].dirt
 
