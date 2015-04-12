@@ -26,10 +26,10 @@ class CollectDirtProblem(object):
         :param state: Current robot state
         :return: List of (state, action) tuples
         """
-        actions = state.getLegalActions()
+        actions = state.getLegalActions(state.getRobotPosition())
         successors = []
         for action in actions:
-            if state[0].willVisitNewCell(action):
+            if state.willVisitNewCell(state.getRobotPosition(), action):
                 next_state = state.generateSuccessor(action)
                 successors.append((next_state, action))
         return successors

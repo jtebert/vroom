@@ -96,8 +96,10 @@ class RobotSimulator(object):
         #print actions
 
         # DIRT COLLECTION PROBLEM
-        #problem = CollectDirtProblem(state)
-        #actions = a_star_search(problem, dirt_heuristic)
+        state.map = self.environment.copyEnvIntoMap(state.map)
+        problem = CollectDirtProblem(state)
+        actions = a_star_search(problem, dirt_heuristic)
+        print actions
         
 
         while(True):
