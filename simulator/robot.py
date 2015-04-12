@@ -32,6 +32,7 @@ class RobotSimulator(object):
 
         self.start = False
         self.updateDirt = False
+        self.drawLabels = False
 
         
     
@@ -62,6 +63,8 @@ class RobotSimulator(object):
                     self.showEnvironment = (not self.showEnvironment)
                 if self.k == pygame.K_d:
                     self.updateDirt = True
+                if self.k == pygame.K_l:
+                    self.drawLabels = (not self.drawLabels)
             
 
 
@@ -99,7 +102,7 @@ class RobotSimulator(object):
         #print actions
 
         # DIRT COLLECTION PROBLEM
-        #state.map = self.environment.copyEnvIntoMap(state.map)
+        state.map = self.environment.copyEnvIntoMap(state.map)
         #problem = CollectDirtProblem(state)
         #actions = a_star_search(problem, dirt_heuristic)
         #print actions
@@ -136,9 +139,16 @@ class RobotSimulator(object):
             if self.showEnvironment:
                 state.map.draw(screen,environment = self.environment)
                 state.map.drawRobot(screen,state.r)
+
+                if self.drawLabels:
+                    state.map.drawLabels(screen)
+
             else:
                 state.map.draw(screen)
                 state.map.drawRobot(screen,state.r)
+
+                if self.drawLabels:
+                    state.map.drawLabels(screen)
             
 
             
@@ -346,7 +356,7 @@ class Robot(object):
 
     def copy(self):
         r = Robot(self.environment)
-        r.pos = self.pos
+        r.pos = list(self.pos)
         r.heading = self.heading
         return r
 
@@ -439,6 +449,7 @@ class RobotState:
         #print self.willVisitNewCell(self.r.pos, action) 
 
         #print "start generate successor: ",action
+        #print "position: ",state.r.pos
 
         if action != None:
             #check bumper 
@@ -497,7 +508,7 @@ class RobotState:
             if pos not in (state.map.robotPositions):
                 state.map.robotPositions.append([pos[0],pos[1]])
         
-        #print "end generate successor: ",action
+        #print "end generate successor: ",state.r.pos
                 
         return state
 

@@ -132,7 +132,7 @@ class RobotMap(object):
                         pygame.draw.rect(screen,(0,0,0),r,0)
                     elif (self.map[x][y].dirt > 0):
                         d = self.map[x][y].dirt
-                        print "DIRT:", d
+
                         pygame.draw.rect(screen,(0,0,255-(60*d)),r,0)
                     elif self.map[x][y].isVisited:
                         pygame.draw.rect(screen,(255,255,255),r,0)
@@ -166,6 +166,35 @@ class RobotMap(object):
 
         if robot.heading == 'West':
             pygame.draw.line(screen,(255,0,0),(robotCenterX,robotCenterY),(robotCenterX-robot.size,robotCenterY))
+
+
+    def drawLabels(self, screen):
+        """
+        For each group of map labels, draw the label in text
+        """
+        
+        print "drawing Labels!"
+        isDrawn = []
+        
+        for row in range(self.yCells):
+            for col in range(self.xCells):
+                #assumes it hits the top left corner of a group of labels
+                #and that the labels are 10x10
+                if self.map[col][row].label != None: 
+                    if [col,row] not in isDrawn:
+                        myfont = pygame.font.SysFont("Comic Sans MS", 16)
+                        # apply it to text on a label
+                        print self.map[col][row].label
+                        label = myfont.render(str(self.map[col][row].label), 1, (255,255,0))
+                        labelPos = ((col+5)*self.cellYSize, (row)*self.cellXSize)
+                        screen.blit(label, labelPos)
+                        
+                        for i in range(10):
+                            for j in range(10):
+                                isDrawn.append([col+i,row+j])
+                    
+        return True
+
 
     def are_all_visited(self):
         """
@@ -402,6 +431,9 @@ class Environment(object):
 
                 if self.map[x][y].value == 0:
                     mapcp.map[x][y].isVisited = True
+
+                if self.map[x][y].label != None:
+                    mapcp.map[x][y].label = self.map[x][y].label
                     
                     
                 mapcp.visitedCells.append([x,y])
