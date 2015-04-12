@@ -84,8 +84,9 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        problem = MapEnvironmentProblem(state, 10)
-        #actions = depth_first_search(problem)
+        problem = MapEnvironmentProblem(state)
+        actions = depth_first_search(problem)
+        print actions
         
 
         while(True):
@@ -418,7 +419,7 @@ class RobotState:
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
         
-        print self.getLegalActions(self.r.pos)
+        #print self.getLegalActions(self.r.pos)
         #print self.willVisitNewCell(self.r.pos, action) 
 
         if action != None:

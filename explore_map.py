@@ -8,18 +8,15 @@ class MapEnvironmentProblem:
     A search problem of visiting (exploring) all squares in an unknown environment
     Updates the robot's knowledge of the environment as it explores
 
-    A search state is a tuple of (RobotState, Grid)
+    A search state is a RobotState
     """
 
-    def __init__(self, start_state, grid_size=100):
-        grid = utils.Grid(grid_size)
-        grid.visit(start_state.getRobotPosition())
-        grid.set_all_valid_actions(start_state)
-        self.start = (start_state, grid)
+    def __init__(self, start_state):
+        self.start = (start_state)
 
     @staticmethod
     def is_goal_state(state):
-        return state[1].are_all_visited()
+        return state.map.are_all_visited()
 
     @staticmethod
     def get_successors(state):
@@ -28,19 +25,16 @@ class MapEnvironmentProblem:
         :param state: Current robot position & exploration grid
         :return: List of (state, action) tuples
         """
-        robot_state = state[0]
-        actions = robot_state.getLegalActions()
+        actions = state.getLegalActions(state.getRobotPosition())
+        print state.getRobotPosition()
         successors = []
         for action in actions:
-            if state[0].willVisitNewCell(action):
-                next_state = robot_state.generateSuccessor(action)
-                next_x, next_y = next_state.getRobotPosition()
-                # Create new grid with newly visited cells and rechecking whether
-                # new cells will be visited
-                next_grid = state[1].deepcopy()
-                next_grid.mark_visited((next_x, next_y))
-                next_grid.set_all_valid_actions(state[0])
-                successors.append(((next_state, next_grid), action))
+            if state.willVisitNewCell(state.getRobotPosition(), action):
+                print action
+                next_state = state.generateSuccessor(action)
+                # Recheck whether new cells will be visited
+                next_state.set_all_valid_actions(state)
+                successors.append((next_state, action))
         return successors
 
     def get_cost_of_actions(self, actions):
@@ -49,11 +43,11 @@ class MapEnvironmentProblem:
         :param actions: List of actions
         :return: Numerical cost of actions
         """
-        robot_state = self.start[0]
+        robot_state = self.start
         cost = 0
         for action in actions:
             # Check if legal
-            legal = robot_state.getLegalActions()
+            legal = robot_state.getLegalActions(robot_state.getRobotPosition())
             if not action in legal:
                 return 999999
             robot_state = robot_state.generateSuccessor(action)

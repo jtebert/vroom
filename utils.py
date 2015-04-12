@@ -56,7 +56,7 @@ class Grid:
 
     def __init__(self, grid_size=100):
         self.grid_size = grid_size
-        self.grid = [[GridCell((x,y)) for y in range(grid_size)] for x in range(grid_size)]
+        self.grid = [[GridCell((y,x)) for y in range(grid_size)] for x in range(grid_size)]
 
     def __str__(self):
         print_str = ""
@@ -76,10 +76,10 @@ class Grid:
         :param robot_state: RobotState (for the map)
         :return: Nothing. Mutation, man.
         """
-        for x in range(self.grid_size):
-            for y in range(self.grid_size):
-                if self.grid[x][y].is_visited:
-                    self.grid[x][y].set_valid_actions(robot_state)
+        for y in range(self.grid_size):
+            for x in range(self.grid_size):
+                if self.grid[y][x].is_visited:
+                    self.grid[y][x].set_valid_actions(robot_state)
 
     def is_visited(self, x, y):
         """
@@ -88,7 +88,7 @@ class Grid:
         :param y: y position
         :return: Boolean
         """
-        return self.grid[x][y].is_visited
+        return self.grid[y][x].is_visited
 
     def are_all_visited(self):
         """
@@ -96,9 +96,9 @@ class Grid:
         If all visited, search mapping is complete
         :return: Boolean, fully explored or not
         """
-        for x in range(self.grid_size):
-            for y in range(self.grid_size):
-                if self.grid[x][y].are_any_valid_actions():
+        for y in range(self.grid_size):
+            for x in range(self.grid_size):
+                if self.grid[y][x].are_any_valid_actions():
                     return False
         return True
 
@@ -152,8 +152,8 @@ class GridCell(object):
         # TODO: Not actually sure if robot_state is updated to have the correct info for checking this?
         new_actions = []
         # TODO: Change this back when getLegalActions is updated
-        #actions = robot_state.getLegalActions(self.coord)
-        actions = robot_state.getLegalActions()
+        actions = robot_state.getLegalActions(self.coord)
+        #actions = robot_state.getLegalActions()
         for a in actions:
             if robot_state.willVisitNewCell(self.coord, a):
                 new_actions.append(a)

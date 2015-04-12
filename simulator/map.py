@@ -25,12 +25,35 @@ labelDict = { "openCell": openCellDist,
 
 class MapNode(object):
     
-    def __init__(self):
+    def __init__(self, row, col):
         self.isObstacle = False
         self.isVisited = False
         self.dirt = 0
         self.label = None
         self.value = None
+        self.validActions = []
+        self.row = row
+        self.col = col
+
+    def __str__(self):
+        if self.isVisited:
+            return "1"
+        else:
+            return "0"
+
+    def set_valid_actions(self, robot_state):
+        """
+        Use the robot state to determine explorative actions from the current cell
+        """
+        new_actions = []
+        actions = robot_state.getLegalActions((self.col, self.row))
+        for a in actions:
+            if robot_state.willVisitNewCell((self.col, self.row), a):
+                new_actions.append(a)
+        self.valid_actions = new_actions
+
+    def are_any_valid_actions(self):
+        return len(self.validActions) > 0
 
 
 class RobotMap(object):
@@ -52,11 +75,20 @@ class RobotMap(object):
         self.unvisitedCells = []
         self.observedCells = []  #cells seen by the proximity sensor, but not visited
         
-        self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+        self.map = [[MapNode(rows, columns) for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
               
         for x in xrange(0,int(self.xCells)):
             for y in xrange(0,int(self.yCells)):
                 self.unvisitedCells.append([x,y])
+
+
+    def __str__(self):
+        print_str = ""
+        for row in range(self.yCells):
+            for col in xrange(self.xCells):
+                print_str += (str(self.map[row][col]) + " ")
+            print_str += "\n"
+        return print_str
         
 
     def draw(self,screen, environment = None):
@@ -148,7 +180,29 @@ class RobotMap(object):
         if robot.heading == 'West':
             pygame.draw.line(screen,(255,0,0),(robotCenterX,robotCenterY),(robotCenterX-robot.size,robotCenterY))
 
+    def are_all_visited(self):
+        """
+        Check if all explorable cells have been explored.
+        If all visited, search mapping is complete
+        :return: Boolean, fully explored or not
+        """
+        for row in range(self.yCells):
+            for col in range(self.xCells):
+                if self.map[col][row].are_any_valid_actions():
+                    return False
+        return True
 
+    def set_all_valid_actions(self, robot_state):
+        """
+        Use the robot state to determine what actions are valid,
+        ONLY for cells that have been visited.
+        :param robot_state: RobotState (for the map)
+        :return: Nothing. Mutation, man.
+        """
+        for row in range(self.yCells):
+            for col in range(self.xCells):
+                if self.map[col][row].isVisited:
+                    self.map[col][row].set_valid_actions(robot_state)
 
     def copy (self):
         mapcp = RobotMap()
@@ -181,7 +235,7 @@ class Environment(object):
         self.heightCells = h / cellYSize
         self.boundingBox = ((w/2,h/2),(w/2,h/2))
         self.label = ''
-        self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+        self.map = [[MapNode(rows, columns) for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
 
 
         self.importEnviroment(environmentCSV)

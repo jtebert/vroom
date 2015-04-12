@@ -101,11 +101,13 @@ def depth_first_search(problem):
     """
     node = Node(problem.start, None, None, problem)
     while not problem.is_goal_state(node.state):
+        print node.state[1]
         next_states = problem.get_successors(node.state)
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
             next_state = node.parent.state
         else:
             next_state = next_states[0]
-        node = Node(next_state[0], next_state[2], node, problem)
+        print "GO:", next_state[1]
+        node = Node(next_state[0], next_state[1], node, problem)
     return node.get_path()

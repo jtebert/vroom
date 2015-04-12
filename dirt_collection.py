@@ -15,7 +15,7 @@ class CollectDirtProblem(object):
         """
         Has all the dirt been collected?
         :param state: Current state of the robot
-        :return: Boolaen (cleaned or not)
+        :return: Boolean (cleaned or not)
         """
         return len(state.getDirt()) == 0
 
