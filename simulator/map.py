@@ -71,6 +71,7 @@ class RobotMap(object):
         self.dirtCells = []
         self.visitedCells = []
         self.obstacles = []
+        self.robotPositions = []
 
         self.unvisitedCells = []
         self.observedCells = []  #cells seen by the proximity sensor, but not visited
@@ -151,8 +152,9 @@ class RobotMap(object):
 
                 if ([robot.pos[0]+x,robot.pos[1]+y] in self.unvisitedCells):
                     self.unvisitedCells.remove([robot.pos[0]+x,robot.pos[1]+y])
-                
-                        
+
+        if robot.pos not in (self.robotPositions):
+            self.robotPositions.append([robot.pos[0],robot.pos[1]])
 
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),
@@ -211,6 +213,7 @@ class RobotMap(object):
         mapcp.obstacles = list(self.obstacles)
         mapcp.unvisitedCells = list(self.unvisitedCells)
         mapcp.observedCells = list(self.observedCells)
+        mapcp.robotPositions = list(self.robotPositions)
 
         cellXMax = self.width/self.cellXSize
         cellYMax = self.height/self.cellYSize
@@ -384,8 +387,35 @@ class Environment(object):
     
     
 
- 
+    def copyEnvIntoMap( self, m ):
+        #Takes in a map, and ports the environment into the map 
+        #as if the robot fully explored it.
 
+        mapcp = m.copy()
+        mapcp.dirtCells = []
+        mapcp.visitedCells = []
+        mapcp.unvisitedCells = []
+        mapcp.obstacles = []
+        mapcp.robotPositions = []
 
+        self.unvisitedCells = []
+        
+        for x in xrange(0,int(mapcp.xCells)):
+            for y in xrange(0,int(mapcp.yCells)):
+                #map              environments "map"
+                mapcp.map[x][y] = self.map[x][y] 
 
- 
+                if self.map[x][y].value > 0:
+                    mapcp.dirtCells.append([x,y,self.map[x][y].value])
+
+                if self.map[x][y].value == -1:
+                    mapcp.obstacles.append([x,y])
+
+                if self.map[x][y].value == 0:
+                    mapcp.map[x][y].isVisited = True
+                    
+                    
+                mapcp.visitedCells.append([x,y])
+
+            
+        return mapcp
