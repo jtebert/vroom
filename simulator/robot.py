@@ -32,6 +32,7 @@ class RobotSimulator(object):
 
         self.start = False
         self.updateDirt = False
+        self.drawLabels = False
 
         
     
@@ -62,6 +63,8 @@ class RobotSimulator(object):
                     self.showEnvironment = (not self.showEnvironment)
                 if self.k == pygame.K_d:
                     self.updateDirt = True
+                if self.k == pygame.K_l:
+                    self.drawLabels = (not self.drawLabels)
             
 
 
@@ -91,15 +94,18 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        problem = MapEnvironmentProblem(state)
+        #problem = MapEnvironmentProblem(state)
+
+        #actions = depth_first_search(problem)
+        #print actions
         #actions = depth_first_search(problem)
         #print actions
 
         # DIRT COLLECTION PROBLEM
         state.map = self.environment.copyEnvIntoMap(state.map)
-        problem = CollectDirtProblem(state)
-        actions = a_star_search(problem, dirt_heuristic)
-        print actions
+        #problem = CollectDirtProblem(state)
+        #actions = a_star_search(problem, dirt_heuristic)
+        #print actions
         
 
         while(True):
@@ -133,9 +139,16 @@ class RobotSimulator(object):
             if self.showEnvironment:
                 state.map.draw(screen,environment = self.environment)
                 state.map.drawRobot(screen,state.r)
+
+                if self.drawLabels:
+                    state.map.drawLabels(screen)
+
             else:
                 state.map.draw(screen)
                 state.map.drawRobot(screen,state.r)
+
+                if self.drawLabels:
+                    state.map.drawLabels(screen)
             
 
             
@@ -343,7 +356,7 @@ class Robot(object):
 
     def copy(self):
         r = Robot(self.environment)
-        r.pos = self.pos
+        r.pos = list(self.pos)
         r.heading = self.heading
         return r
 
@@ -435,6 +448,9 @@ class RobotState:
         #print self.getLegalActions(self.r.pos)
         #print self.willVisitNewCell(self.r.pos, action) 
 
+        #print "start generate successor: ",action
+        #print "position: ",state.r.pos
+
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)
@@ -464,15 +480,35 @@ class RobotState:
                     
                     if openCell in state.map.unvisitedCells:
                        # print "adding observed cell: ",openCell
-                        state.map.observedCells.append(openCell)
-
-            
+                        state.map.observedCells.append(openCell)            
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)
             else:
                 self.bump = True
+             
+            
+            
+            pos = [0,0]
+            pos[0] = int(state.r.pos[0])
+            pos[1] = int(state.r.pos[1])
+            for x in range(-2,3,1):
+                for y in range (-2,3,1):
+                    state.map.map[pos[0]+x][pos[1]+y].isVisited = True
 
+                    if ([pos[0]+x,pos[1]+y] not in state.map.visitedCells):
+                        state.map.visitedCells.append([pos[0]+x,pos[1]+y])
+                
+                    if ([pos[0]+x,pos[1]+y] in state.map.observedCells):
+                        state.map.observedCells.remove([pos[0]+x,pos[1]+y])
+
+                    if ([pos[0]+x,pos[1]+y] in state.map.unvisitedCells):
+                        state.map.unvisitedCells.remove([pos[0]+x,pos[1]+y])
+                    
+            if pos not in (state.map.robotPositions):
+                state.map.robotPositions.append([pos[0],pos[1]])
+        
+        #print "end generate successor: ",state.r.pos
                 
         return state
 
@@ -513,7 +549,7 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    defaultEnvironmentCSV = './../assets/maps/basement.csv'
+    defaultEnvironmentCSV = './../assets/maps/test.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':

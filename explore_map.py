@@ -45,6 +45,7 @@ class MapEnvironmentProblem:
         """
         robot_state = self.start
         cost = 0
+        '''
         for action in actions:
             # Check if legal
             legal = robot_state.getLegalActions(robot_state.getRobotPosition())
@@ -52,4 +53,5 @@ class MapEnvironmentProblem:
                 return 999999
             robot_state = robot_state.generateSuccessor(action)
             cost += 1
+        '''
         return cost
