@@ -110,6 +110,6 @@ def depth_first_search(problem):
         else:
             next_state = next_states[0]
         print "GO:", next_state[1]
-        #print next_state[0].getVisited()
+        print next_state[0].map.robotPositions
         node = Node(next_state[0], next_state[1], node, problem)
     return node.get_path()
