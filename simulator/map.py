@@ -50,7 +50,7 @@ class MapNode(object):
         for a in actions:
             if robot_state.willVisitNewCell((self.col, self.row), a):
                 new_actions.append(a)
-        self.valid_actions = new_actions
+        self.validActions = new_actions
 
     def are_any_valid_actions(self):
         return len(self.validActions) > 0

@@ -78,7 +78,13 @@ class RobotSimulator(object):
         self.bump = None
         self.cleanDirection = 'Down'
 
+        # Set valid actions for the robot's starting position
+        # (otherwise no actions to begin with and it stops)
         state = RobotState(self.robot,self.map )
+        pos = state.getRobotPosition()
+        state.map.map[pos[0]][pos[1]].set_valid_actions(state)
+        print state.map.map[pos[0]][pos[1]].validActions
+
         agent = None  #TODO replace with agent selection
 
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']

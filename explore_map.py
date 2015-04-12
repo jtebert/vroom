@@ -33,7 +33,7 @@ class MapEnvironmentProblem:
                 print action
                 next_state = state.generateSuccessor(action)
                 # Recheck whether new cells will be visited
-                next_state.set_all_valid_actions(state)
+                next_state.map.set_all_valid_actions(state)
                 successors.append((next_state, action))
         return successors
 
