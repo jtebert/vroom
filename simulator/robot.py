@@ -7,6 +7,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from explore_map import *
+from dirt_collection import *
 from search import *
 
 import time
@@ -91,8 +92,12 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
         problem = MapEnvironmentProblem(state)
-        actions = depth_first_search(problem)
-        print actions
+        #actions = depth_first_search(problem)
+        #print actions
+
+        # DIRT COLLECTION PROBLEM
+        #problem = CollectDirtProblem(state)
+        #actions = a_star_search(problem, dirt_heuristic)
         
 
         while(True):

@@ -40,7 +40,7 @@ class CollectDirtProblem(object):
         :param actions: List of actions
         :return: Numerical cost of actions
         """
-        robot_state = self.start[0]
+        robot_state = self.start
         cost = 0
         for action in actions:
             # Check if legal
@@ -52,19 +52,18 @@ class CollectDirtProblem(object):
         return cost
 
 
-def exploration_heuristic(state, problem):
+def dirt_heuristic(state, problem):
     """
     Heuristic to search all locations in the map
     Uses distance to furthest dirt as heuristic
-    :param state: Current state of the robot/world
+    :param state: Current state of the robot/world (RobotState)
     :param problem: Search problem to be completed (e.g., MapEnvironmentProblem)
     :return: Heuristic value of the current state (RobotState, Grid)
     """
-    robot_state, grid = state
-    unexplored = grid.list_unexplored()
+    unvisited = state.map.unvisitedCells
     cell_costs = []
-    for cell in unexplored:
-        cell_costs.append(utils.manhattan_distance(robot_state.getRobotPosition(), cell))
+    for cell in unvisited:
+        cell_costs.append(utils.manhattan_distance(state.getRobotPosition(), cell))
     if len(cell_costs) > 0:
         max_cost = max(cell_costs)
     else:
