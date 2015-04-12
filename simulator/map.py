@@ -132,6 +132,7 @@ class RobotMap(object):
                         pygame.draw.rect(screen,(0,0,0),r,0)
                     elif (self.map[x][y].dirt > 0):
                         d = self.map[x][y].dirt
+                        print "DIRT:", d
                         pygame.draw.rect(screen,(0,0,255-(60*d)),r,0)
                     elif self.map[x][y].isVisited:
                         pygame.draw.rect(screen,(255,255,255),r,0)
@@ -343,6 +344,8 @@ class Environment(object):
 
                             value = int(column[0])
                             if value >= 0:
+                                if value > 3:
+                                    value = 3
                                 self.map[i][j].dirt = value
                             else:
                                 self.map[i][j].isObstacle = True
@@ -353,6 +356,8 @@ class Environment(object):
                             
                             value = int(column)
                             if value >= 0:
+                                if value > 3:
+                                    value = 3
                                 self.map[i][j].dirt = value
                             else:
                                 self.map[i][j].isObstacle = True

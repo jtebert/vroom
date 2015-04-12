@@ -35,24 +35,8 @@ class PriorityQueue:
         return len(self.heap) == 0
 
 
-class Stack:
-    """
-    LIFO queue (based on Berkeley Pacman Project
-    """
-    def __init__(self):
-        self.list = []
-
-    def push(self, i):
-        self.list.append(i)
-
-    def pop(self):
-        return self.list.pop()
-
-    def is_empty(self):
-        return len(self.list) == 0
-
-
 class Grid:
+    # TODO: Get rid of this (once sure everything is migrated to RobotMap)
 
     def __init__(self, grid_size=100):
         self.grid_size = grid_size
