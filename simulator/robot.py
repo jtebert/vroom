@@ -506,7 +506,7 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    defaultEnvironmentCSV = './../assets/maps/test.csv'
+    defaultEnvironmentCSV = './../assets/maps/basement.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':
