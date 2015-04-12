@@ -40,6 +40,7 @@ class CollectDirtProblem(object):
         :param actions: List of actions
         :return: Numerical cost of actions
         """
+        # TODO: Find some way to avoid calling generateSuccessor?
         robot_state = self.start
         cost = 0
         for action in actions:
