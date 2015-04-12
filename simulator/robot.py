@@ -84,7 +84,7 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        problem = MapEnvironmentProblem(state, 10)
+        #problem = MapEnvironmentProblem(state, 10)
         #actions = depth_first_search(problem)
         
 
@@ -499,7 +499,7 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    defaultEnvironmentCSV = './../assets/maps/test.csv'
+    defaultEnvironmentCSV = './../assets/maps/basement.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':
