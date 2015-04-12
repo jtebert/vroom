@@ -101,6 +101,8 @@ def depth_first_search(problem):
     """
     node = Node(problem.start, None, None, problem)
     while not problem.is_goal_state(node.state):
+        print ""
+        print "Getting next states:"
         next_states = problem.get_successors(node.state)
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
@@ -108,5 +110,6 @@ def depth_first_search(problem):
         else:
             next_state = next_states[0]
         print "GO:", next_state[1]
+        #print next_state[0].getVisited()
         node = Node(next_state[0], next_state[1], node, problem)
     return node.get_path()

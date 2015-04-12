@@ -140,22 +140,6 @@ class RobotMap(object):
     def drawRobot (self,screen,robot):
 
 
-        for x in range(-2,3,1):
-            for y in range (-2,3,1):
-                self.map[robot.pos[0]+x][robot.pos[1]+y].isVisited = True
-
-                if ([robot.pos[0]+x,robot.pos[1]+y] not in self.visitedCells):
-                    self.visitedCells.append([robot.pos[0]+x,robot.pos[1]+y])
-                
-                if ([robot.pos[0]+x,robot.pos[1]+y] in self.observedCells):
-                    self.observedCells.remove([robot.pos[0]+x,robot.pos[1]+y])
-
-                if ([robot.pos[0]+x,robot.pos[1]+y] in self.unvisitedCells):
-                    self.unvisitedCells.remove([robot.pos[0]+x,robot.pos[1]+y])
-
-        if robot.pos not in (self.robotPositions):
-            self.robotPositions.append([robot.pos[0],robot.pos[1]])
-
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),
                                 max((robot.pos[1]*self.cellYSize)-(robot.size)/2,0),

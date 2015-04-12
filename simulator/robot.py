@@ -92,7 +92,7 @@ class RobotSimulator(object):
         #TODO defaults to run exploration and then shows results
         problem = MapEnvironmentProblem(state)
         actions = depth_first_search(problem)
-        print actions
+        #print actions
         
 
         while(True):
@@ -428,6 +428,8 @@ class RobotState:
         #print self.getLegalActions(self.r.pos)
         #print self.willVisitNewCell(self.r.pos, action) 
 
+        #print "start generate successor: ",action
+
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)
@@ -457,15 +459,35 @@ class RobotState:
                     
                     if openCell in state.map.unvisitedCells:
                        # print "adding observed cell: ",openCell
-                        state.map.observedCells.append(openCell)
-
-            
+                        state.map.observedCells.append(openCell)            
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)
             else:
                 self.bump = True
+             
+            
+            
+            pos = [0,0]
+            pos[0] = int(state.r.pos[0])
+            pos[1] = int(state.r.pos[1])
+            for x in range(-2,3,1):
+                for y in range (-2,3,1):
+                    state.map.map[pos[0]+x][pos[1]+y].isVisited = True
 
+                    if ([pos[0]+x,pos[1]+y] not in state.map.visitedCells):
+                        state.map.visitedCells.append([pos[0]+x,pos[1]+y])
+                
+                    if ([pos[0]+x,pos[1]+y] in state.map.observedCells):
+                        state.map.observedCells.remove([pos[0]+x,pos[1]+y])
+
+                    if ([pos[0]+x,pos[1]+y] in state.map.unvisitedCells):
+                        state.map.unvisitedCells.remove([pos[0]+x,pos[1]+y])
+                    
+            if pos not in (state.map.robotPositions):
+                state.map.robotPositions.append([pos[0],pos[1]])
+        
+        #print "end generate successor: ",action
                 
         return state
 
@@ -506,7 +528,7 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    defaultEnvironmentCSV = './../assets/maps/basement.csv'
+    defaultEnvironmentCSV = './../assets/maps/test.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':
