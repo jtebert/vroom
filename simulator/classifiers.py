@@ -10,6 +10,7 @@ class Classifiers(object):
         cellValue['none'] = 0.0
         cellValue['dirt'] = 0.0
         cellValue['obs'] = 0.0
+        self.classifierNames = ('openCell', 'doorway', 'garbageCan', 'chair', 'litterBox', 'houseEntrance')
         self.classifiers['openCell'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
         self.classifiers['doorway'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
@@ -68,8 +69,14 @@ class Classifiers(object):
     def getClassifier(self, classifier):
         return self.classifiers[classifier]
 
-
-
+    def laplaceSmoothing(self, num = 4):
+        for name in self.classifierNames:
+            for i in range(self.sampleRowSize):
+                for j in range(self.sampleColumnSize):
+                    self.classifiers[name][i][j]['dirt'] += num
+                    self.classifiers[name][i][j]['none'] += num
+                    self.classifiers[name][i][j]['obs'] += num
+        self.normalize()
 
 
 
@@ -85,4 +92,4 @@ x.train(sample2, 'chair')
 y = Classifiers(10, 10)
 mapTest = utils.readTrainingMap('./../assets/training_maps/chair_0.csv')
 y.train(mapTest, 'chair')
-x = 0
+y.laplaceSmoothing()
