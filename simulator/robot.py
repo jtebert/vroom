@@ -7,6 +7,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from explore_map import *
+from search import *
 
 import time
 
@@ -29,6 +30,7 @@ class RobotSimulator(object):
         self.action = None
 
         self.start = False
+        self.updateDirt = False
 
         
     
@@ -58,7 +60,7 @@ class RobotSimulator(object):
                 if self.k == pygame.K_e:
                     self.showEnvironment = (not self.showEnvironment)
                 if self.k == pygame.K_d:
-                    self.environment.updateDirt()
+                    self.updateDirt = True
             
 
 
@@ -79,11 +81,11 @@ class RobotSimulator(object):
         state = RobotState(self.robot,self.map )
         agent = None  #TODO replace with agent selection
 
+        #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        #problem = MapEnvironmentProblem(state, 70)
-        #heuristic = exploration_heuristic
-        #actions = a_star_search(problem, heuristic)
+        problem = MapEnvironmentProblem(state, 10)
+        #actions = depth_first_search(problem)
         
 
         while(True):
@@ -91,6 +93,10 @@ class RobotSimulator(object):
             
             if (agent == None):
                 self.listenControls()
+
+                if self.updateDirt:
+                    self.updateDirt = False
+                    self.environment.updateDirt()
                 #self.action is set directly by self.listenControls
             else:
                 self.action = agent.getAction(state)
@@ -101,7 +107,7 @@ class RobotSimulator(object):
                 self.action = actions.pop(0)
             else:
                 self.action = 'None'
-            '''    
+            '''   
                 
             screen = pygame.display.get_surface()
 
@@ -141,36 +147,66 @@ class Robot(object):
         pos = self.pos
         
         obsLocations = []
+        openLocations = []
 
 
         #check for sides
         for i in range(-2,3,1):
+
             if self.environment.map[pos[0]-3][pos[1]+i].value == -1:
                 obsLocations.append([pos[0]-3,pos[1]+i])
+            else:
+                openLocations.append([pos[0]-3,pos[1]+i])
+
             if self.environment.map[pos[0]+3][pos[1]+i].value == -1:
                 obsLocations.append([pos[0]+3,pos[1]+i])
+            else:
+                openLocations.append([pos[0]+3,pos[1]+i])
+
             if self.environment.map[pos[0]+i][pos[1]+3].value == -1:
                 obsLocations.append([pos[0]+i,pos[1]+3])
+            else:
+                openLocations.append([pos[0]+i,pos[1]+3])
+
             if self.environment.map[pos[0]+i][pos[1]-3].value == -1:
                 obsLocations.append([pos[0]+i,pos[1]-3])
+            else:
+                openLocations.append([pos[0]+i,pos[1]-3])
 
         #check for corners        
         if self.environment.map[pos[0]-3][pos[1]-3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]-3])
+        else:
+            openLocations.append([pos[0]-3,pos[1]-3])
+
         if self.environment.map[pos[0]-3][pos[1]+3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]+3])
-        if self.environment.map[pos[0]-3][pos[1]+3].value == -1:
-            obsLocations.append([pos[0]-3,pos[1]+3])
+        else:
+            openLocations.append([pos[0]-3,pos[1]+3])
+
+        if self.environment.map[pos[0]+3][pos[1]-3].value == -1:
+            obsLocations.append([pos[0]+3,pos[1]-3])
+        else:
+            openLocations.append([pos[0]+3,pos[1]-3])
+
         if self.environment.map[pos[0]+3][pos[1]+3].value == -1:
             obsLocations.append([pos[0]+3,pos[1]+3])
-
-        return obsLocations
+        else:
+            openLocations.append([pos[0]+3,pos[1]+3])
         
 
-    def bumpSensor(self, action):
+        return obsLocations,openLocations
+        
+
+    def bumpSensor(self, action, position = None):
         b = []
         
-        bumpCoordinates = self.getBumpCoordinates(action)
+        if position == None:
+            pos = self.pos
+        else:
+            pos = position
+
+        bumpCoordinates = self.getBumpCoordinates(action, pos)
 
         if bumpCoordinates != None:
             for pos in bumpCoordinates:
@@ -184,41 +220,74 @@ class Robot(object):
             bump = True
         return bump
 
-    def getBumpCoordinates(self, action):
+    def getBumpCoordinates(self, action, position):
         
         coords = None
+        pos = position
         
-        if self.heading == action:
-            if action == 'North':
-                coords = [[self.pos[0],self.pos[1]-3], 
-                          [self.pos[0]-1,self.pos[1]-3],
-                          [self.pos[0]+1,self.pos[1]-3],
-                          [self.pos[0]-2,self.pos[1]-3],
-                          [self.pos[0]+2,self.pos[1]-3]]
+        if action == 'North':
+            coords = [[pos[0],pos[1]-3], 
+                      [pos[0]-1,pos[1]-3],
+                      [pos[0]+1,pos[1]-3],
+                      [pos[0]-2,pos[1]-3],
+                      [pos[0]+2,pos[1]-3]]
+            
+        if action == 'South':
+            coords = [[pos[0]+1,pos[1]+3],
+                      [pos[0],pos[1]+3], 
+                      [pos[0]-1,pos[1]+3],
+                      [pos[0]-2,pos[1]+3],
+                      [pos[0]+2,pos[1]+3]]
 
-            if action == 'South':
-                coords = [[self.pos[0]+1,self.pos[1]+3],
-                          [self.pos[0],self.pos[1]+3], 
-                          [self.pos[0]-1,self.pos[1]+3],
-                          [self.pos[0]-2,self.pos[1]+3],
-                          [self.pos[0]+2,self.pos[1]+3]]
+        if action == 'East':
+            coords = [[pos[0]+3,pos[1]], 
+                      [pos[0]+3,pos[1]-1],
+                      [pos[0]+3,pos[1]+1],
+                      [pos[0]+3,pos[1]-2],
+                      [pos[0]+3,pos[1]+2]]
 
-            if action == 'East':
-                coords = [[self.pos[0]+3,self.pos[1]], 
-                          [self.pos[0]+3,self.pos[1]-1],
-                          [self.pos[0]+3,self.pos[1]+1],
-                          [self.pos[0]+3,self.pos[1]-2],
-                          [self.pos[0]+3,self.pos[1]+2]]
-
-            if action == 'West':
-                coords = [[self.pos[0]-3,self.pos[1]], 
-                          [self.pos[0]-3,self.pos[1]-1],
-                          [self.pos[0]-3,self.pos[1]+1],
-                          [self.pos[0]-3,self.pos[1]-2],
-                          [self.pos[0]-3,self.pos[1]+2]]
+        if action == 'West':
+            coords = [[pos[0]-3,pos[1]], 
+                      [pos[0]-3,pos[1]-1],
+                      [pos[0]-3,pos[1]+1],
+                      [pos[0]-3,pos[1]-2],
+                      [pos[0]-3,pos[1]+2]]
 
         return coords
+
+    def getEmptySpaceCoords(self,position, action):
+        coords = []
+        pos = position
+        
+        if action == 'North':
+            coords = [[pos[0],pos[1]-3], 
+                      [pos[0]-1,pos[1]-3],
+                      [pos[0]+1,pos[1]-3],
+                      [pos[0]-2,pos[1]-3],
+                      [pos[0]+2,pos[1]-3]]
             
+        if action == 'South':
+            coords = [[pos[0]+1,pos[1]+3],
+                      [pos[0],pos[1]+3], 
+                      [pos[0]-1,pos[1]+3],
+                      [pos[0]-2,pos[1]+3],
+                      [pos[0]+2,pos[1]+3]]
+
+        if action == 'East':
+            coords = [[pos[0]+3,pos[1]], 
+                      [pos[0]+3,pos[1]-1],
+                      [pos[0]+3,pos[1]+1],
+                      [pos[0]+3,pos[1]-2],
+                      [pos[0]+3,pos[1]+2]]
+
+        if action == 'West':
+            coords = [[pos[0]-3,pos[1]], 
+                      [pos[0]-3,pos[1]-1],
+                      [pos[0]-3,pos[1]+1],
+                      [pos[0]-3,pos[1]-2],
+                      [pos[0]-3,pos[1]+2]]
+
+        return coords
         
 
     def dirtSensor(self):
@@ -237,60 +306,26 @@ class Robot(object):
 
     def takeAction(self,action):
         
-        
-
-        if (self.heading == action):
-            #drive forwards
-            if action == 'North':
-                #north is negative
-                self.pos[1] -= 1
-            if action == 'East':
-                self.pos[0] += 1
-            if action == 'West':
-                self.pos[0] -= 1
-            if action == 'South':
-                self.pos[1] += 1
+        #drive forwards
+        if action == 'North':
+            #north is negative
+            self.pos[1] -= 1
+        if action == 'East':
+            self.pos[0] += 1
+        if action == 'West':
+            self.pos[0] -= 1
+        if action == 'South':
+            self.pos[1] += 1
                 
-        else:
-            #turn torwards requested action
-            self.heading = self.evaluateTurn(action)
+        if (action != 'None'):
+            self.heading = action
 
-        #print "robot pos: ",self.pos
-        #print "robot heading: ",self.heading
 
     def evaluateTurn(self,action):
-        
-        heading = self.heading
-
-        if self.heading == 'None':
-            heading = action
-
-        if self.heading == 'North':
-            if (action == 'East') or (action == 'TurnRight'):
-                heading = 'East'
-            if (action == 'West') or (action == 'TurnLeft'):
-                heading = 'West'
-
-        if self.heading == 'East':
-            if (action == 'South') or (action == 'TurnRight'):
-                heading = 'South'
-            if (action == 'North') or (action == 'TurnLeft'):
-                heading = 'North'
-
-        if self.heading == 'South':
-            if (action == 'West') or (action == 'TurnRight'):
-                heading = 'West'
-            if (action == 'East') or (action == 'TurnLeft'):
-                heading = 'East'
-                
-        if self.heading == 'West':
-            if (action == 'North') or (action == 'TurnRight'):
-                heading = 'North'
-            if (action == 'South') or (action == 'TurnLeft'):
-                heading = 'South'
-
-        return heading
-
+        #not needed anymore
+ 
+        raise Exception("evaluateTurn is not supported by simulator")
+    
 
     def copy(self):
         r = Robot(self.environment)
@@ -301,17 +336,78 @@ class Robot(object):
 class RobotState:
 
 
-    def getLegalActions( self ):
+    def getLegalActions( self, pos):
 
         possibleActions = ['North','South','East','West','None']
         legalActions = []
 
         for action in possibleActions:
-            bumpReadings = self.r.bumpSensor(action)
+            bumpReadings = self.r.bumpSensor(action, position=pos)
             if (len(bumpReadings) == 0):
                 legalActions.append(action)
         
         return legalActions
+
+    def proxSensorCoords (self, action):
+        # For a given action, return the coordinates of the proximety sensor
+        # at that position
+        coords = []
+        pos = list(self.r.pos)
+        
+
+        if action == 'North':
+            pos[1] -= 1
+        if action == 'South':
+            pos[1] += 1
+        if action == 'East':
+            pos[0] += 1
+        if action == 'West':
+            pos[0] -= 1
+        
+                
+        for i in range(-2,3,1):
+            coords.append([pos[0]-3,pos[1]+i])
+            coords.append([pos[0]+3,pos[1]+i])
+            coords.append([pos[0]+i,pos[1]-3])
+            coords.append([pos[0]+i,pos[1]+3])
+
+        #dont forget the corners :-)
+        coords.append([pos[0]+3,pos[1]+3])
+        coords.append([pos[0]-3,pos[1]+3])
+        coords.append([pos[0]+3,pos[1]-3])
+        coords.append([pos[0]-3,pos[1]-3])
+        
+        return coords
+                
+    def willExploreNewCell (self, action):
+        #if the robot will explore a new cell return true
+
+        coords = self.proxSensorCoords(action)
+        observedCells = self.getObserved()
+        result = False
+
+        #print observedCells
+
+        for coord in coords:
+            if coord in observedCells:
+                result = True
+
+        return result
+                
+        
+
+    def willVisitNewCell( self, pos, action):
+        cellCoords = self.r.getEmptySpaceCoords(pos, action)
+        result = False
+
+        unvisitedCells = self.getUnvisited()
+        #print len(unvisitedCells)
+
+        for coord in cellCoords:
+            if (coord in unvisitedCells):
+                result = True
+
+        return result
 
     def generateSuccessor( self, action ):
         
@@ -321,11 +417,14 @@ class RobotState:
         robotCp = self.r.copy()
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
-       
+        
+        print self.getLegalActions(self.r.pos)
+        #print self.willVisitNewCell(self.r.pos, action) 
+
         if action != None:
             #check bumper 
             bumpReadings = state.r.bumpSensor(action)
-            proxReadings = state.r.proximitySensor()
+            proxReadings,openReadings = state.r.proximitySensor()
             dirtReadings = state.r.dirtSensor()
             
             if len(dirtReadings):
@@ -343,6 +442,17 @@ class RobotState:
                     
                     if (prox in state.map.unvisitedCells):
                         state.map.unvisitedCells.remove(prox)
+
+            #print "length of openreadings: ",len(openReadings)
+            if len(openReadings):
+                for openCell in openReadings:
+                    
+                    
+                    if openCell in state.map.unvisitedCells:
+                       # print "adding observed cell: ",openCell
+                        state.map.observedCells.append(openCell)
+
+            
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)
@@ -365,6 +475,9 @@ class RobotState:
 
     def getVisited( self ):
         return self.map.visitedCells
+
+    def getObserved ( self ):
+        return self.map.observedCells
 
     def getObstacles( self ):
         return self.map.obstacles

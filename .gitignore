@@ -1,3 +1,5 @@
 *.pyc
 *~
 .idea/*
+simulator/testSample.csv
+*.jpg

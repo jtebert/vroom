@@ -9,7 +9,7 @@ MAX_DIRT = 3
 
 #Probalistic Distributions per dirt level based on obstacle label
 # "dirtValue" : [ p(accum. dirt) , p(spreading) ]
-openCellDist = { "0" : [.1,0] , "1" : [.20,.01] , "2" : [.20, .05] , "3" : [.0,.2] }
+openCellDist = { "0" : [.001,0] , "1" : [.10,.01] , "2" : [.10, .05] , "3" : [.0,.1] }
 doorwayDist =  { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
 garbageCanDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
 chairDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
@@ -30,7 +30,7 @@ class MapNode(object):
         self.isVisited = False
         self.dirt = 0
         self.label = None
-        self.value = 0
+        self.value = None
 
 
 class RobotMap(object):
@@ -49,11 +49,15 @@ class RobotMap(object):
         self.visitedCells = []
         self.obstacles = []
 
-        #TODO to get unvisited cells to work right we need the map cells
-        #depend on the input environment
         self.unvisitedCells = []
-
+        self.observedCells = []  #cells seen by the proximity sensor, but not visited
+        
         self.map = [[MapNode() for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+              
+        for x in xrange(0,int(self.xCells)):
+            for y in xrange(0,int(self.yCells)):
+                self.unvisitedCells.append([x,y])
+        
 
     def draw(self,screen, environment = None):
 
@@ -62,6 +66,7 @@ class RobotMap(object):
         sy = self.scale*float(s[1])/self.height
         center = (0,0)
 
+     
 
         halfWidthMap = ceil(self.width/(2.*self.scale))
         halfHeightMap = ceil(self.height/(2.*self.scale))
@@ -85,16 +90,16 @@ class RobotMap(object):
                         pygame.draw.rect(screen,(0,0,0),r,0)
                     elif environment.map[x][y].value == 0:
                         pygame.draw.rect(screen,(255,255,255),r,0)
-                    elif environment.map[x][y].value > 0:
-                        d = environment.map[x][y].value
-                        pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
+                    elif environment.map[x][y].dirt > 0:
+                        d = environment.map[x][y].dirt
+                        pygame.draw.rect(screen,(0,0,255-(60*d)),r,0)
 
                 else:
                     if self.map[x][y].isObstacle:
                         pygame.draw.rect(screen,(0,0,0),r,0)
                     elif (self.map[x][y].dirt > 0):
                         d = self.map[x][y].dirt
-                        pygame.draw.rect(screen,(0,0,255-(40*d)),r,0)
+                        pygame.draw.rect(screen,(0,0,255-(60*d)),r,0)
                     elif self.map[x][y].isVisited:
                         pygame.draw.rect(screen,(255,255,255),r,0)
 
@@ -106,9 +111,16 @@ class RobotMap(object):
             for y in range (-2,3,1):
                 self.map[robot.pos[0]+x][robot.pos[1]+y].isVisited = True
 
-                if ((robot.pos[0]+x,robot.pos[1]+y) not in self.visitedCells):
-                    self.visitedCells.append((robot.pos[0]+x,robot.pos[1]+y))
+                if ([robot.pos[0]+x,robot.pos[1]+y] not in self.visitedCells):
+                    self.visitedCells.append([robot.pos[0]+x,robot.pos[1]+y])
+                
+                if ([robot.pos[0]+x,robot.pos[1]+y] in self.observedCells):
+                    self.observedCells.remove([robot.pos[0]+x,robot.pos[1]+y])
 
+                if ([robot.pos[0]+x,robot.pos[1]+y] in self.unvisitedCells):
+                    self.unvisitedCells.remove([robot.pos[0]+x,robot.pos[1]+y])
+                
+                        
 
 
         minx,miny,maxx,maxy =  (max((robot.pos[0]*self.cellXSize)-(robot.size)/2,0),
@@ -144,6 +156,7 @@ class RobotMap(object):
         mapcp.visitedCells = list(self.visitedCells)
         mapcp.obstacles = list(self.obstacles)
         mapcp.unvisitedCells = list(self.unvisitedCells)
+        mapcp.observedCells = list(self.observedCells)
 
         cellXMax = self.width/self.cellXSize
         cellYMax = self.height/self.cellYSize
@@ -187,9 +200,16 @@ class Environment(object):
 
     def adjacent(self, x, y):
         # Returns the adjacent cells to one cell (the other ones that will impact the amount of dirt in a given cell)
-        return [(self.map[x + 1][y]), (self.map[x - 1][y]), (self.map[x][y + 1]), (self.map[x][y - 1])]
+        try:
+            adjCells = [(self.map[x + 1][y]), (self.map[x - 1][y]), (self.map[x][y + 1]), (self.map[x][y - 1])]
+        except:
+            print x
+            print y
+            raise
 
-    def addDirt(currentDirt, newDirt):
+        return adjCells
+
+    def addDirt(self, currentDirt, newDirt):
         # Returns amount of dirt after adding newDirt to currentDirt
         return min(MAX_DIRT, currentDirt + newDirt)
 
@@ -200,37 +220,70 @@ class Environment(object):
 
         mapCopy = self.copy() #Check copy so dirt doesn't cascade across the map from earlier checks
 
-        for y in xrange(0,int(mapCopy.heightCells)):
-            for x in xrange(0,int(mapCopy.widthCells)):
+
+        for y in xrange(0,int(mapCopy.heightCells-1)):
+            for x in xrange(0,int(mapCopy.widthCells-1)):
 
                 if mapCopy.map[x][y].isObstacle:
                     #Obstacle that can't be cleaned
                     continue
 
-                elif mapCopy.map[x][y].label == None:
+                elif mapCopy.map[x][y].value == None:
+                    #It's a cell not in the environment
+                    continue
+
+
+
+                elif mapCopy.map[x][y].label == None or mapCopy.map[x][y].label == '':
+                    randomVal = random.random()
+                    cellDist = openCellDist[str(mapCopy.map[x][y].dirt)]
+                    
                     #Own cell: default dirt generation
-                    if random.random() >= openCellDist[str(mapCopy.map[x][y].dirt)]:
+                    if randomVal < cellDist[0]:
                         self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+                
 
                 else:
                     #Own cell: Generation based on label
-                    if random.random() >= labelDict[str(mapCopy.map[x][y].label)][str(mapCopy.map[x][y].dirt)]:
+                    randomVal = random.random()
+                    labelDist = labelDict[str(mapCopy.map[x][y].label)]
+                    cellDist = labelDist[str(mapCopy.map[x][y].dirt)]
+                    if randomVal < cellDist[0]:
                         self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+
+
+                #for i in mapCopy.adjacent(x, y):
+                #    print i.dirt, i.isObstacle, i.isVisited, i.label, i.value
 
                 #Dirt generation from adjacent cells
                 for cell in mapCopy.adjacent(x, y):
                     if cell.isObstacle:
+                        #print "Skipping: obstacle"
+                        continue
+
+                    elif cell.value == None:
+                        #print "Skipping: none cell value"
                         continue
 
                     elif cell.label == None:
+                        randomVal = random.random()
+                        cellDist = openCellDist[str(cell.dirt)]
+                        #print "No cell label", x, y, cellDist, randomVal, randomVal < cellDist[1], self.map[x][y].dirt, self.map[x][y].value
+                    
                         #Adjacent cell: default dirt generation
-                        if random.random() >= openCellDist[str(mapCopy.map[x][y].dirt)]:
+                        if randomVal < cellDist[1]:
                             self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
 
                     else:
+                        #print "Cell label"
                         #Adjacent cell: Generation based on label
-                        if random.random() >= labelDict[str(mapCopy.map[x][y].label)][str(mapCopy.map[x][y].dirt)]:
+                        randomVal = random.random()
+                        labelDist = labelDict[str(mapCopy.map[x][y].label)]
+                        cellDist = labelDist[str(mapCopy.map[x][y].dirt)]
+                        if randomVal < cellDist[1]:
                             self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+
+                self.map[x][y].value = self.map[x][y].dirt
 
     def importEnviroment(self,csvFile):
 
@@ -248,7 +301,7 @@ class Environment(object):
                             column = column.split(',')
 
                             value = int(column[0])
-                            if value > 0:
+                            if value >= 0:
                                 self.map[i][j].dirt = value
                             else:
                                 self.map[i][j].isObstacle = True
@@ -258,13 +311,14 @@ class Environment(object):
                         else:
                             
                             value = int(column)
-                            if value > 0:
+                            if value >= 0:
                                 self.map[i][j].dirt = value
                             else:
                                 self.map[i][j].isObstacle = True
 
                             self.map[i][j].value = int(column)
-
+                    else:
+                        self.map[i][j].value = None
                     i += 1
                 i = 0
                 j += 1
