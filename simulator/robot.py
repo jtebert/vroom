@@ -95,9 +95,6 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
         #problem = MapEnvironmentProblem(state)
-
-        #actions = depth_first_search(problem)
-        #print actions
         #actions = depth_first_search(problem)
         #print actions
 
@@ -138,19 +135,14 @@ class RobotSimulator(object):
             
             if self.showEnvironment:
                 state.map.draw(screen,environment = self.environment)
-                state.map.drawRobot(screen,state.r)
-
-                if self.drawLabels:
-                    state.map.drawLabels(screen)
-
             else:
                 state.map.draw(screen)
-                state.map.drawRobot(screen,state.r)
 
-                if self.drawLabels:
-                    state.map.drawLabels(screen)
+            state.map.drawRobot(screen,state.r)
+
+            if self.drawLabels:
+                state.map.drawLabels(screen)
             
-
             
             pygame.display.update()
 
@@ -249,72 +241,31 @@ class Robot(object):
 
     def getBumpCoordinates(self, action, position):
         
-        coords = None
-        pos = position
-        
-        if action == 'North':
-            coords = [[pos[0],pos[1]-3], 
-                      [pos[0]-1,pos[1]-3],
-                      [pos[0]+1,pos[1]-3],
-                      [pos[0]-2,pos[1]-3],
-                      [pos[0]+2,pos[1]-3]]
-            
-        if action == 'South':
-            coords = [[pos[0]+1,pos[1]+3],
-                      [pos[0],pos[1]+3], 
-                      [pos[0]-1,pos[1]+3],
-                      [pos[0]-2,pos[1]+3],
-                      [pos[0]+2,pos[1]+3]]
-
-        if action == 'East':
-            coords = [[pos[0]+3,pos[1]], 
-                      [pos[0]+3,pos[1]-1],
-                      [pos[0]+3,pos[1]+1],
-                      [pos[0]+3,pos[1]-2],
-                      [pos[0]+3,pos[1]+2]]
-
-        if action == 'West':
-            coords = [[pos[0]-3,pos[1]], 
-                      [pos[0]-3,pos[1]-1],
-                      [pos[0]-3,pos[1]+1],
-                      [pos[0]-3,pos[1]-2],
-                      [pos[0]-3,pos[1]+2]]
-
-        return coords
-
-    def getEmptySpaceCoords(self,position, action):
         coords = []
         pos = position
         
         if action == 'North':
-            coords = [[pos[0],pos[1]-3], 
-                      [pos[0]-1,pos[1]-3],
-                      [pos[0]+1,pos[1]-3],
-                      [pos[0]-2,pos[1]-3],
-                      [pos[0]+2,pos[1]-3]]
+            y = -3
+            for i in range(-2,3,1):
+                coords.append([pos[0]+i,pos[1]+y])
             
         if action == 'South':
-            coords = [[pos[0]+1,pos[1]+3],
-                      [pos[0],pos[1]+3], 
-                      [pos[0]-1,pos[1]+3],
-                      [pos[0]-2,pos[1]+3],
-                      [pos[0]+2,pos[1]+3]]
+            y = 3
+            for i in range(-2,3,1):
+                coords.append([pos[0]+i,pos[1]+y])
 
         if action == 'East':
-            coords = [[pos[0]+3,pos[1]], 
-                      [pos[0]+3,pos[1]-1],
-                      [pos[0]+3,pos[1]+1],
-                      [pos[0]+3,pos[1]-2],
-                      [pos[0]+3,pos[1]+2]]
+            x = 3
+            for i in range(-2,3,1):
+                coords.append([pos[0]+x,pos[1]+i])
 
         if action == 'West':
-            coords = [[pos[0]-3,pos[1]], 
-                      [pos[0]-3,pos[1]-1],
-                      [pos[0]-3,pos[1]+1],
-                      [pos[0]-3,pos[1]-2],
-                      [pos[0]-3,pos[1]+2]]
+            x = -3
+            for i in range(-2,3,1):
+                coords.append([pos[0]+x,pos[1]+i])
 
         return coords
+
         
 
     def dirtSensor(self):
@@ -424,7 +375,7 @@ class RobotState:
         
 
     def willVisitNewCell( self, pos, action):
-        cellCoords = self.r.getEmptySpaceCoords(pos, action)
+        cellCoords = self.r.getBumpCoordinates(action, pos)
         result = False
 
         unvisitedCells = self.getUnvisited()
