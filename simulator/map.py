@@ -173,7 +173,6 @@ class RobotMap(object):
         For each group of map labels, draw the label in text
         """
         
-        print "drawing Labels!"
         isDrawn = []
         
         for row in range(self.yCells):
@@ -184,8 +183,8 @@ class RobotMap(object):
                     if [col,row] not in isDrawn:
                         myfont = pygame.font.SysFont("Comic Sans MS", 16)
                         # apply it to text on a label
-                        print self.map[col][row].label
-                        label = myfont.render(str(self.map[col][row].label), 1, (255,255,0))
+                        #print self.map[col][row].label
+                        label = myfont.render(str(self.map[col][row].label), 1, (0,0,0))
                         labelPos = ((col+5)*self.cellYSize, (row)*self.cellXSize)
                         screen.blit(label, labelPos)
                         
@@ -369,6 +368,7 @@ class Environment(object):
                     if(column != ''):
                         if '[' in column:
                             column = column.replace('[','')
+                            column = column.replace(']','')
                             column = column.split(',')
 
                             value = int(column[0])
