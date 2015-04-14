@@ -30,6 +30,10 @@ class PriorityQueue:
         self.heap = []
         self.count = 0
 
+    def __str__(self):
+        #return str(self.heap)
+        return str([str(x[2]) for x in list(self.heap)])
+
     def push(self, item, priority):
         """
         Add an item with a given priority to the queue

@@ -94,9 +94,9 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        problem = MapEnvironmentProblem(state)
-        actions = depth_first_search(problem)
-        print actions
+        #problem = MapEnvironmentProblem(state)
+        #actions = depth_first_search(problem)
+        #print actions
 
         # DIRT COLLECTION PROBLEM
         #state.map = self.environment.copyEnvIntoMap(state.map)
@@ -350,7 +350,7 @@ class RobotState:
             coords.append([pos[0]+i,pos[1]-3])
             coords.append([pos[0]+i,pos[1]+3])
 
-        #dont forget the corners :-)
+        #dont forget th                print actione corners :-)
         coords.append([pos[0]+3,pos[1]+3])
         coords.append([pos[0]-3,pos[1]+3])
         coords.append([pos[0]+3,pos[1]-3])
@@ -392,7 +392,7 @@ class RobotState:
         
         #create copy of the current state
         #need to make a copy of the map
-        #does the environment need to be coppied?
+        #does the environment need to be copied?
         robotCp = self.r.copy()
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )

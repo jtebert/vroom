@@ -17,6 +17,7 @@ class CollectDirtProblem(object):
         :param state: Current state of the robot
         :return: Boolean (cleaned or not)
         """
+        #print state.getDirt()
         return len(state.getDirt()) == 0
 
     @staticmethod
@@ -29,7 +30,7 @@ class CollectDirtProblem(object):
         actions = state.getLegalActions(state.getRobotPosition())
         successors = []
         for action in actions:
-            if state.willVisitNewCell(state.getRobotPosition(), action):
+            if not action == 'None':
                 next_state = state.generateSuccessor(action)
                 successors.append((next_state, action))
         return successors
@@ -45,7 +46,7 @@ class CollectDirtProblem(object):
         cost = 0
         for action in actions:
             # Check if legal
-            legal = robot_state.getLegalActions()
+            legal = robot_state.getLegalActions(robot_state.getRobotPosition())
             if not action in legal:
                 return 999999
             robot_state = robot_state.generateSuccessor(action)

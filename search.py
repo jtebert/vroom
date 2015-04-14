@@ -15,7 +15,7 @@ class Node:
         self.cost = self.get_cost_estimate(problem)
 
     def __str__(self):
-        return str(self.state)
+        return str(self.state.getRobotPosition())
 
     def has_parent(self):
         """
@@ -73,6 +73,7 @@ def a_star_search(problem, heuristic):
     explored = set()
     while not frontier.is_empty():
         node = frontier.pop()
+        print node.get_path()
         explored.add(node.state)
         if problem.is_goal_state(node.state):
             return node.getPath()
@@ -83,7 +84,6 @@ def a_star_search(problem, heuristic):
             frontier_states.append(n[2].state)
             frontier_costs.append(n[2].cost)
         for next_state in next_states:
-
             next_node = Node(next_state[0], next_state[1], node, problem, heuristic)
             if (next_node.state not in explored and next_node.state not in frontier_states) or \
                     (next_node.state in frontier_states and frontier_costs[
@@ -106,7 +106,9 @@ def depth_first_search(problem):
         next_states = problem.get_successors(node.state)
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
-            next_state = (node.parent.state, utils.reverse_action(node.parent.prev_action))
+            new_action = utils.reverse_action(node.parent.prev_action)
+            new_robot_state = node.state.generateSuccessor(new_action)
+            next_state = (new_robot_state, new_action)
         else:
             next_state = next_states[0]
         print "GO:", next_state[1]
