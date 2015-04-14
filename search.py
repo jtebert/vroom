@@ -106,7 +106,7 @@ def depth_first_search(problem):
         next_states = problem.get_successors(node.state)
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
-            next_state = node.parent.state
+            next_state = (node.parent.state, utils.reverse_action(node.parent.prev_action))
         else:
             next_state = next_states[0]
         print "GO:", next_state[1]

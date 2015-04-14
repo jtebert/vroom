@@ -3,6 +3,25 @@
 import heapq
 import csv
 
+
+def reverse_action(action):
+    """
+    Give the opposite action of that given (go in the opposite direction)
+    :param action: North, East, South, West, None
+    :return: North, East, South, West, None
+    """
+    if action == 'North':
+        return 'South'
+    elif action == 'South':
+        return 'North'
+    elif action == 'East':
+        return 'West'
+    elif action == 'West':
+        return 'East'
+    else:
+        return 'None'
+
+
 class PriorityQueue:
     """
     Priority Queue data structure based on the Berkeley Pacman Project

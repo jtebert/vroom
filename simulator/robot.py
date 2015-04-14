@@ -94,12 +94,12 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        #problem = MapEnvironmentProblem(state)
-        #actions = depth_first_search(problem)
-        #print actions
+        problem = MapEnvironmentProblem(state)
+        actions = depth_first_search(problem)
+        print actions
 
         # DIRT COLLECTION PROBLEM
-        state.map = self.environment.copyEnvIntoMap(state.map)
+        #state.map = self.environment.copyEnvIntoMap(state.map)
         #problem = CollectDirtProblem(state)
         #actions = a_star_search(problem, dirt_heuristic)
         #print actions
@@ -154,9 +154,10 @@ class Robot(object):
     def __init__(self,environment, pos=[5,4],heading='East'):
 
         self.size = 50   #5x5 cells
-        self.pos = [5,4]
+        self.pos = pos
         self.heading = heading
         self.environment = environment
+        self.home = pos
 
     def proximitySensor(self):
         #checks immediate surroundings for obstacles
@@ -500,7 +501,8 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    defaultEnvironmentCSV = './../assets/maps/test.csv'
+    #defaultEnvironmentCSV = './../assets/maps/test.csv'
+    defaultEnvironmentCSV = './../assets/maps/smallCloset.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':
