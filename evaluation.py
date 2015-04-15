@@ -3,6 +3,8 @@
 # - Dirt collection rate (over different numbers of time steps/movements)
 
 import matplotlib.pyplot as plt
+from dirt_collection import *
+from search import *
 
 
 def classification_accuracy(map, environment):
@@ -12,6 +14,7 @@ def classification_accuracy(map, environment):
     :param environment: Ground truth map of obstacle classification
     :return: TODO
     """
+    # TODO
 
 def all_dirt_collection_rates(state, environment):
     """
@@ -21,7 +24,17 @@ def all_dirt_collection_rates(state, environment):
     :param environment: EnvironmentMap
     :return: ([num_time_steps], ([actual], [reactive], [ideal])
     """
-    return ([], ([], [], []))
+    max_num_time_steps = 100
+    range_num_time_steps = range(max_num_time_steps)
+    actual_rates = []
+    worst_rates = []
+    ideal_rates = []
+    for num_time_steps in range_num_time_steps:
+        actual, worst, ideal  = dirt_collection_rate(state, environment, num_time_steps)
+        actual_rates.append(actual)
+        worst_rates.append(worst)
+        ideal_rates.append(ideal)
+    return (range_num_time_steps, (actual_rates, worst_rates, ideal_rates))
 
 
 def dirt_collection_rate(state, environment, num_time_steps):
@@ -34,9 +47,32 @@ def dirt_collection_rate(state, environment, num_time_steps):
     :param environment: EnvironmentMap
     :return: tuple (actual, reactive, ideal) of amount of dirt collected
     """
+    initial_dirt = len(state.environment.map.getDirt())
+    # TODO
     # Do actual search
+    actual_state = state.copy()
+    problem = CollectDirtProblem(actual_state)
+    actions = a_star_search(problem, dirt_heuristic)
+    execute_actions = actions[0:num_time_steps]
+    actual_state.executeActions(execute_actions)
+    remaining_dirt = len(actual_state.environment.map.getDirt())
+    actual_collected = initial_dirt - remaining_dirt
+
     # Do worst search
+    # Reactive agent? (not sure where this is)
+    worst_collected = initial_dirt - remaining_dirt
+
     # Copy environment into map and do ideal search
+    ideal_state = state.copy()
+    ideal_state.map = environment.copyEnvIntoMap(state.map)
+    problem = CollectDirtProblem(ideal_state)
+    actions = a_star_search(problem, dirt_heuristic)
+    execute_actions = actions[0:num_time_steps]
+    actual_state.executeActions(execute_actions)
+    remaining_dirt = len(ideal_state.environment.map.getDirt())
+    ideal_collected = initial_dirt - remaining_dirt
+
+    return (actual_collected, worst_collected, ideal_collected)
 
 
 def plot_dirt_collection_rates(rates):

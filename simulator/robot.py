@@ -333,7 +333,7 @@ class RobotState:
         return legalActions
 
     def proxSensorCoords (self, action):
-        # For a given action, return the coordinates of the proximety sensor
+        # For a given action, return the coordinates of the proximity sensor
         # at that position
         coords = []
         pos = list(self.r.pos)
