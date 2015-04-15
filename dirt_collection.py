@@ -79,5 +79,5 @@ def dirt_heuristic(state, problem):
         max_cost = max(cell_costs)
     else:
         max_cost = 0
-    return max_cost
+    return max_cost + len(unvisited)
  

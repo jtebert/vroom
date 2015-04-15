@@ -99,15 +99,19 @@ class RobotSimulator(object):
         #print actions
 
         # DIRT COLLECTION PROBLEM
-        #state.map = self.environment.copyEnvIntoMap(state.map)
-        #problem = CollectDirtProblem(state)
-        #actions = a_star_search(problem, dirt_heuristic)
-        #print actions
+        state.map = self.environment.copyEnvIntoMap(state.map)
+
+        startTime = time.clock()
+        problem = CollectDirtProblem(state)
+        actions = a_star_search(problem, dirt_heuristic)
+        endTime = time.clock()
+        print "a_star_search executed in %d seconds!"%(endTime - startTime)
+        print actions
         
 
         while(True):
 
-            
+            '''
             if (agent == None):
                 self.listenControls()
 
@@ -117,15 +121,16 @@ class RobotSimulator(object):
                 #self.action is set directly by self.listenControls
             else:
                 self.action = agent.getAction(state)
-            
-            
             '''
+            
+            
             if len(actions):
                 self.action = actions.pop(0)
             else:
                 self.action = 'None'
-            '''   
-                
+              
+            time.sleep(0.2)
+
             screen = pygame.display.get_surface()
 
             state = state.generateSuccessor(self.action)
@@ -464,13 +469,34 @@ class RobotState:
                 
         return state
 
+    def extractSmallState ( self ):
+        #return the only state needed for the search problem
+        dirt = self.getDirt()
+        pos = (self.r.pos[0],self.r.pos[1])
+        state = (pos, len(dirt))
+        return state
+
     def getRobotPosition( self ):
         
         return self.r.pos
         
     def getDirt( self ):
+        
+        removeList = []
+        
+        for dirtCell in self.map.dirtCells:
+            pos = [dirtCell[0],dirtCell[1]]
+            if pos in self.map.visitedCells:
+                removeList.append(dirtCell)
 
-        return self.map.dirtCells
+        #print "remove list is :",removeList
+
+        dirt = list(self.map.dirtCells)
+
+        for cell in removeList:
+            dirt.remove(cell)
+
+        return dirt
 
     def getUnvisited( self ):
         return self.map.unvisitedCells
