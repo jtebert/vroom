@@ -7,8 +7,9 @@ class Node:
     parent Node
     """
 
-    def __init__(self, state, prev_action, parent, problem, heuristic=utils.null_heuristic):
+    def __init__(self, state, fullState, prev_action, parent, problem, heuristic=utils.null_heuristic):
         self.state = state
+        self.fullState = fullState
         self.prev_action = prev_action
         self.parent = parent
         self.heuristic = heuristic
@@ -54,7 +55,7 @@ class Node:
         Get the estimated cost based on cost (from start) and heuristic (estimate to goal)
         """
         path_cost = self.get_path_cost(problem)
-        heuristic_cost = self.heuristic(self.state, problem)
+        heuristic_cost = self.heuristic(self.fullState, problem)
         return path_cost + heuristic_cost
 
 
@@ -65,7 +66,9 @@ def a_star_search(problem, heuristic):
     :param heuristic: e.g. exploration_heuristic
     :return: Actions to take
     """
-    n0 = Node(problem.start, None, None, problem, heuristic)
+    
+    smallState = problem.start.extractSmallState()
+    n0 = Node(smallState, problem.start, None, None, problem, heuristic)
     if problem.is_goal_state(n0.state):
         return ['None']
     frontier = utils.PriorityQueue()
@@ -73,23 +76,27 @@ def a_star_search(problem, heuristic):
     explored = set()
     while not frontier.is_empty():
         node = frontier.pop()
+        path = node.get_path()
         print node.get_path()
+        print node.state
+       # print node.fullState.getVisited()
         explored.add(node.state)
         if problem.is_goal_state(node.state):
-            return node.getPath()
-        next_states = problem.get_successors(node.state)
+            return path
+        next_states = problem.get_successors(node.fullState, node.state)
         frontier_costs = []
         frontier_states = []
         for n in frontier.heap:
             frontier_states.append(n[2].state)
             frontier_costs.append(n[2].cost)
         for next_state in next_states:
-            next_node = Node(next_state[0], next_state[1], node, problem, heuristic)
+            next_node = Node(next_state[0], next_state[1], next_state[2], node, problem, heuristic)
             if (next_node.state not in explored and next_node.state not in frontier_states) or \
                     (next_node.state in frontier_states and frontier_costs[
                         frontier_states.index(next_node.state)] > next_node.cost):
                 frontier.push(next_node, next_node.cost)
-    return ["None"]
+    print "no more frontiers...return path!!"
+    return path #node.getPath()
 
 
 def depth_first_search(problem):

@@ -59,7 +59,7 @@ class MapNode(object):
 class RobotMap(object):
     center = (0,0)
 
-    def __init__(self,w=200,h=200,cellXSize=10,cellYSize=10):
+    def __init__(self,w=700,h=700,cellXSize=10,cellYSize=10,map=True):
         self.scale = 1.0
         self.cellXSize = cellXSize
         self.cellYSize = cellYSize
@@ -76,11 +76,15 @@ class RobotMap(object):
         self.unvisitedCells = []
         self.observedCells = []  #cells seen by the proximity sensor, but not visited
         
-        self.map = [[MapNode(rows, columns) for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+        if(map):
+            self.map = [[MapNode(rows, columns) for columns in xrange(self.width/cellXSize)] for rows in xrange(self.height/cellYSize)]
+            for x in xrange(0,int(self.xCells)):
+                for y in xrange(0,int(self.yCells)):
+                    self.unvisitedCells.append([x,y])
+        else:
+            self.map = None
               
-        for x in xrange(0,int(self.xCells)):
-            for y in xrange(0,int(self.yCells)):
-                self.unvisitedCells.append([x,y])
+
 
 
     def __str__(self):
@@ -220,20 +224,17 @@ class RobotMap(object):
                     self.map[col][row].set_valid_actions(robot_state)
 
     def copy (self):
-        mapcp = RobotMap()
+        mapcp = RobotMap(map=False)
         mapcp.dirtCells = list(self.dirtCells)
         mapcp.visitedCells = list(self.visitedCells)
         mapcp.obstacles = list(self.obstacles)
         mapcp.unvisitedCells = list(self.unvisitedCells)
         mapcp.observedCells = list(self.observedCells)
-        mapcp.robotPositions = list(self.robotPositions)
 
         cellXMax = self.width/self.cellXSize
         cellYMax = self.height/self.cellYSize
 
-        for x in xrange(0,int(cellXMax)):
-            for y in xrange(0,int(cellYMax)):
-                mapcp.map[x][y] = self.map[x][y]
+        mapcp.map = self.map
         
         
         return mapcp
@@ -436,7 +437,7 @@ class Environment(object):
                     mapcp.map[x][y].label = self.map[x][y].label
                     
                     
-                mapcp.visitedCells.append([x,y])
+                #mapcp.visitedCells.append([x,y])
 
-            
+        #print mapcp.visitedCells 
         return mapcp
