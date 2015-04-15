@@ -78,7 +78,18 @@ class Classifiers(object):
                     self.classifiers[name][i][j]['obs'] += num
         self.normalize()
 
+    def featureExtraction(self, inmap):
+        assert(inmap.isinstance(map.Environment))
 
+        #to start with, just uses every blocksize x blocksize section
+        blockSize = 10
+        xRange = int(inmap.widthCells - blockSize - 1)
+        yRange = int(inmap.heightCells - blockSize - 1)
+        for y in xrange(0, yRange):
+            for x in xrange(0, xRange):
+                #Run classifier on block
+                #Limits of this block are [x, x+blockSize] and [y, y+blockSize]
+                continue
 
 
 # Test Cases
