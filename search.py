@@ -106,19 +106,31 @@ def depth_first_search(problem):
     :param problem:
     :return: Path of actions (list)
     """
-    node = Node(problem.start, None, None, problem)
-    while not problem.is_goal_state(node.state):
+
+    smallState = problem.start.extractSmallState()
+    node = Node(smallState,problem.start, None, None, problem)
+    while not problem.is_goal_state(node.fullState):
         print ""
         print "Getting next states:"
-        next_states = problem.get_successors(node.state)
+        next_states = problem.get_successors(node.fullState)
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
+            # move robot to parents state, then update parent
+            print "back tracking: ",node.parent.prev_action
             new_action = utils.reverse_action(node.parent.prev_action)
-            new_robot_state = node.state.generateSuccessor(new_action)
-            next_state = (new_robot_state, new_action)
+            new_robot_state = node.fullState.generateSuccessor(new_action)
+            node.parent.fullState = new_robot_state
+            node.parent.state = node.parent.fullState.extractSmallState()
+            node = node.parent
         else:
             next_state = next_states[0]
-        print "GO:", next_state[1]
-        print next_state[0].map.robotPositions
-        node = Node(next_state[0], next_state[1], node, problem)
+            print "GO:", next_state[1]
+            print next_state[0].map.robotPositions
+        
+            if node.parent != None:
+                print node.parent.prev_action
+
+            node = Node(next_state[0].extractSmallState(), next_state[0], next_state[1], node, problem)
+
+
     return node.get_path()
