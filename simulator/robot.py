@@ -94,9 +94,9 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
+        
         problem = MapEnvironmentProblem(state)
         state = depth_first_search(problem)
-        #print actions
 
         # DIRT COLLECTION PROBLEM
         #state.map = self.environment.copyEnvIntoMap(state.map)

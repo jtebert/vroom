@@ -7,13 +7,15 @@ class Node:
     parent Node
     """
 
-    def __init__(self, state, fullState, prev_action, parent, problem, heuristic=utils.null_heuristic):
+    def __init__(self, state, fullState, prev_action, parent, problem,costNeeded = True, heuristic=utils.null_heuristic):
         self.state = state
         self.fullState = fullState
         self.prev_action = prev_action
         self.parent = parent
         self.heuristic = heuristic
-        self.cost = self.get_cost_estimate(problem)
+
+        if costNeeded:
+            self.cost = self.get_cost_estimate(problem)
 
     def __str__(self):
         return str(self.state.getRobotPosition())
@@ -68,7 +70,7 @@ def a_star_search(problem, heuristic):
     """
     
     smallState = problem.start.extractSmallState()
-    n0 = Node(smallState, problem.start, None, None, problem, heuristic)
+    n0 = Node(smallState, problem.start, None, None, problem,True, heuristic)
     if problem.is_goal_state(n0.state):
         return ['None']
     frontier = utils.PriorityQueue()
@@ -90,7 +92,7 @@ def a_star_search(problem, heuristic):
             frontier_states.append(n[2].state)
             frontier_costs.append(n[2].cost)
         for next_state in next_states:
-            next_node = Node(next_state[0], next_state[1], next_state[2], node, problem, heuristic)
+            next_node = Node(next_state[0], next_state[1], next_state[2], node, problem,True, heuristic)
             if (next_node.state not in explored and next_node.state not in frontier_states) or \
                     (next_node.state in frontier_states and frontier_costs[
                         frontier_states.index(next_node.state)] > next_node.cost):
@@ -108,7 +110,7 @@ def depth_first_search(problem):
     """
 
     smallState = problem.start.extractSmallState()
-    node = Node(smallState,problem.start, None, None, problem)
+    node = Node(smallState,problem.start, None, None, problem, costNeeded=False)
     while not problem.is_goal_state(node.fullState):
         print ""
         print "Getting next states:"
@@ -124,14 +126,14 @@ def depth_first_search(problem):
                 #update the state of the simlator before running 
                 #classification
                 print "showing valid actions"
-                
+                '''
                 for row in range(node.fullState.map.yCells):
                     for col in range(node.fullState.map.xCells):
                         if node.fullState.map.map[col][row].are_any_valid_actions():
                             pos = (col,row)
                             print "Valid action position: ",pos
                             print node.fullState.map.map[col][row].validActions
-                
+                '''
                 return node.fullState
             
             print "back tracking: ",node.parent.prev_action
@@ -144,13 +146,13 @@ def depth_first_search(problem):
         else:
             next_state = next_states[0]
             print "GO:", next_state[1]
-            print next_state[0].map.robotPositions
+            #print next_state[0].map.robotPositions
         
             if node.parent != None:
                 print node.parent.prev_action
 
-            node = Node(next_state[0].extractSmallState(), next_state[0], next_state[1], node, problem)
+            node = Node(next_state[0].extractSmallState(), next_state[0], next_state[1], node, problem, costNeeded=False)
 
     
 
-    return node.get_path()
+    return node.fullState() 
