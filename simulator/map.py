@@ -230,6 +230,7 @@ class RobotMap(object):
         mapcp.obstacles = list(self.obstacles)
         mapcp.unvisitedCells = list(self.unvisitedCells)
         mapcp.observedCells = list(self.observedCells)
+        mapcp.robotPositions = list(self.robotPositions)
 
         cellXMax = self.width/self.cellXSize
         cellYMax = self.height/self.cellYSize
