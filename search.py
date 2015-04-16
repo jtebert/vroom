@@ -116,12 +116,31 @@ def depth_first_search(problem):
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
             # move robot to parents state, then update parent
+            #if problem.is_goal_state()
+
+            
+            if node.parent == None:
+                #kind of a hack, should figure out how to
+                #update the state of the simlator before running 
+                #classification
+                print "showing valid actions"
+                
+                for row in range(node.fullState.map.yCells):
+                    for col in range(node.fullState.map.xCells):
+                        if node.fullState.map.map[col][row].are_any_valid_actions():
+                            pos = (col,row)
+                            print "Valid action position: ",pos
+                            print node.fullState.map.map[col][row].validActions
+                
+                return node.fullState
+            
             print "back tracking: ",node.parent.prev_action
             new_action = utils.reverse_action(node.parent.prev_action)
             new_robot_state = node.fullState.generateSuccessor(new_action)
             node.parent.fullState = new_robot_state
             node.parent.state = node.parent.fullState.extractSmallState()
             node = node.parent
+
         else:
             next_state = next_states[0]
             print "GO:", next_state[1]
@@ -132,5 +151,6 @@ def depth_first_search(problem):
 
             node = Node(next_state[0].extractSmallState(), next_state[0], next_state[1], node, problem)
 
+    
 
     return node.get_path()

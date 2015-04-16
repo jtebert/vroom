@@ -95,12 +95,20 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
         problem = MapEnvironmentProblem(state)
-        actions = depth_first_search(problem)
+        state = depth_first_search(problem)
         #print actions
 
         # DIRT COLLECTION PROBLEM
         #state.map = self.environment.copyEnvIntoMap(state.map)
 
+        #reset visited and unvisitedCells
+        print state
+        state = state.resetMission()
+        
+        #print state.getDirt()
+        #print state.getUnvisited()
+        #print state.getVisited()
+        
         startTime = time.clock()
         problem = CollectDirtProblem(state)
         actions = a_star_search(problem, dirt_heuristic)
@@ -130,6 +138,7 @@ class RobotSimulator(object):
                 self.action = 'None'
               
             time.sleep(0.2)
+            
 
             screen = pygame.display.get_surface()
 
@@ -150,6 +159,8 @@ class RobotSimulator(object):
             
             
             pygame.display.update()
+
+            print state.r.pos
 
 
         
@@ -319,6 +330,22 @@ class Robot(object):
 
 class RobotState:
 
+    def resetMission (self ):
+        #swap unvisited with visited
+
+        temp = self.map.unvisitedCells
+
+        #print "old unvisited: ",self.map.unvisitedCells
+        #print "old visited: ",self.map.visitedCells
+
+        self.map.unvisitedCells = []
+        self.map.unvisitedCells = list(self.map.visitedCells)
+        self.map.visitedCells = list(temp)
+
+        #print "new unvisited : ",self.map.unvisitedCells
+        #print "new visited : ",self.map.visitedCells
+
+        return self
 
     def getLegalActions( self, pos):
 
