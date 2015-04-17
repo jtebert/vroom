@@ -77,7 +77,9 @@ def dirt_heuristic(state, problem):
         cell_costs.append(utils.manhattan_distance(state.getRobotPosition(), cell))
     if len(cell_costs) > 0:
         max_cost = max(cell_costs)
+        min_cost = min(cell_costs)
     else:
         max_cost = 0
-    return max_cost + len(unvisited)
+        min_cost = 0
+    return min_cost + (len(unvisited) * len(unvisited) )
  

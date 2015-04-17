@@ -95,27 +95,29 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
         
-        problem = MapEnvironmentProblem(state)
-        state = depth_first_search(problem)
+        #problem = MapEnvironmentProblem(state)
+        #state = depth_first_search(problem)
 
         # DIRT COLLECTION PROBLEM
-        #state.map = self.environment.copyEnvIntoMap(state.map)
+        state.map = self.environment.copyEnvIntoMap(state.map)
 
         #reset visited and unvisitedCells
         print state
-        state = state.resetMission()
+        #state = state.resetMission()
         
         #print state.getDirt()
         #print state.getUnvisited()
         #print state.getVisited()
-        
+    
+        '''
         startTime = time.clock()
         problem = CollectDirtProblem(state)
         actions = a_star_search(problem, dirt_heuristic)
         endTime = time.clock()
         print "a_star_search executed in %d seconds!"%(endTime - startTime)
         print actions
-        
+        '''
+        actions = ['None']
 
         while(True):
 
@@ -160,7 +162,7 @@ class RobotSimulator(object):
             
             pygame.display.update()
 
-            print state.r.pos
+            #print state.r.pos
 
 
         

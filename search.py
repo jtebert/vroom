@@ -79,7 +79,7 @@ def a_star_search(problem, heuristic):
     while not frontier.is_empty():
         node = frontier.pop()
         path = node.get_path()
-        print node.get_path()
+        #print node.get_path()
         print node.state
        # print node.fullState.getVisited()
         explored.add(node.state)
@@ -115,6 +115,7 @@ def depth_first_search(problem):
         print ""
         print "Getting next states:"
         next_states = problem.get_successors(node.fullState)
+        #print node.get_path()
         if len(next_states) == 0:
             # Nothing new to explore from current location; backtrack
             # move robot to parents state, then update parent
@@ -137,7 +138,7 @@ def depth_first_search(problem):
                 return node.fullState
             
             print "back tracking: ",node.parent.prev_action
-            new_action = utils.reverse_action(node.parent.prev_action)
+            new_action = utils.reverse_action(node.prev_action)
             new_robot_state = node.fullState.generateSuccessor(new_action)
             node.parent.fullState = new_robot_state
             node.parent.state = node.parent.fullState.extractSmallState()
@@ -148,10 +149,13 @@ def depth_first_search(problem):
             print "GO:", next_state[1]
             #print next_state[0].map.robotPositions
         
-            if node.parent != None:
-                print node.parent.prev_action
-
+        
             node = Node(next_state[0].extractSmallState(), next_state[0], next_state[1], node, problem, costNeeded=False)
+
+            #if node.parent != None:
+            #    print node.parent.prev_action
+            #    print node.prev_action
+
 
     
 
