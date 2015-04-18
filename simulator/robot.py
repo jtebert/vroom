@@ -96,15 +96,15 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
         
-        #problem = MapEnvironmentProblem(state)
-        #state = depth_first_search(problem)
+        problem = MapEnvironmentProblem(state)
+        state = depth_first_search(problem)
 
         # DIRT COLLECTION PROBLEM
-        state.map = self.environment.copyEnvIntoMap(state.map)
+        #state.map = self.environment.copyEnvIntoMap(state.map)
 
         #reset visited and unvisitedCells
-        print state
-        #state = state.resetMission()
+        #print state
+        state = state.resetMission()
         
         #print state.getDirt()
         #print state.getUnvisited()
@@ -118,14 +118,14 @@ class RobotSimulator(object):
         #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
         #plot_classification_accuracy(actual, classified, labels)
     
-        '''
+        
         startTime = time.clock()
         problem = CollectDirtProblem(state)
         actions = a_star_search(problem, dirt_heuristic)
         endTime = time.clock()
         print "a_star_search executed in %d seconds!"%(endTime - startTime)
         print actions
-        '''
+        
         actions = ['None']
 
         while(True):
@@ -559,9 +559,9 @@ class RobotState:
         self.r = robot
         self.map = robotMap
 
-    def __copy__ ( self ):
+    def copy ( self ):
         robotCp = self.r.copy()
-        mapCp = self.map.copy()
+        mapCp = self.map.copy(copyMap=True)
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 
