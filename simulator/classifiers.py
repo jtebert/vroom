@@ -15,32 +15,16 @@ class Classifiers(object):
         cellValue['none given not C'] = 0.0
         cellValue['dirt given not C'] = 0.0
         cellValue['obs given not C'] = 0.0
-        self.classifierNames = ('corner', 'doorway', 'garbagecan', 'table', 'litterbox', 'closet')
-        self.classifiers['corner'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.classifiers['doorway'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.classifiers['garbagecan'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.classifiers['table'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.classifiers['litterbox'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.classifiers['closet'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
+        self.classifierNames = getClassifiers()
         self.normalizedClassifiers = dict()
-        self.normalizedClassifiers['corner'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+
+        for name in self.classifierNames:
+            self.classifiers[str(name)] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['doorway'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+
+            self.normalizedClassifiers[str(name)] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['garbagecan'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['table'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['litterbox'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['closet'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
-                                        for y in range(self.sampleRowSize)]
+
     '''
     In train you are given a list of lists matrix for the sample
     This sample then has either noen, obs, and dirt for each  cell.
@@ -177,6 +161,18 @@ x.train(sample, 'chair')
 sample2 = [[0,1,3,2,1],[0,0,0,0,0]]
 x.train(sample2, 'chair')
 '''
+
+def getClassifiers():
+    from os import listdir
+    mypath = '../assets/training_maps'
+    onlyfiles = [f for f in listdir(mypath)]
+    classifiers = list()
+
+    for file in onlyfiles:
+        classifier = file.split('_')[0]
+        if classifier not in classifiers:
+            classifiers.append(classifier)
+    return classifiers
 
 y = Classifiers(10, 10)
 
