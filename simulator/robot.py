@@ -572,6 +572,7 @@ class RobotState:
     def copy( self ):
         robotCp = self.r.copy()
         mapCp = self.map.copy()
+        robotCp.environment = self.r.environment.copy()
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 
