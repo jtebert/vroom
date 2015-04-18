@@ -285,7 +285,7 @@ class Environment(object):
         # Returns amount of dirt after adding newDirt to currentDirt
         return min(MAX_DIRT, currentDirt + newDirt)
 
-    def updateDirt(self):
+    def updateDirt(self, useRobotMap=False):
         # Updates dirt by adding more based on however much is there to begin with and the adjacent cells
         #Todo: seeding
         import random
@@ -422,8 +422,8 @@ class Environment(object):
         if m.width != m.height:
             print "Can't do that"
         else:
-            for x in range(0, int(m.width)):
-                for y in range(0, int(m.height)):
+            for x in range(0, int(m.width) -1):
+                for y in range(0, int(m.height) -1):
                     mcp[y][m.width - x] = m[x][y]
             return mcp
 
@@ -432,8 +432,8 @@ class Environment(object):
         if m.width != m.height:
             print "Can't do that"
         else:
-            for x in range(0, int(m.width)):
-                for y in range(0, int(m.height)):
+            for x in range(0, int(m.width) -1):
+                for y in range(0, int(m.height) -1):
                     mcp[x][m.height - y] = m[x][y]
             return
 
