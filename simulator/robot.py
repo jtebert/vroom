@@ -591,9 +591,10 @@ class RobotState:
                 # Run classifier on block
                 # Limits of this block are [x, x+blockSize] and [y, y+blockSize]
                 map = inputMap.map
-                submatrix = [[map[i][j] for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
+                submatrix = [[map[i][j].value for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
+
                 bestClassifier = self.classifier.getBestClassifier(submatrix)
-                print "best classifier:", bestClassifier
+                    print "best classifier:", bestClassifier
                 if bestClassifier != None:
                     for a in xrange(y, y + blockSize):
                         for b in xrange(x, x + blockSize):
@@ -614,7 +615,7 @@ if __name__ == "__main__":
         
 
     #defaultEnvironmentCSV = './../assets/maps/test.csv'
-    defaultEnvironmentCSV = './../assets/maps/obstaclesgrid.csv'
+    defaultEnvironmentCSV = './../assets/maps/roomwithcloset1.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':

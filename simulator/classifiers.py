@@ -25,7 +25,7 @@ class Classifiers(object):
             self.normalizedClassifiers[str(name)] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
         self.train_with_files()
-        self.laplaceSmoothing(10)
+        self.laplaceSmoothing(20)
 
     def importClassifers(self):
         from os import listdir
@@ -199,7 +199,7 @@ sample2 = [[0,1,3,2,1],[0,0,0,0,0]]
 x.train(sample2, 'chair')
 '''
 
-
+'''
 
 y = Classifiers()
 
@@ -223,3 +223,4 @@ submatrix = [[sample2[i][j] for i in range(2)] for j in range(2)]
 
 
 x = 0
+'''
