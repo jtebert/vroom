@@ -94,9 +94,6 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
 
-        #problem = MapEnvironmentProblem(state)
-        #state = depth_first_search(problem)
-        
         #startTime = time.clock()
         #problem = MapEnvironmentProblem(state)
         #state = depth_first_search(problem)
@@ -104,9 +101,9 @@ class RobotSimulator(object):
         #print "exploration executed in %d seconds!"%(endTime - startTime)
 
         # DIRT COLLECTION PROBLEM
-        state.map = self.environment.copyEnvIntoMap(state.map)
+        #state.map = self.environment.copyEnvIntoMap(state.map)
 
-        state.featureExtraction(state.map)
+        #state.featureExtraction(state.map)
 
         #reset visited and unvisitedCells
         #print state
@@ -117,11 +114,11 @@ class RobotSimulator(object):
         #print state.getVisited()
 
         # Calculate and plot different dirt collection for different methods
-        time_steps, collected = all_dirt_collection_rates(state, state.r.environment)
-        plot_dirt_collection_rates(time_steps, collected)
+        #time_steps, collected = all_dirt_collection_rates(state, state.r.environment)
+        #plot_dirt_collection_rates(time_steps, collected)
         # Calculate and plot classification accuracy
-        actual, classified, labels = classification_accuracy(state.map, state.r.environment)
-        plot_classification_accuracy(actual, classified, labels)
+        #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
+        #plot_classification_accuracy(actual, classified, labels)
     
         '''
         startTime = time.clock()
@@ -133,9 +130,13 @@ class RobotSimulator(object):
         '''
         actions = ['None']
 
+        pygame.init()
+        pygame.display.set_mode((700,700),pygame.RESIZABLE)
+        pygame.display.update()
+
         while(True):
 
-            '''
+            
             if (agent == None):
                 self.listenControls()
 
@@ -145,14 +146,14 @@ class RobotSimulator(object):
                 #self.action is set directly by self.listenControls
             else:
                 self.action = agent.getAction(state)
+            
+            
             '''
-            
-            
             if len(actions):
                 self.action = actions.pop(0)
             else:
                 self.action = 'None'
-              
+
             time.sleep(0.2)
             
 
