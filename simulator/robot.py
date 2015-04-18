@@ -73,10 +73,7 @@ class RobotSimulator(object):
 
     def run(self):
         
-        pygame.init()
-        pygame.display.set_mode((700,700),pygame.RESIZABLE)
-        pygame.display.update()
-
+    
         self.turning = False
         self.turningDistance = 0
         self.turnDirection = None
@@ -96,8 +93,11 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
         
+        startTime = time.clock()
         problem = MapEnvironmentProblem(state)
         state = depth_first_search(problem)
+        endTime = time.clock()
+        print "exploration executed in %d seconds!"%(endTime - startTime)
 
         # DIRT COLLECTION PROBLEM
         #state.map = self.environment.copyEnvIntoMap(state.map)
@@ -126,7 +126,9 @@ class RobotSimulator(object):
         print "a_star_search executed in %d seconds!"%(endTime - startTime)
         print actions
         
-        actions = ['None']
+        pygame.init()
+        pygame.display.set_mode((700,700),pygame.RESIZABLE)
+        pygame.display.update()
 
         while(True):
 
