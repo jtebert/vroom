@@ -15,7 +15,7 @@ class Classifiers(object):
         cellValue['none given not C'] = 0.0
         cellValue['dirt given not C'] = 0.0
         cellValue['obs given not C'] = 0.0
-        self.classifierNames = getClassifiers()
+        self.classifierNames = self.importClassifers()
         self.normalizedClassifiers = dict()
 
         for name in self.classifierNames:
@@ -24,6 +24,18 @@ class Classifiers(object):
 
             self.normalizedClassifiers[str(name)] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
+
+    def importClassifers(self):
+        from os import listdir
+        mypath = '../assets/training_maps'
+        onlyfiles = [f for f in listdir(mypath)]
+        classifiers = list()
+
+        for file in onlyfiles:
+            classifier = file.split('_')[0]
+            if classifier not in classifiers:
+                classifiers.append(classifier)
+        return classifiers
 
     '''
     In train you are given a list of lists matrix for the sample
@@ -48,6 +60,10 @@ class Classifiers(object):
         for label in self.classifierNames:
             self.normalize(label)
 
+    '''
+    Helper Function:
+    Task is to update every other classifier with evidence
+    '''
     def update_other_classifiers(self, label, evidence, coord):
         namesToUpdate = [name for name in self.classifierNames if name != label ]
         for name in namesToUpdate:
@@ -85,7 +101,7 @@ class Classifiers(object):
     def getClassifier(self, classifier):
         return self.normalizedClassifiers[classifier]
 
-    def chooseBestClassifier(self, inputGrid):
+    def getBestClassifier(self, inputGrid):
         # Gets yes probabilites
         probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
 
@@ -127,30 +143,40 @@ class Classifiers(object):
         probYes *= sumC
         probNo *= sumNotC
 
+        tot = probNo + probYes
+        probNo /= tot
+        probYes /= tot
+
         return (probYes, probNo)
 
 
     def laplaceSmoothing(self, num = 4):
-        for name in self.classifierNames:
+        for classifier in self.classifierNames:
             for i in range(self.sampleRowSize):
                 for j in range(self.sampleColumnSize):
-                    self.classifiers[name][i][j]['dirt'] += num
-                    self.classifiers[name][i][j]['none'] += num
-                    self.classifiers[name][i][j]['obs'] += num
-        self.normalize()
+                    self.classifiers[classifier][i][j]['dirt given C'] += num
+                    self.classifiers[classifier][i][j]['dirt given not C'] += num
+                    self.classifiers[classifier][i][j]['none given C'] += num
+                    self.classifiers[classifier][i][j]['none given not C'] += num
+                    self.classifiers[classifier][i][j]['obs given C'] += num
+                    self.classifiers[classifier][i][j]['obs given not C'] += num
+            self.normalize(classifier)
 
     def featureExtraction(self, inmap):
         assert(inmap.isinstance(map.Environment))
 
-        #to start with, just uses every blocksize x blocksize section
+        # to start with, just uses every blocksize x blocksize section
         blockSize = 10
         xRange = int(inmap.widthCells - blockSize - 1)
         yRange = int(inmap.heightCells - blockSize - 1)
         for y in xrange(0, yRange):
             for x in xrange(0, xRange):
-                #Run classifier on block
-                #Limits of this block are [x, x+blockSize] and [y, y+blockSize]
-                continue
+                # Run classifier on block
+                # Limits of this block are [x, x+blockSize] and [y, y+blockSize]
+                map = inmap.map
+                submatrix = [[map[i][j] for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
+                self.getBestClassifier(submatrix)
+
 
 
 # Test Cases
@@ -162,17 +188,7 @@ sample2 = [[0,1,3,2,1],[0,0,0,0,0]]
 x.train(sample2, 'chair')
 '''
 
-def getClassifiers():
-    from os import listdir
-    mypath = '../assets/training_maps'
-    onlyfiles = [f for f in listdir(mypath)]
-    classifiers = list()
 
-    for file in onlyfiles:
-        classifier = file.split('_')[0]
-        if classifier not in classifiers:
-            classifiers.append(classifier)
-    return classifiers
 
 y = Classifiers(10, 10)
 
@@ -186,4 +202,23 @@ for file in onlyfiles:
     classifier = file.split('_')[0]
     map = utils.readTrainingMap(pathToMap)
     y.train(map, classifier)
+
+y.laplaceSmoothing(4)
+
+testMap = '../assets/training_maps/doorway_1.csv'
+testMap = utils.readTrainingMap(testMap)
+z = y.getBestClassifier(testMap)
+x = 0
+
+
+sample2 = [[0, 1, 3, 2, 1],
+           [0, 0, 0, 0, 0],
+           [1, 1, 3, 0, 1],
+           [0, 1, 0, 0, 0]]
+
+submatrix = sample2[0:3]
+submatrix = submatrix[:][0:2]
+
+submatrix = [[sample2[i][j] for i in range(2)] for j in range(2)]
+
 x = 0
