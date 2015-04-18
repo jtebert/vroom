@@ -15,31 +15,31 @@ class Classifiers(object):
         cellValue['none given not C'] = 0.0
         cellValue['dirt given not C'] = 0.0
         cellValue['obs given not C'] = 0.0
-        self.classifierNames = ('openCell', 'doorway', 'garbageCan', 'chair', 'litterBox', 'houseEntrance')
-        self.classifiers['openCell'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.classifierNames = ('corner', 'doorway', 'garbagecan', 'table', 'litterbox', 'closet')
+        self.classifiers['corner'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
         self.classifiers['doorway'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.classifiers['garbageCan'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.classifiers['garbagecan'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.classifiers['chair'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.classifiers['table'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.classifiers['litterBox'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.classifiers['litterbox'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.classifiers['houseEntrance'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.classifiers['closet'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
         self.normalizedClassifiers = dict()
-        self.normalizedClassifiers['openCell'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.normalizedClassifiers['corner'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
         self.normalizedClassifiers['doorway'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['garbageCan'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.normalizedClassifiers['garbagecan'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['chair'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.normalizedClassifiers['table'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['litterBox'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.normalizedClassifiers['litterbox'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
-        self.normalizedClassifiers['houseEntrance'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
+        self.normalizedClassifiers['closet'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
     '''
     In train you are given a list of lists matrix for the sample
@@ -47,6 +47,8 @@ class Classifiers(object):
     Based on this then probabilities are then updated for each cell, as we go through.
     '''
     def train(self, sample, label):
+        if label not in self.classifierNames:
+            raise Exception("Invalid classifier name " + label)
         for i in range(self.sampleRowSize):
             for j in range(self.sampleColumnSize):
                 y = sample[i][j]
@@ -59,7 +61,8 @@ class Classifiers(object):
                 elif sample[i][j] == -1:
                     self.classifiers[label][i][j]['obs given C'] += 1
                     self.update_other_classifiers(label, 'obs given not C', (i, j))
-        self.normalize(label)
+        for label in self.classifierNames:
+            self.normalize(label)
 
     def update_other_classifiers(self, label, evidence, coord):
         namesToUpdate = [name for name in self.classifierNames if name != label ]
@@ -84,9 +87,15 @@ class Classifiers(object):
                         sumC += pred[key]
                 for key in pred.keys():
                     if "not C" in key:
-                        pred[key] = pred[key] / sumNotC
+                        if sumNotC != 0:
+                            pred[key] = pred[key] / sumNotC
+                        else:
+                            pred[key] = 0
                     else:
-                        pred[key] = pred[key] / sumC
+                        if sumC != 0:
+                            pred[key] = pred[key] / sumC
+                        else:
+                            pred[key] = 0
                 self.normalizedClassifiers[classifier][i][j] = pred
 
     def getClassifier(self, classifier):
@@ -104,9 +113,6 @@ class Classifiers(object):
             return maxClassifier[0]
         else:
             return "None"
-
-
-
 
 
     def getLikelyhood(self, classifier, inputGrid):
@@ -140,9 +146,6 @@ class Classifiers(object):
         return (probYes, probNo)
 
 
-
-
-
     def laplaceSmoothing(self, num = 4):
         for name in self.classifierNames:
             for i in range(self.sampleRowSize):
@@ -167,14 +170,24 @@ class Classifiers(object):
 
 
 # Test Cases
-
+'''
 x = Classifiers()
 sample = [[1,2,3,0,-1],[0,0,0,0,0]]
 x.train(sample, 'chair')
 sample2 = [[0,1,3,2,1],[0,0,0,0,0]]
 x.train(sample2, 'chair')
+'''
 
 y = Classifiers(10, 10)
-mapTest = utils.readTrainingMap('./../assets/training_maps/chair_0.csv')
-y.train(mapTest, 'chair')
-y.laplaceSmoothing()
+
+
+from os import listdir
+mypath = '../assets/training_maps'
+onlyfiles = [f for f in listdir(mypath)]
+
+for file in onlyfiles:
+    pathToMap = './../assets/training_maps/' + file
+    classifier = file.split('_')[0]
+    map = utils.readTrainingMap(pathToMap)
+    y.train(map, classifier)
+x = 0
