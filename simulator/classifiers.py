@@ -24,6 +24,8 @@ class Classifiers(object):
 
             self.normalizedClassifiers[str(name)] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
+        self.train_with_files()
+        self.laplaceSmoothing()
 
     def importClassifers(self):
         from os import listdir
@@ -37,6 +39,18 @@ class Classifiers(object):
                 classifiers.append(classifier)
         return classifiers
 
+    def train_with_files(self):
+        from os import listdir
+        mypath = '../assets/training_maps'
+        onlyfiles = [f for f in listdir(mypath)]
+
+        for file in onlyfiles:
+            pathToMap = './../assets/training_maps/' + file
+            classifier = file.split('_')[0]
+            map = utils.readTrainingMap(pathToMap)
+            self.train(map, classifier)
+
+
     '''
     In train you are given a list of lists matrix for the sample
     This sample then has either noen, obs, and dirt for each  cell.
@@ -48,7 +62,7 @@ class Classifiers(object):
         for i in range(self.sampleRowSize):
             for j in range(self.sampleColumnSize):
                 y = sample[i][j]
-                if sample[i][j] >= 1:
+                if 1 <= sample[i][j] <= 3:
                     self.classifiers[label][i][j]['dirt given C'] += 1
                     self.update_other_classifiers(label, 'dirt given not C', (i, j))
                 elif sample[i][j] == 0:
@@ -57,6 +71,8 @@ class Classifiers(object):
                 elif sample[i][j] == -1:
                     self.classifiers[label][i][j]['obs given C'] += 1
                     self.update_other_classifiers(label, 'obs given not C', (i, j))
+                else:
+                    raise Exception("Invalid training map, bad cell value")
         for label in self.classifierNames:
             self.normalize(label)
 
@@ -107,19 +123,19 @@ class Classifiers(object):
 
         # Calculates new probabilities
         from operator import itemgetter
-        maxClassifier = max(probs, key = itemgetter(1))
+        maxClassifier = max(probs, key=itemgetter(1))
 
         if maxClassifier[1] >= self.THRESHOLD:
             return maxClassifier[0]
         else:
-            return "None"
+            return None
 
 
     def getLikelyhood(self, classifier, inputGrid):
         probYes, probNo = 1 , 1
         for i in range(self.sampleRowSize):
             for j in range(self.sampleColumnSize):
-                if inputGrid[i][j] >= 1:
+                if 1 <= inputGrid[i][j] <= 3:
                     probYes *= self.normalizedClassifiers[classifier][i][j]['dirt given C']
                     probNo *= self.normalizedClassifiers[classifier][i][j]['dirt given not C']
                 elif inputGrid[i][j] == 0:
@@ -128,6 +144,8 @@ class Classifiers(object):
                 elif inputGrid[i][j] == -1:
                     probYes *= self.normalizedClassifiers[classifier][i][j]['obs given C']
                     probNo *= self.normalizedClassifiers[classifier][i][j]['obs given not C']
+                else:
+                    raise Exception("Invalid input grid given to get classifier")
 
         pred = self.classifiers[classifier][0][0].copy()
         sumC , sumNotC = 0 , 0
@@ -173,20 +191,7 @@ x.train(sample2, 'chair')
 
 
 
-y = Classifiers(10, 10)
-
-
-from os import listdir
-mypath = '../assets/training_maps'
-onlyfiles = [f for f in listdir(mypath)]
-
-for file in onlyfiles:
-    pathToMap = './../assets/training_maps/' + file
-    classifier = file.split('_')[0]
-    map = utils.readTrainingMap(pathToMap)
-    y.train(map, classifier)
-
-y.laplaceSmoothing(4)
+y = Classifiers()
 
 testMap = '../assets/training_maps/doorway_1.csv'
 testMap = utils.readTrainingMap(testMap)

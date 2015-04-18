@@ -80,7 +80,7 @@ def a_star_search(problem, heuristic):
         node = frontier.pop()
         path = node.get_path()
         #print node.get_path()
-        print node.state
+        #print node.state
        # print node.fullState.getVisited()
         explored.add(node.state)
         if problem.is_goal_state(node.state):
@@ -112,8 +112,8 @@ def depth_first_search(problem):
     smallState = problem.start.extractSmallState()
     node = Node(smallState,problem.start, None, None, problem, costNeeded=False)
     while not problem.is_goal_state(node.fullState):
-        print ""
-        print "Getting next states:"
+        #print ""
+        #print "Getting next states:"
         next_states = problem.get_successors(node.fullState)
         #print node.get_path()
         if len(next_states) == 0:
@@ -126,7 +126,7 @@ def depth_first_search(problem):
                 #kind of a hack, should figure out how to
                 #update the state of the simlator before running 
                 #classification
-                print "showing valid actions"
+                ##print "showing valid actions"
                 '''
                 for row in range(node.fullState.map.yCells):
                     for col in range(node.fullState.map.xCells):
@@ -137,7 +137,7 @@ def depth_first_search(problem):
                 '''
                 return node.fullState
             
-            print "back tracking: ",node.parent.prev_action
+            #print "back tracking: ",node.parent.prev_action
             new_action = utils.reverse_action(node.prev_action)
             new_robot_state = node.fullState.generateSuccessor(new_action)
             node.parent.fullState = new_robot_state
@@ -146,7 +146,7 @@ def depth_first_search(problem):
 
         else:
             next_state = next_states[0]
-            print "GO:", next_state[1]
+            #print "GO:", next_state[1]
             #print next_state[0].map.robotPositions
         
         
