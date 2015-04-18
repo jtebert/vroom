@@ -33,6 +33,10 @@ def all_dirt_collection_rates(state, environment):
     max_num_time_steps = 100
     range_num_time_steps = range(max_num_time_steps)
     actual_actions, worst_actions, ideal_actions = get_collection_actions(state, environment)
+
+    print "Dirt", len(environment.get_dirt())
+    print "Robot env Dirt", len(state.r.environment.get_dirt())
+
     actual_rates = dirt_collection_rate(state, environment, actual_actions, max_num_time_steps)
     worst_rates = dirt_collection_rate(state, environment, worst_actions, max_num_time_steps)
     ideal_rates = dirt_collection_rate(state, environment, ideal_actions, max_num_time_steps)
@@ -49,9 +53,9 @@ def dirt_collection_rate(state, environment, actions, num_time_steps):
     initial_dirt = len(environment.get_dirt())
     dirt_collected = []
     for t in range(len(actions)):
-        state.generateSuccessor(actions[t])
-        collect = len(state.r.environment.get_dirt())
-        dirt_collected.append(initial_dirt - collect)
+        my_state = my_state.generateSuccessor(actions[t])
+        remaining = len(my_state.r.environment.get_dirt())
+        dirt_collected.append(initial_dirt - remaining)
     dirt_collected = max_rate_num_time_steps(dirt_collected, num_time_steps)
     return dirt_collected
 
@@ -129,8 +133,8 @@ def plot_classification_accuracy(actual, classified, labels):
     fig, ax = plt.subplots()
     ind = np.arange(len(actual))
     width = 0.35
-    rects1 = ax.bar(ind, actual, width, color='g')
-    rects2 = ax.bar(ind + width, classified, width, color='r')
+    rects1 = ax.bar(ind, actual, width, color='g', edgecolor=None)
+    rects2 = ax.bar(ind + width, classified, width, color='r', edgecolor=None)
 
     ax.set_xlabel('Obstacle Category', fontweight='bold')
     ax.set_ylabel('Number Found', fontweight='bold')
