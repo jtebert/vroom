@@ -162,23 +162,6 @@ class Classifiers(object):
                     self.classifiers[classifier][i][j]['obs given not C'] += num
             self.normalize(classifier)
 
-    def featureExtraction(self, inmap):
-        assert(inmap.isinstance(map.Environment))
-
-        # to start with, just uses every blocksize x blocksize section
-        blockSize = 10
-        xRange = int(inmap.widthCells - blockSize - 1)
-        yRange = int(inmap.heightCells - blockSize - 1)
-        for y in xrange(0, yRange):
-            for x in xrange(0, xRange):
-                # Run classifier on block
-                # Limits of this block are [x, x+blockSize] and [y, y+blockSize]
-                map = inmap.map
-                submatrix = [[map[i][j] for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
-                self.getBestClassifier(submatrix)
-
-
-
 # Test Cases
 '''
 x = Classifiers()
@@ -220,5 +203,7 @@ submatrix = sample2[0:3]
 submatrix = submatrix[:][0:2]
 
 submatrix = [[sample2[i][j] for i in range(2)] for j in range(2)]
+
+
 
 x = 0
