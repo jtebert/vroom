@@ -204,7 +204,6 @@ def readTrainingMap(fileName):
     return trainingMap
 
 
-<<<<<<< HEAD
 def countLabels(map):
     """
     For each group of map labels, draw the label in text
@@ -214,8 +213,7 @@ def countLabels(map):
     width = len(map[0])
     height = len(map)
 
-    labels = labels_dict
-    is_labeled = []
+    labels = labels_dict()
 
     for row in range(height):
         for col in range(width):
@@ -223,24 +221,21 @@ def countLabels(map):
             #and that the labels are 10x10
             label = map[col][row].label
             if label != None:
-                if [col, row] not in is_labeled:
-                    # Add label to count
-                    labels[label] += 1
-                    # Mark others as counted
-                    for i in range(10):
-                        for j in range(10):
-                            is_labeled.append([col + i, row + j])
+                # Add label to count
+                labels[label] += 1
     return labels
 
 
-labels_dict = {
-    'garbagecan': 0,
-    'doorway': 0,
-    'corner': 0,
-    'litterbox': 0,
-    'closet': 0,
-    'table': 0,
-}
+def labels_dict ():
+    return {
+        'garbagecan': 0,
+        'doorway': 0,
+        'corner': 0,
+        'litterbox': 0,
+        'closet': 0,
+        'table': 0,
+    }
+
 def generateMapOrientations(m):
     orient = list()
     orient.append(copy.deepcopy(m))

@@ -19,9 +19,11 @@ def classification_accuracy(robotmap, environment):
     # Get number of each type of obstacle
     actual_obstacles_all = utils.countLabels(environment.map)
     actual_obstacles = actual_obstacles_all.values()
+    #print actual_obstacles
     labels = actual_obstacles_all.keys()
     classified_obstacles = utils.countLabels(robotmap.map).values()
-
+    #print classified_obstacles
+    #print actual_obstacles
 
     #actual_obstacles = [1, 3, 5, 6, 7, 2]
     #classified_obstacles = [1, 2, 5, 4, 8, 3]

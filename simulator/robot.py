@@ -106,7 +106,12 @@ class RobotSimulator(object):
         # DIRT COLLECTION PROBLEM
         state.map = self.environment.copyEnvIntoMap(state.map)
 
+        print "COUNTS"
+        print utils.countLabels(state.r.environment.map)
+
         state.featureExtraction(state.map)
+
+        print utils.countLabels(state.r.environment.map)
 
         #reset visited and unvisitedCells
         #print state
