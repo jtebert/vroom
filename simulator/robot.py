@@ -569,7 +569,7 @@ class RobotState:
         #if makeClassifier == True:
         self.classifier = Classifiers()
 
-    def __copy__ ( self ):
+    def copy( self ):
         robotCp = self.r.copy()
         mapCp = self.map.copy()
         stateCp = RobotState(robotCp, mapCp )
@@ -594,7 +594,7 @@ class RobotState:
                 submatrix = [[map[i][j].value for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
 
                 bestClassifier = self.classifier.getBestClassifier(submatrix)
-                    print "best classifier:", bestClassifier
+                print "best classifier:", bestClassifier
                 if bestClassifier != None:
                     for a in xrange(y, y + blockSize):
                         for b in xrange(x, x + blockSize):
