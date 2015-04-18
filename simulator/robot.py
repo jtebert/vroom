@@ -556,6 +556,26 @@ class RobotState:
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 
+    def featureExtraction(self, inputMap):
+        assert(inputMap.isinstance(map.Environment))
+
+        # to start with, just uses every blocksize x blocksize section
+        blockSize = 10
+        xRange = int(inputMap.widthCells - blockSize - 1)
+        yRange = int(inputMap.heightCells - blockSize - 1)
+        for y in xrange(0, yRange):
+            for x in xrange(0, xRange):
+                # Run classifier on block
+                # Limits of this block are [x, x+blockSize] and [y, y+blockSize]
+                map = inputMap.map
+                submatrix = [[map[i][j] for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
+                bestClassifier = self.getBestClassifier(submatrix)
+                if bestClassifier != None:
+                    for a in xrange(y, y + blockSize):
+                        for b in xrange(x, x + blockSize):
+                            map[b][a].label = bestClassifier
+
+
 if __name__ == "__main__":
     
     #TODO add option to import environment
