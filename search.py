@@ -79,9 +79,6 @@ def a_star_search(problem, heuristic):
     while not frontier.is_empty():
         node = frontier.pop()
         path = node.get_path()
-        #print node.get_path()
-        #print node.state
-       # print node.fullState.getVisited()
         explored.add(node.state)
         if problem.is_goal_state(node.state):
             return path

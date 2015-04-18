@@ -32,6 +32,7 @@ def all_dirt_collection_rates(state, environment):
     """
     max_num_time_steps = 100
     range_num_time_steps = range(max_num_time_steps)
+    print "Dirt", len(environment.get_dirt())
     actual_actions, worst_actions, ideal_actions = get_collection_actions(state, environment)
 
     print "Dirt", len(environment.get_dirt())
@@ -87,7 +88,7 @@ def get_collection_actions(state, environment):
     actual_state = state.copy()
     problem = CollectDirtProblem(actual_state)
     actual_actions = a_star_search(problem, dirt_heuristic)
-
+    
     # TODO: Use reactive agent
     worst_actions = []
 

@@ -275,7 +275,8 @@ class Environment(object):
 
         for x in xrange(0,int(cellXMax)):
             for y in xrange(0,int(cellYMax)):
-                mapcp.map[x][y] = self.map[x][y]
+                mapcp.map[x][y] = MapNode(y, x)
+                mapcp.map[x][y].dirt = int(self.map[x][y].dirt)
 
         return mapcp
 
@@ -471,7 +472,7 @@ class Environment(object):
 
                 if self.map[x][y].value == 0:
                     mapcp.map[x][y].isVisited = True
-
+                    
                 if self.map[x][y].label != None:
                     mapcp.map[x][y].label = self.map[x][y].label
                     

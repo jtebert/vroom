@@ -87,6 +87,7 @@ class RobotSimulator(object):
         state.map.map[pos[0]][pos[1]].set_valid_actions(state)
         print state.map.map[pos[0]][pos[1]].validActions
 
+        
         agent = None  #TODO replace with agent selection
 
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
@@ -96,18 +97,18 @@ class RobotSimulator(object):
         #problem = MapEnvironmentProblem(state)
         #state = depth_first_search(problem)
         
-        startTime = time.clock()
-        problem = MapEnvironmentProblem(state)
+        #startTime = time.clock()
+        #problem = MapEnvironmentProblem(state)
         #state = depth_first_search(problem)
-        endTime = time.clock()
-        print "exploration executed in %d seconds!"%(endTime - startTime)
+        #endTime = time.clock()
+        #print "exploration executed in %d seconds!"%(endTime - startTime)
 
         # DIRT COLLECTION PROBLEM
         #state.map = self.environment.copyEnvIntoMap(state.map)
 
         #reset visited and unvisitedCells
         #print state
-        state = state.resetMission()
+        #state = state.resetMission()
         
         #print state.getDirt()
         #print state.getUnvisited()
@@ -338,6 +339,7 @@ class Robot(object):
 
     def copy(self, copyEnv = False):
         if copyEnv:
+            print "copy environment fully"
             environment = self.environment.copy()
         else:
             environment = self.environment
@@ -462,6 +464,7 @@ class RobotState:
             if len(dirtReadings):
                 for dirtReading in dirtReadings:
                     state.map.map[dirtReading[0]][dirtReading[1]].dirt = dirtReading[2]
+                    state.r.environment.map[dirtReading[0]][dirtReading[1]].dirt = 0
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
                         
@@ -480,7 +483,6 @@ class RobotState:
             if len(openReadings):
                 for openCell in openReadings:
                     
-                    
                     if openCell in state.map.unvisitedCells:
                        # print "adding observed cell: ",openCell
                         state.map.observedCells.append(openCell)            
@@ -490,8 +492,6 @@ class RobotState:
             else:
                 self.bump = True
              
-            
-            
             pos = [0,0]
             pos[0] = int(state.r.pos[0])
             pos[1] = int(state.r.pos[1])
@@ -568,7 +568,8 @@ class RobotState:
         self.map = robotMap
 
     def copy ( self ):
-        robotCp = self.r.copy( copyEnv = True)
+        robotCp = self.r.copy(copyEnv= True)
+        robotCp.environment = self.r.environment.copy()
         mapCp = self.map.copy(copyMap=True)
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
