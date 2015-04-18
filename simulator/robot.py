@@ -527,6 +527,12 @@ class RobotState:
 
         return dirt
 
+    def removeUnreachableDirt ( self ):
+        #after performing update dirt, or if importing a map with dirt cells
+        #we will need to remove dirtCells from the dirt list the robot cannot 
+        #reach
+        return None
+
     def getUnvisited( self ):
         return self.map.unvisitedCells
 
@@ -543,6 +549,12 @@ class RobotState:
 
         self.r = robot
         self.map = robotMap
+
+    def __copy__ ( self ):
+        robotCp = self.r.copy()
+        mapCp = self.map.copy()
+        stateCp = RobotState(robotCp, mapCp )
+        return stateCp
 
 if __name__ == "__main__":
     
