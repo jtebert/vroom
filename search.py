@@ -137,7 +137,7 @@ def depth_first_search(problem):
                 '''
                 return node.fullState
             
-            print "back tracking: ",node.parent.prev_action
+            #print "back tracking: ",node.parent.prev_action
             new_action = utils.reverse_action(node.prev_action)
             new_robot_state = node.fullState.generateSuccessor(new_action)
             node.parent.fullState = new_robot_state
