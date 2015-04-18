@@ -405,7 +405,37 @@ class Environment(object):
             return
                 
     
-    
+    def generateMapOrientations(self, m):
+        orient = list()
+        orient.add(m.copy())
+        orient.add(self.rotateMap(orient[0]))
+        orient.add(self.rotateMap(orient[1]))
+        orient.add(self.rotateMap(orient[2]))
+        orient.add(self.flipMap(orient[0]))
+        orient.add(self.flipMap(orient[1]))
+        orient.add(self.flipMap(orient[2]))
+        orient.add(self.flipMap(orient[3]))
+        return orient
+
+    def rotateMap(self, m):
+        mcp = m.copy()
+        if m.width != m.height:
+            print "Can't do that"
+        else:
+            for x in range(0, int(m.width)):
+                for y in range(0, int(m.height)):
+                    mcp[y][m.width - x] = m[x][y]
+            return mcp
+
+    def flipMap(self, m):
+        mcp = m.copy()
+        if m.width != m.height:
+            print "Can't do that"
+        else:
+            for x in range(0, int(m.width)):
+                for y in range(0, int(m.height)):
+                    mcp[x][m.height - y] = m[x][y]
+            return
 
     def copyEnvIntoMap( self, m ):
         #Takes in a map, and ports the environment into the map 
