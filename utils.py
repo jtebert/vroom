@@ -2,6 +2,7 @@
 
 import heapq
 import csv
+import copy
 
 
 def reverse_action(action):
@@ -201,3 +202,36 @@ def readTrainingMap(fileName):
         line = row[0].split(',')
         trainingMap.append(map(int, line))
     return trainingMap
+
+
+def generateMapOrientations(m):
+    orient = list()
+    orient.append(copy.deepcopy(m))
+    orient.append(rotateMap(orient[0]))
+    orient.append(rotateMap(orient[1]))
+    orient.append(rotateMap(orient[2]))
+    orient.append(flipMap(orient[0]))
+    orient.append(flipMap(orient[1]))
+    orient.append(flipMap(orient[2]))
+    orient.append(flipMap(orient[3]))
+    return orient
+
+def rotateMap(m, width = 10, height = 10):
+    mcp = copy.deepcopy(m)
+    if width != height:
+        print "Can't do that"
+    else:
+        for x in range(0, int(width)):
+            for y in range(0, int(height)):
+                mcp[y][width - 1 - x] = m[x][y]
+        return mcp
+
+def flipMap(m, width = 10, height = 10):
+    mcp = copy.deepcopy(m)
+    if width != height:
+        print "Can't do that"
+    else:
+        for x in range(0, int(width)):
+            for y in range(0, int(height)):
+                mcp[x][height - 1 - y] = m[x][y]
+        return mcp
