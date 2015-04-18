@@ -9,6 +9,7 @@ sys.path.insert(0,parentdir)
 from explore_map import *
 from dirt_collection import *
 from search import *
+from evaluation import *
 
 import time
 
@@ -72,10 +73,7 @@ class RobotSimulator(object):
 
     def run(self):
         
-        pygame.init()
-        pygame.display.set_mode((700,700),pygame.RESIZABLE)
-        pygame.display.update()
-
+    
         self.turning = False
         self.turningDistance = 0
         self.turnDirection = None
@@ -95,29 +93,42 @@ class RobotSimulator(object):
         
         #TODO defaults to run exploration and then shows results
         
-        #problem = MapEnvironmentProblem(state)
-        #state = depth_first_search(problem)
+        startTime = time.clock()
+        problem = MapEnvironmentProblem(state)
+        state = depth_first_search(problem)
+        endTime = time.clock()
+        print "exploration executed in %d seconds!"%(endTime - startTime)
 
         # DIRT COLLECTION PROBLEM
-        state.map = self.environment.copyEnvIntoMap(state.map)
+        #state.map = self.environment.copyEnvIntoMap(state.map)
 
         #reset visited and unvisitedCells
-        print state
-        #state = state.resetMission()
+        #print state
+        state = state.resetMission()
         
         #print state.getDirt()
         #print state.getUnvisited()
         #print state.getVisited()
+
+        # Calculate and plot different dirt collection for different methods
+        num_time_steps = 100
+        #collected = all_dirt_collection_rates(state, state.r.environment)
+        #plot_dirt_collection_rates(collected, num_time_steps)
+        # Calculate and plot classification accuracy
+        #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
+        #plot_classification_accuracy(actual, classified, labels)
     
-        '''
+        
         startTime = time.clock()
         problem = CollectDirtProblem(state)
         actions = a_star_search(problem, dirt_heuristic)
         endTime = time.clock()
         print "a_star_search executed in %d seconds!"%(endTime - startTime)
         print actions
-        '''
-        actions = ['None']
+        
+        pygame.init()
+        pygame.display.set_mode((700,700),pygame.RESIZABLE)
+        pygame.display.update()
 
         while(True):
 
@@ -294,9 +305,10 @@ class Robot(object):
         for x in range(-2,3,1):
             for y in range (-2,3,1): 
             
-                if self.environment.map[self.pos[0]+x][self.pos[1]+y].value > 0:
-                    d = self.environment.map[self.pos[0]+x][self.pos[1]+y].value
+                if self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt > 0:
+                    d = self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt
                     dValues.append([self.pos[0]+x,self.pos[1]+y,d])
+                    self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt = 0
         
         return dValues
 
@@ -324,7 +336,11 @@ class Robot(object):
         raise Exception("evaluateTurn is not supported by simulator")
     
 
-    def copy(self):
+    def copy(self, copyEnv = False):
+        if copyEnv:
+            environment = self.environment.copy()
+        else:
+            environment = self.environment
         r = Robot(self.environment)
         r.pos = list(self.pos)
         r.heading = self.heading
@@ -448,6 +464,7 @@ class RobotState:
                     state.map.map[dirtReading[0]][dirtReading[1]].dirt = dirtReading[2]
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
+                        
                 
             if len(proxReadings):
                 for prox in proxReadings:
@@ -550,9 +567,9 @@ class RobotState:
         self.r = robot
         self.map = robotMap
 
-    def __copy__ ( self ):
-        robotCp = self.r.copy()
-        mapCp = self.map.copy()
+    def copy ( self ):
+        robotCp = self.r.copy( copyEnv = True)
+        mapCp = self.map.copy(copyMap=True)
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 

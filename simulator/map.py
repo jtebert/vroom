@@ -223,8 +223,8 @@ class RobotMap(object):
                 if self.map[col][row].isVisited:
                     self.map[col][row].set_valid_actions(robot_state)
 
-    def copy (self):
-        mapcp = RobotMap(map=False)
+    def copy (self, copyMap=False):
+        mapcp = RobotMap(map=copyMap)
         mapcp.dirtCells = list(self.dirtCells)
         mapcp.visitedCells = list(self.visitedCells)
         mapcp.obstacles = list(self.obstacles)
@@ -257,6 +257,15 @@ class Environment(object):
 
 
         self.importEnviroment(environmentCSV)
+
+    def get_dirt(self):
+        """Give back coordinates of dirt in the environment's map"""
+        dirt_cells = []
+        for row in range(self.heightCells):
+            for col in range(self.widthCells):
+                if not self.map[row][col] == 0:
+                    dirt_cells.append((col, row))
+        return dirt_cells
 
     def copy (self):
         mapcp = Environment()
@@ -303,7 +312,6 @@ class Environment(object):
                 elif mapCopy.map[x][y].value == None:
                     #It's a cell not in the environment
                     continue
-
 
 
                 elif mapCopy.map[x][y].label == None or mapCopy.map[x][y].label == '':
