@@ -112,8 +112,8 @@ class RobotSimulator(object):
 
         # Calculate and plot different dirt collection for different methods
         num_time_steps = 100
-        #collected = all_dirt_collection_rates(state, state.r.environment)
-        #plot_dirt_collection_rates(collected, num_time_steps)
+        collected = all_dirt_collection_rates(state, state.r.environment)
+        plot_dirt_collection_rates(collected, num_time_steps)
         # Calculate and plot classification accuracy
         #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
         #plot_classification_accuracy(actual, classified, labels)
@@ -173,8 +173,6 @@ class RobotSimulator(object):
 
             #print state.r.pos
 
-
-        
 
 class Robot(object):
 
@@ -559,7 +557,7 @@ class RobotState:
         self.r = robot
         self.map = robotMap
 
-    def __copy__ ( self ):
+    def copy ( self ):
         robotCp = self.r.copy()
         mapCp = self.map.copy()
         stateCp = RobotState(robotCp, mapCp )
