@@ -2,14 +2,19 @@ import utils
 
 class Classifiers(object):
 
-    def __init__(self, row = 2, column = 5):
+    def __init__(self, row = 10, column = 10):
+        # Threshold for classifier prediction
+        self.THRESHOLD = .5
         self.classifiers = dict()
         self.sampleRowSize = row
         self.sampleColumnSize = column
         cellValue = dict()
-        cellValue['none'] = 0.0
-        cellValue['dirt'] = 0.0
-        cellValue['obs'] = 0.0
+        cellValue['none given C'] = 0.0
+        cellValue['dirt given C'] = 0.0
+        cellValue['obs given C'] = 0.0
+        cellValue['none given not C'] = 0.0
+        cellValue['dirt given not C'] = 0.0
+        cellValue['obs given not C'] = 0.0
         self.classifierNames = ('openCell', 'doorway', 'garbageCan', 'chair', 'litterBox', 'houseEntrance')
         self.classifiers['openCell'] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
@@ -46,12 +51,22 @@ class Classifiers(object):
             for j in range(self.sampleColumnSize):
                 y = sample[i][j]
                 if sample[i][j] >= 1:
-                    self.classifiers[label][i][j]['dirt'] += 1
+                    self.classifiers[label][i][j]['dirt given C'] += 1
+                    self.update_other_classifiers(label, 'dirt given not C', (i, j))
                 elif sample[i][j] == 0:
-                    self.classifiers[label][i][j]['none'] += 1
+                    self.classifiers[label][i][j]['none given C'] += 1
+                    self.update_other_classifiers(label, 'none given not C', (i, j))
                 elif sample[i][j] == -1:
-                    self.classifiers[label][i][j]['obs'] += 1
+                    self.classifiers[label][i][j]['obs given C'] += 1
+                    self.update_other_classifiers(label, 'obs given not C', (i, j))
         self.normalize(label)
+
+    def update_other_classifiers(self, label, evidence, coord):
+        namesToUpdate = [name for name in self.classifierNames if name != label ]
+        for name in namesToUpdate:
+            self.classifiers[name][coord[0]][coord[1]][evidence] += 1
+
+
 
     '''
     Helper function:
@@ -61,13 +76,72 @@ class Classifiers(object):
         for i in range(self.sampleRowSize):
             for j in range(self.sampleColumnSize):
                 pred = self.classifiers[classifier][i][j].copy()
-                total = sum(pred.values())
+                sumC , sumNotC = 0 , 0
                 for key in pred.keys():
-                    pred[key] = pred[key] / total
+                    if "not C" in key:
+                        sumNotC += pred[key]
+                    else:
+                        sumC += pred[key]
+                for key in pred.keys():
+                    if "not C" in key:
+                        pred[key] = pred[key] / sumNotC
+                    else:
+                        pred[key] = pred[key] / sumC
                 self.normalizedClassifiers[classifier][i][j] = pred
 
     def getClassifier(self, classifier):
-        return self.classifiers[classifier]
+        return self.normalizedClassifiers[classifier]
+
+    def chooseBestClassifier(self, inputGrid):
+        # Gets yes probabilites
+        probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
+
+        # Calculates new probabilities
+        from operator import itemgetter
+        maxClassifier = max(probs, key = itemgetter(1))
+
+        if maxClassifier[1] >= self.THRESHOLD:
+            return maxClassifier[0]
+        else:
+            return "None"
+
+
+
+
+
+    def getLikelyhood(self, classifier, inputGrid):
+        probYes, probNo = 1 , 1
+        for i in range(self.sampleRowSize):
+            for j in range(self.sampleColumnSize):
+                if inputGrid[i][j] >= 1:
+                    probYes *= self.normalizedClassifiers[classifier][i][j]['dirt given C']
+                    probNo *= self.normalizedClassifiers[classifier][i][j]['dirt given not C']
+                elif inputGrid[i][j] == 0:
+                    probYes *= self.normalizedClassifiers[classifier][i][j]['none given C']
+                    probNo *= self.normalizedClassifiers[classifier][i][j]['none given not C']
+                elif inputGrid[i][j] == -1:
+                    probYes *= self.normalizedClassifiers[classifier][i][j]['obs given C']
+                    probNo *= self.normalizedClassifiers[classifier][i][j]['obs given not C']
+
+        pred = self.classifiers[classifier][0][0].copy()
+        sumC , sumNotC = 0 , 0
+        for key in pred.keys():
+            if "not C" in key:
+                sumNotC += pred[key]
+            else:
+                 sumC += pred[key]
+        tot = sumC + sumNotC
+        sumC /= tot
+        sumNotC /= tot
+
+        probYes *= sumC
+        probNo *= sumNotC
+
+        return (probYes, probNo)
+
+
+
+
 
     def laplaceSmoothing(self, num = 4):
         for name in self.classifierNames:
