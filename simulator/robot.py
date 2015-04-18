@@ -336,7 +336,11 @@ class Robot(object):
         raise Exception("evaluateTurn is not supported by simulator")
     
 
-    def copy(self):
+    def copy(self, copyEnv = False):
+        if copyEnv:
+            environment = self.environment.copy()
+        else:
+            environment = self.environment
         r = Robot(self.environment)
         r.pos = list(self.pos)
         r.heading = self.heading
@@ -564,7 +568,7 @@ class RobotState:
         self.map = robotMap
 
     def copy ( self ):
-        robotCp = self.r.copy()
+        robotCp = self.r.copy( copyEnv = True)
         mapCp = self.map.copy(copyMap=True)
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
