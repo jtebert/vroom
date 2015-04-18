@@ -26,11 +26,11 @@ class MapEnvironmentProblem:
         :return: List of (state, action) tuples
         """
         actions = state.getLegalActions(state.getRobotPosition())
-        print state.getRobotPosition()
+        #print state.getRobotPosition()
         successors = []
         for action in actions:
             if state.willVisitNewCell(state.getRobotPosition(), action):
-                print action
+                #print action
                 next_state = state.generateSuccessor(action)
                 # Recheck whether new cells will be visited
                 #next_state.map.set_all_valid_actions(state)
@@ -69,10 +69,10 @@ class GoHomeProblem:
         :return: List of (state, action) tuples
         """
         actions = state.getLegalActions(state.getRobotPosition())
-        print state.getRobotPosition()
+        #print state.getRobotPosition()
         successors = []
         for action in actions:
-                print action
+                #print action
                 next_state = state.generateSuccessor(action)
                 successors.append((next_state, action))
         return successors
