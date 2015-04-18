@@ -95,7 +95,7 @@ class RobotSimulator(object):
         #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
         
         #TODO defaults to run exploration and then shows results
-        
+
         #problem = MapEnvironmentProblem(state)
         #state = depth_first_search(problem)
 
@@ -111,12 +111,11 @@ class RobotSimulator(object):
         #print state.getVisited()
 
         # Calculate and plot different dirt collection for different methods
-        num_time_steps = 100
-        collected = all_dirt_collection_rates(state, state.r.environment)
-        plot_dirt_collection_rates(collected, num_time_steps)
+        #time_steps, collected = all_dirt_collection_rates(state, state.r.environment)
+        #plot_dirt_collection_rates(time_steps, collected)
         # Calculate and plot classification accuracy
-        #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
-        #plot_classification_accuracy(actual, classified, labels)
+        actual, classified, labels = classification_accuracy(state.map, state.r.environment)
+        plot_classification_accuracy(actual, classified, labels)
     
         '''
         startTime = time.clock()

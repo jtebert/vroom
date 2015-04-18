@@ -263,7 +263,7 @@ class Environment(object):
         dirt_cells = []
         for row in range(self.heightCells):
             for col in range(self.widthCells):
-                if not self.map[row][col] == 0:
+                if self.map[row][col].dirt > 0:
                     dirt_cells.append((col, row))
         return dirt_cells
 
