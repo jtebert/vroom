@@ -305,9 +305,10 @@ class Robot(object):
         for x in range(-2,3,1):
             for y in range (-2,3,1): 
             
-                if self.environment.map[self.pos[0]+x][self.pos[1]+y].value > 0:
-                    d = self.environment.map[self.pos[0]+x][self.pos[1]+y].value
+                if self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt > 0:
+                    d = self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt
                     dValues.append([self.pos[0]+x,self.pos[1]+y,d])
+                    self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt = 0
         
         return dValues
 
@@ -459,6 +460,7 @@ class RobotState:
                     state.map.map[dirtReading[0]][dirtReading[1]].dirt = dirtReading[2]
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
+                        
                 
             if len(proxReadings):
                 for prox in proxReadings:
