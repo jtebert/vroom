@@ -53,8 +53,8 @@ def dirt_collection_rate(state, environment, actions, num_time_steps):
     initial_dirt = len(environment.get_dirt())
     dirt_collected = []
     for t in range(len(actions)):
-        my_state = my_state.generateSuccessor(actions[t])
-        remaining = len(my_state.r.environment.get_dirt())
+        state = state.generateSuccessor(actions[t])
+        remaining = len(state.r.environment.get_dirt())
         dirt_collected.append(initial_dirt - remaining)
     dirt_collected = max_rate_num_time_steps(dirt_collected, num_time_steps)
     return dirt_collected
