@@ -96,7 +96,7 @@ class RobotSimulator(object):
 
         #problem = MapEnvironmentProblem(state)
         #state = depth_first_search(problem)
-        
+
         #startTime = time.clock()
         #problem = MapEnvironmentProblem(state)
         #state = depth_first_search(problem)
@@ -111,7 +111,7 @@ class RobotSimulator(object):
         #reset visited and unvisitedCells
         #print state
         #state = state.resetMission()
-        
+
         #print state.getDirt()
         #print state.getUnvisited()
         #print state.getVisited()
@@ -122,7 +122,7 @@ class RobotSimulator(object):
         # Calculate and plot classification accuracy
         actual, classified, labels = classification_accuracy(state.map, state.r.environment)
         plot_classification_accuracy(actual, classified, labels)
-    
+
         '''
         startTime = time.clock()
         problem = CollectDirtProblem(state)
@@ -146,23 +146,23 @@ class RobotSimulator(object):
             else:
                 self.action = agent.getAction(state)
             '''
-            
-            
+
+
             if len(actions):
                 self.action = actions.pop(0)
             else:
                 self.action = 'None'
-              
+
             time.sleep(0.2)
-            
+
 
             screen = pygame.display.get_surface()
 
             state = state.generateSuccessor(self.action)
-            
+
             #update Screen
-            screen.fill((204,204,204))  
-            
+            screen.fill((204,204,204))
+
             if self.showEnvironment:
                 state.map.draw(screen,environment = self.environment)
             else:
@@ -172,8 +172,8 @@ class RobotSimulator(object):
 
             if self.drawLabels:
                 state.map.drawLabels(screen)
-            
-            
+
+
             pygame.display.update()
 
             #print state.r.pos
@@ -193,9 +193,9 @@ class Robot(object):
         #checks immediate surroundings for obstacles
 
         #TODO This assumes a robot size of 5, make it adaptable
-        
+
         pos = self.pos
-        
+
         obsLocations = []
         openLocations = []
 
@@ -223,7 +223,7 @@ class Robot(object):
             else:
                 openLocations.append([pos[0]+i,pos[1]-3])
 
-        #check for corners        
+        #check for corners
         if self.environment.map[pos[0]-3][pos[1]-3].value == -1:
             obsLocations.append([pos[0]-3,pos[1]-3])
         else:
@@ -243,14 +243,14 @@ class Robot(object):
             obsLocations.append([pos[0]+3,pos[1]+3])
         else:
             openLocations.append([pos[0]+3,pos[1]+3])
-        
+
 
         return obsLocations,openLocations
-        
+
 
     def bumpSensor(self, action, position = None):
         b = []
-        
+
         if position == None:
             pos = self.pos
         else:
@@ -271,15 +271,15 @@ class Robot(object):
         return bump
 
     def getBumpCoordinates(self, action, position):
-        
+
         coords = []
         pos = position
-        
+
         if action == 'North':
             y = -3
             for i in range(-2,3,1):
                 coords.append([pos[0]+i,pos[1]+y])
-            
+
         if action == 'South':
             y = 3
             for i in range(-2,3,1):
@@ -297,25 +297,25 @@ class Robot(object):
 
         return coords
 
-        
+
 
     def dirtSensor(self):
         dValues = []
 
         #the whole robot is a vacuum!
         for x in range(-2,3,1):
-            for y in range (-2,3,1): 
-            
+            for y in range (-2,3,1):
+
                 if self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt > 0:
                     d = self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt
                     dValues.append([self.pos[0]+x,self.pos[1]+y,d])
                     self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt = 0
-        
+
         return dValues
 
 
     def takeAction(self,action):
-        
+
         #drive forwards
         if action == 'North':
             #north is negative
@@ -326,16 +326,16 @@ class Robot(object):
             self.pos[0] -= 1
         if action == 'South':
             self.pos[1] += 1
-                
+
         if (action != 'None'):
             self.heading = action
 
 
     def evaluateTurn(self,action):
         #not needed anymore
- 
+
         raise Exception("evaluateTurn is not supported by simulator")
-    
+
 
     def copy(self, copyEnv = False):
         if copyEnv:
@@ -376,7 +376,7 @@ class RobotState:
             bumpReadings = self.r.bumpSensor(action, position=pos)
             if (len(bumpReadings) == 0):
                 legalActions.append(action)
-        
+
         return legalActions
 
     def proxSensorCoords (self, action):
@@ -384,7 +384,7 @@ class RobotState:
         # at that position
         coords = []
         pos = list(self.r.pos)
-        
+
 
         if action == 'North':
             pos[1] -= 1
@@ -394,8 +394,8 @@ class RobotState:
             pos[0] += 1
         if action == 'West':
             pos[0] -= 1
-        
-                
+
+
         for i in range(-2,3,1):
             coords.append([pos[0]-3,pos[1]+i])
             coords.append([pos[0]+3,pos[1]+i])
@@ -407,9 +407,9 @@ class RobotState:
         coords.append([pos[0]-3,pos[1]+3])
         coords.append([pos[0]+3,pos[1]-3])
         coords.append([pos[0]-3,pos[1]-3])
-        
+
         return coords
-                
+
     def willExploreNewCell (self, action):
         #if the robot will explore a new cell return true
 
@@ -424,8 +424,8 @@ class RobotState:
                 result = True
 
         return result
-                
-        
+
+
 
     def willVisitNewCell( self, pos, action):
         cellCoords = self.r.getBumpCoordinates(action, pos)
@@ -441,56 +441,56 @@ class RobotState:
         return result
 
     def generateSuccessor( self, action ):
-        
+
         #create copy of the current state
         #need to make a copy of the map
         #does the environment need to be copied?
         robotCp = self.r.copy()
         mapCp = self.map.copy()
         state = RobotState(robotCp, mapCp )
-        
+
         #print self.getLegalActions(self.r.pos)
-        #print self.willVisitNewCell(self.r.pos, action) 
+        #print self.willVisitNewCell(self.r.pos, action)
 
         #print "start generate successor: ",action
         #print "position: ",state.r.pos
 
         if action != None:
-            #check bumper 
+            #check bumper
             bumpReadings = state.r.bumpSensor(action)
             proxReadings,openReadings = state.r.proximitySensor()
             dirtReadings = state.r.dirtSensor()
-            
+
             if len(dirtReadings):
                 for dirtReading in dirtReadings:
                     state.map.map[dirtReading[0]][dirtReading[1]].dirt = dirtReading[2]
                     state.r.environment.map[dirtReading[0]][dirtReading[1]].dirt = 0
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
-                
+
             if len(proxReadings):
                 for prox in proxReadings:
                     state.map.map[prox[0]][prox[1]].isObstacle = True
-                    
+
                     if (prox not in state.map.obstacles):
                         state.map.obstacles.append(prox)
-                    
+
                     if (prox in state.map.unvisitedCells):
                         state.map.unvisitedCells.remove(prox)
 
             #print "length of openreadings: ",len(openReadings)
             if len(openReadings):
                 for openCell in openReadings:
-                    
+
                     if openCell in state.map.unvisitedCells:
                        # print "adding observed cell: ",openCell
-                        state.map.observedCells.append(openCell)            
+                        state.map.observedCells.append(openCell)
 
             if(not(state.r.isBump(bumpReadings))):
                 state.r.takeAction(action)
             else:
                 self.bump = True
-             
+
             pos = [0,0]
             pos[0] = int(state.r.pos[0])
             pos[1] = int(state.r.pos[1])
@@ -500,18 +500,18 @@ class RobotState:
 
                     if ([pos[0]+x,pos[1]+y] not in state.map.visitedCells):
                         state.map.visitedCells.append([pos[0]+x,pos[1]+y])
-                
+
                     if ([pos[0]+x,pos[1]+y] in state.map.observedCells):
                         state.map.observedCells.remove([pos[0]+x,pos[1]+y])
 
                     if ([pos[0]+x,pos[1]+y] in state.map.unvisitedCells):
                         state.map.unvisitedCells.remove([pos[0]+x,pos[1]+y])
-                    
+
             if pos not in (state.map.robotPositions):
                 state.map.robotPositions.append([pos[0],pos[1]])
-        
+
         #print "end generate successor: ",state.r.pos
-                
+
         return state
 
     def extractSmallState ( self ):
@@ -522,13 +522,13 @@ class RobotState:
         return state
 
     def getRobotPosition( self ):
-        
+
         return self.r.pos
-        
+
     def getDirt( self ):
-        
+
         removeList = []
-        
+
         for dirtCell in self.map.dirtCells:
             pos = [dirtCell[0],dirtCell[1]]
             if pos in self.map.visitedCells:
@@ -545,7 +545,7 @@ class RobotState:
 
     def removeUnreachableDirt ( self ):
         #after performing update dirt, or if importing a map with dirt cells
-        #we will need to remove dirtCells from the dirt list the robot cannot 
+        #we will need to remove dirtCells from the dirt list the robot cannot
         #reach
         return None
 
@@ -572,7 +572,6 @@ class RobotState:
     def copy( self ):
         robotCp = self.r.copy()
         mapCp = self.map.copy()
-        robotCp.environment = self.r.environment.copy()
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 
