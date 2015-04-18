@@ -104,7 +104,9 @@ class RobotSimulator(object):
         #print "exploration executed in %d seconds!"%(endTime - startTime)
 
         # DIRT COLLECTION PROBLEM
-        #state.map = self.environment.copyEnvIntoMap(state.map)
+        state.map = self.environment.copyEnvIntoMap(state.map)
+
+        state.featureExtraction(state.map)
 
         #reset visited and unvisitedCells
         #print state
@@ -121,17 +123,15 @@ class RobotSimulator(object):
         actual, classified, labels = classification_accuracy(state.map, state.r.environment)
         plot_classification_accuracy(actual, classified, labels)
     
-        
+        '''
         startTime = time.clock()
         problem = CollectDirtProblem(state)
         actions = a_star_search(problem, dirt_heuristic)
         endTime = time.clock()
         print "a_star_search executed in %d seconds!"%(endTime - startTime)
         print actions
-        
-        pygame.init()
-        pygame.display.set_mode((700,700),pygame.RESIZABLE)
-        pygame.display.update()
+        '''
+        actions = ['None']
 
         while(True):
 
@@ -467,7 +467,6 @@ class RobotState:
                     state.r.environment.map[dirtReading[0]][dirtReading[1]].dirt = 0
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
-                        
                 
             if len(proxReadings):
                 for prox in proxReadings:
@@ -562,36 +561,45 @@ class RobotState:
     def getObstacles( self ):
         return self.map.obstacles
 
-    def __init__ ( self, robot , robotMap ):
+    def __init__ ( self, robot , robotMap, makeClassifier=False ):
 
         self.r = robot
         self.map = robotMap
+        from classifiers import Classifiers
+        #if makeClassifier == True:
+        self.classifier = Classifiers()
 
-    def copy ( self ):
-        robotCp = self.r.copy(copyEnv= True)
-        robotCp.environment = self.r.environment.copy()
-        mapCp = self.map.copy(copyMap=True)
+    def copy( self ):
+        robotCp = self.r.copy()
+        mapCp = self.map.copy()
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 
     def featureExtraction(self, inputMap):
-        assert(inputMap.isinstance(map.Environment))
+
+        print "Called featureExtraction"
 
         # to start with, just uses every blocksize x blocksize section
         blockSize = 10
-        xRange = int(inputMap.widthCells - blockSize - 1)
-        yRange = int(inputMap.heightCells - blockSize - 1)
+        print "xCells:", inputMap.xCells, "yCells:", inputMap.yCells, "blockSize", blockSize
+        xRange = int(inputMap.xCells - blockSize + 1)
+        yRange = int(inputMap.yCells - blockSize + 1)
+        print "xRange:", xRange, "yRange:", yRange
         for y in xrange(0, yRange):
             for x in xrange(0, xRange):
+                print "fE", x, y
                 # Run classifier on block
                 # Limits of this block are [x, x+blockSize] and [y, y+blockSize]
                 map = inputMap.map
-                submatrix = [[map[i][j] for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
-                bestClassifier = self.getBestClassifier(submatrix)
+                submatrix = [[map[i][j].value for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
+
+                bestClassifier = self.classifier.getBestClassifier(submatrix)
+                print "best classifier:", bestClassifier
                 if bestClassifier != None:
                     for a in xrange(y, y + blockSize):
                         for b in xrange(x, x + blockSize):
                             map[b][a].label = bestClassifier
+                            #print "fe updatelabel", a, b
 
 
 if __name__ == "__main__":
@@ -607,7 +615,7 @@ if __name__ == "__main__":
         
 
     #defaultEnvironmentCSV = './../assets/maps/test.csv'
-    defaultEnvironmentCSV = './../assets/maps/smallCloset.csv'
+    defaultEnvironmentCSV = './../assets/maps/roomwithcloset1.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':

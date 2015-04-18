@@ -1,11 +1,10 @@
 # For evaluating the success of the project:
-# - Accuracy of classification
+# - Accuracy of classification (counts number of each type of obstacle)
 # - Dirt collection rate (over different numbers of time steps/movements)
 
 import matplotlib.pyplot as plt
 from dirt_collection import *
 from search import *
-import numpy as np
 
 
 def classification_accuracy(map, environment):
@@ -72,7 +71,7 @@ def max_rate_num_time_steps(rates, num_time_steps):
     if num_actions > num_time_steps:
         return rates[0:num_time_steps]
     if num_actions == 0:
-        return np.zeros(num_time_steps)
+        return [0] * num_time_steps
     extra = [rates[num_actions - 1]] * (num_time_steps - num_actions)
     rates.extend(extra)
     return rates
@@ -132,10 +131,11 @@ def plot_classification_accuracy(actual, classified, labels):
     print actual
     print classified
     fig, ax = plt.subplots()
-    ind = np.arange(len(actual))
     width = 0.35
+    ind = range(len(actual))
+    ind2 = [x + width for x in ind]
     rects1 = ax.bar(ind, actual, width, color='g', edgecolor=None)
-    rects2 = ax.bar(ind + width, classified, width, color='r', edgecolor=None)
+    rects2 = ax.bar(ind2, classified, width, color='r', edgecolor=None)
 
     ax.set_xlabel('Obstacle Category', fontweight='bold')
     ax.set_ylabel('Number Found', fontweight='bold')
