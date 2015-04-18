@@ -614,8 +614,8 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    defaultEnvironmentCSV = './../assets/maps/basement.csv'
-    #defaultEnvironmentCSV = './../assets/maps/roomwithcloset1.csv'
+    #defaultEnvironmentCSV = './../assets/maps/basement.csv'
+    defaultEnvironmentCSV = './../assets/maps/roomwithcloset1.csv'
     saveMapEnvAtEnd = False
     for opt,arg in opts:
         if opt == '-e':
