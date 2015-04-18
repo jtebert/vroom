@@ -586,10 +586,10 @@ class RobotState:
 
         # to start with, just uses every blocksize x blocksize section
         blockSize = 10
-        print "xCells:", inputMap.xCells, "yCells:", inputMap.yCells, "blockSize", blockSize
+        #print "xCells:", inputMap.xCells, "yCells:", inputMap.yCells, "blockSize", blockSize
         xRange = int(inputMap.xCells - blockSize + 1)
         yRange = int(inputMap.yCells - blockSize + 1)
-        print "xRange:", xRange, "yRange:", yRange
+        #print "xRange:", xRange, "yRange:", yRange
         for y in xrange(0, yRange):
             for x in xrange(0, xRange):
                 print "fE", x, y
