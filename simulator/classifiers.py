@@ -4,7 +4,7 @@ class Classifiers(object):
 
     def __init__(self, row = 10, column = 10):
         # Threshold for classifier prediction
-        self.THRESHOLD = .5
+        self.THRESHOLD = .9
         self.classifiers = dict()
         self.sampleRowSize = row
         self.sampleColumnSize = column
@@ -25,7 +25,7 @@ class Classifiers(object):
             self.normalizedClassifiers[str(name)] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
         self.train_with_files()
-        self.laplaceSmoothing()
+        self.laplaceSmoothing(10)
 
     def importClassifers(self):
         from os import listdir
@@ -113,14 +113,21 @@ class Classifiers(object):
                         else:
                             pred[key] = 0
                 self.normalizedClassifiers[classifier][i][j] = pred
-
+    '''
+    Test function should not be really used
+    '''
     def getClassifier(self, classifier):
         return self.normalizedClassifiers[classifier]
 
+    '''
+    Goes trhough and gets likelyhood for each classifier
+    then chooses threshold with max likelyhood
+    if likelyhood is greater than threshold then returns that otherwise returns none
+    '''
     def getBestClassifier(self, inputGrid):
         # Gets yes probabilites
         probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
-
+        print probs
         # Calculates new probabilities
         from operator import itemgetter
         maxClassifier = max(probs, key=itemgetter(1))
@@ -180,6 +187,9 @@ class Classifiers(object):
                     self.classifiers[classifier][i][j]['obs given not C'] += num
             self.normalize(classifier)
 
+
+
+
 # Test Cases
 '''
 x = Classifiers()
@@ -194,6 +204,7 @@ x.train(sample2, 'chair')
 y = Classifiers()
 
 testMap = '../assets/training_maps/doorway_1.csv'
+testMap = '../assets/maps/obstacle.csv'
 testMap = utils.readTrainingMap(testMap)
 z = y.getBestClassifier(testMap)
 x = 0
