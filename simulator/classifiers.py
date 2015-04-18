@@ -151,6 +151,8 @@ class Classifiers(object):
                 elif inputGrid[i][j] == -1:
                     probYes *= self.normalizedClassifiers[classifier][i][j]['obs given C']
                     probNo *= self.normalizedClassifiers[classifier][i][j]['obs given not C']
+                elif inputGrid[i][j] == None:
+                    continue
                 else:
                     raise Exception("Invalid input grid given to get classifier")
 
