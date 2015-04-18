@@ -125,9 +125,17 @@ class Classifiers(object):
     if likelyhood is greater than threshold then returns that otherwise returns none
     '''
     def getBestClassifier(self, inputGrid):
+        all_possible_grids = utils.generateMapOrientations(inputGrid)
+        probs = list()
+
+        for classifier in self.classifierNames:
+            values = [self.getLikelyhood(classifier, inputGrid)[0] for inputGrid in all_possible_grids]
+            maxValue = max(values)
+            probs.append((classifier, maxValue))
+
         # Gets yes probabilites
-        probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
-        print probs
+        #probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
+        #print probs
         # Calculates new probabilities
         from operator import itemgetter
         maxClassifier = max(probs, key=itemgetter(1))

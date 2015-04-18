@@ -413,37 +413,38 @@ class Environment(object):
                     break
             return
                 
-    
-    def generateMapOrientations(self, m):
+    @staticmethod
+    def generateMapOrientations(m):
         orient = list()
-        orient.add(m.copy())
-        orient.add(self.rotateMap(orient[0]))
-        orient.add(self.rotateMap(orient[1]))
-        orient.add(self.rotateMap(orient[2]))
-        orient.add(self.flipMap(orient[0]))
-        orient.add(self.flipMap(orient[1]))
-        orient.add(self.flipMap(orient[2]))
-        orient.add(self.flipMap(orient[3]))
+        orient.append(list(m))
+        orient.append(Environment.rotateMap(orient[0]))
+        orient.append(Environment.rotateMap(orient[1]))
+        orient.append(Environment.rotateMap(orient[2]))
+        orient.append(Environment.flipMap(orient[0]))
+        orient.append(Environment.flipMap(orient[1]))
+        orient.append(Environment.flipMap(orient[2]))
+        orient.append(Environment.flipMap(orient[3]))
         return orient
 
-    def rotateMap(self, m):
-        mcp = m.copy()
-        if m.width != m.height:
+    @staticmethod
+    def rotateMap(m, width = 10, height = 10):
+        mcp = list(m)
+        if width != height:
             print "Can't do that"
         else:
-            for x in range(0, int(m.width) -1):
-                for y in range(0, int(m.height) -1):
-                    mcp[y][m.width - x] = m[x][y]
+            for x in range(0, int(width)):
+                for y in range(0, int(height)):
+                    mcp[y][width - 1 - x] = m[x][y]
             return mcp
-
-    def flipMap(self, m):
-        mcp = m.copy()
-        if m.width != m.height:
+    @staticmethod
+    def flipMap(m, width = 10, height = 10):
+        mcp = list(m)
+        if width != height:
             print "Can't do that"
         else:
-            for x in range(0, int(m.width) -1):
-                for y in range(0, int(m.height) -1):
-                    mcp[x][m.height - y] = m[x][y]
+            for x in range(0, int(width)):
+                for y in range(0, int(height)):
+                    mcp[x][height - 1 - y] = m[x][y]
             return
 
     def copyEnvIntoMap( self, m ):
