@@ -201,3 +201,41 @@ def readTrainingMap(fileName):
         line = row[0].split(',')
         trainingMap.append(map(int, line))
     return trainingMap
+
+
+def countLabels(map):
+    """
+    For each group of map labels, draw the label in text
+    :param map: Grid of MapNodes
+    """
+
+    width = len(map[0])
+    height = len(map)
+
+    labels = labels_dict
+    is_labeled = []
+
+    for row in range(height):
+        for col in range(width):
+            # assumes it hits the top left corner of a group of labels
+            #and that the labels are 10x10
+            label = map[col][row].label
+            if label != None:
+                if [col, row] not in is_labeled:
+                    # Add label to count
+                    labels[label] += 1
+                    # Mark others as counted
+                    for i in range(10):
+                        for j in range(10):
+                            is_labeled.append([col + i, row + j])
+    return labels
+
+
+labels_dict = {
+    'garbagecan': 0,
+    'doorway': 0,
+    'corner': 0,
+    'litterbox': 0,
+    'closet': 0,
+    'table': 0,
+}

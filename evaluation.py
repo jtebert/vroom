@@ -5,20 +5,27 @@
 import matplotlib.pyplot as plt
 from dirt_collection import *
 from search import *
+import utils
 
 
-def classification_accuracy(map, environment):
+def classification_accuracy(robotmap, environment):
     """
     Compare the accuracy of classification in the map to the environment ground-truth
     :param map: Robot's map after exploration and classification
     :param environment: Ground truth map of obstacle classification
     :return: TODO
     """
-    # TODO
+    # TODO: Update with actual data once classification functions
     # Get number of each type of obstacle
-    actual_obstacles = [1, 3, 5, 6, 7, 2]
-    classified_obstacles = [1, 2, 5, 4, 8, 3]
-    labels = ["Closet", "Corner", "Doorway", "Garbage can", "Litterbox", "Table"]
+    actual_obstacles_all = utils.countLabels(environment.map)
+    actual_obstacles = actual_obstacles_all.values()
+    labels = actual_obstacles_all.keys()
+    classified_obstacles = utils.countLabels(robotmap.map).values()
+
+
+    #actual_obstacles = [1, 3, 5, 6, 7, 2]
+    #classified_obstacles = [1, 2, 5, 4, 8, 3]
+    #labels = ["Closet", "Corner", "Doorway", "Garbage can", "Litterbox", "Table"]
     return actual_obstacles, classified_obstacles, labels
 
 def all_dirt_collection_rates(state, environment):
@@ -50,6 +57,7 @@ def dirt_collection_rate(state, environment, actions, num_time_steps):
     :param environment: State of environment
     :return: List of amount of total dirt collected after each time step
     """
+    state = state.copy()
     initial_dirt = len(environment.get_dirt())
     dirt_collected = []
     for t in range(len(actions)):
@@ -107,14 +115,20 @@ def plot_dirt_collection_rates(time_steps, collection_rates):
     :return: None
     """
     actual_rates, reactive_rates, ideal_rates = collection_rates
-    plt.figure()
-    plt.title('Dirt Collection Rates')
-    plt.xlabel('Time Steps')
-    plt.ylabel('Total Dirt Collected')
+    fig, ax = plt.subplots()
+    ax.set_title('Dirt Collection Rates', fontweight='bold')
+    ax.set_xlabel('Time Steps', fontweight='bold')
+    ax.set_ylabel('Total Dirt Collected', fontweight='bold')
     actual_h, = plt.plot(time_steps, actual_rates, linewidth=3, color='b')
     reactive_h, = plt.plot(time_steps, reactive_rates, linewidth=2, color='r')
     ideal_h, = plt.plot(time_steps, ideal_rates, linewidth=2, color='g')
-    plt.legend([actual_h, reactive_h, ideal_h], ['Actual Rate', 'Reactive Agent Rate', 'Ideal Rate'])
+    ax.legend([actual_h, reactive_h, ideal_h],
+               ['Actual Rate', 'Reactive Agent Rate', 'Ideal Rate'],
+               loc='best', frameon=False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
     plt.show()
 
 
@@ -141,7 +155,7 @@ def plot_classification_accuracy(actual, classified, labels):
     ax.set_ylabel('Number Found', fontweight='bold')
     ax.set_title('Classification Accuracy')
     ax.legend([rects1, rects2], ['Actual', 'Classified'], loc='best', frameon=False)
-    ax.set_xticks(ind + width)
+    ax.set_xticks(ind2)
     ax.set_xticklabels(labels)
 
     ax.spines['right'].set_visible(False)

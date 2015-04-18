@@ -59,7 +59,7 @@ class MapNode(object):
 class RobotMap(object):
     center = (0,0)
 
-    def __init__(self,w=110,h=110,cellXSize=10,cellYSize=10,map=True):
+    def __init__(self,w=700,h=700,cellXSize=10,cellYSize=10,map=True):
         self.scale = 1.0
         self.cellXSize = cellXSize
         self.cellYSize = cellYSize
