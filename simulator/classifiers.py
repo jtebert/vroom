@@ -107,12 +107,12 @@ class Classifiers(object):
 
         # Calculates new probabilities
         from operator import itemgetter
-        maxClassifier = max(probs, key = itemgetter(1))
+        maxClassifier = max(probs, key=itemgetter(1))
 
         if maxClassifier[1] >= self.THRESHOLD:
             return maxClassifier[0]
         else:
-            return "None"
+            return None
 
 
     def getLikelyhood(self, classifier, inputGrid):
