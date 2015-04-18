@@ -15,6 +15,11 @@ def classification_accuracy(map, environment):
     :return: TODO
     """
     # TODO
+    # Get number of each type of obstacle
+    actual_obstacles = [1, 3, 5, 6, 7, 2]
+    classified_obstacles = [1, 2, 5, 4, 3]
+    labels = ["Closet", "Corner", "Doorway", "Garbage can", "Litterbox", "Table"]
+    return actual_obstacles, classified_obstacles, labels
 
 def all_dirt_collection_rates(state, environment):
     """
@@ -47,7 +52,7 @@ def dirt_collection_rate(state, environment, num_time_steps):
     :param environment: EnvironmentMap
     :return: tuple (actual, reactive, ideal) of amount of dirt collected
     """
-    initial_dirt = len(state.environment.map.getDirt())
+    initial_dirt = len(environment.get_dirt())
     # TODO
     # Do actual search
     actual_state = state.copy()
@@ -75,16 +80,47 @@ def dirt_collection_rate(state, environment, num_time_steps):
     return (actual_collected, worst_collected, ideal_collected)
 
 
-def plot_dirt_collection_rates(rates):
+def plot_dirt_collection_rates(num_time_steps, rates):
     """
     Plot the results of all_dirt_collection_rates
-    :param rates: ([num_time_steps], ([actual], [reactive], [ideal])
+    :param num_time_steps: Int of # of steps of dirt collection
+    :param rates: ([actual], [reactive], [ideal])
     :return: None
     """
     num_time_steps, collection_rates = rates
     actual_rates, reactive_rates, ideal_rates = collection_rates
     plt.figure()
+    plt.title('Dirt Collection Rates')
+    plt.xlabel('Time Steps')
+    plt.ylabel('Total Dirt Collected')
     actual_h, = plt.plot(num_time_steps, actual_rates, linewidth=3, color='b')
     reactive_h, = plt.plot(num_time_steps, reactive_rates, linewidth=2, color='r')
     ideal_h, = plt.plot(num_time_steps, ideal_rates, linewidth=2, color='g')
     plt.legend([actual_h, reactive_h, ideal_h], ['Actual Rate', 'Reactive Agent Rate', 'Ideal Rate'])
+    plt.show()
+
+
+def plot_classification_accuracy(actual, classified, labels):
+    """
+    Plot the classification accuracy of # of each type of obstacle found
+    Each is a list:
+    [closet, corner, doorway, garbage can, litterbox, table]
+    :param actual: ground truth from environment
+    :param classified: output of classifier
+    :param labels: Names of the obstacle types (in order)
+    :return: None
+    """
+    plt.figure()
+    ind = range(len(actual))
+    width = 0.35
+    rects1 = plt.bar(ind, actual, width, color='g')
+    rects2 = plt.bar(ind + width, classified, width, color='r')
+
+    plt.xlabel('Obstacle Category')
+    plt.ylabel('Number Found')
+    plt.title('Classification Accuracy')
+    plt.legend([rects1, rects2], ['Actual', 'Classified'])
+    plt.xticks(ind + width)
+    plt.xticklabels(labels)
+
+    plt.show()

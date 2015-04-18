@@ -9,6 +9,7 @@ sys.path.insert(0,parentdir)
 from explore_map import *
 from dirt_collection import *
 from search import *
+from evaluation import *
 
 import time
 
@@ -108,6 +109,14 @@ class RobotSimulator(object):
         #print state.getDirt()
         #print state.getUnvisited()
         #print state.getVisited()
+
+        # Calculate and plot different dirt collection for different methods
+        num_time_steps = 100
+        #collected = all_dirt_collection_rates(state, state.r.environment)
+        #plot_dirt_collection_rates(collected, num_time_steps)
+        # Calculate and plot classification accuracy
+        #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
+        #plot_classification_accuracy(actual, classified, labels)
     
         '''
         startTime = time.clock()

@@ -258,6 +258,15 @@ class Environment(object):
 
         self.importEnviroment(environmentCSV)
 
+    def get_dirt(self):
+        """Give back coordinates of dirt in the environment's map"""
+        dirt_cells = []
+        for row in range(self.heightCells):
+            for col in range(self.widthCells):
+                if not self.map[row][col] == 0:
+                    dirt_cells.append((col, row))
+        return dirt_cells
+
     def copy (self):
         mapcp = Environment()
 
