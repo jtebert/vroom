@@ -1,6 +1,7 @@
 from map import *
 
 import os,sys,inspect, getopt
+import cPickle as pickle
 
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -24,6 +25,7 @@ class RobotSimulator(object):
         
         # the world
         self.environment = Environment(environmentCSV=inputEnv)
+        self.envName = inputEnv
 
         # what the robot knows
         self.map = RobotMap()
@@ -124,7 +126,20 @@ class RobotSimulator(object):
 
     
         if simulatorArgs["exploreSearch"]:
-            state = self.executeExploration(state)
+
+            if simulatorArgs ["usePickle"]:
+                pickleName = self.getPickleName("explore")
+                if os.path.isfile(pickleName):
+                    print "explore pickle available for %s "%(self.envName)
+                    print "skipping exploration phase...."
+                    state = pickle.load( open( pickleName, "rb"))
+                else:
+                    state = self.executeExploration(state)
+                    pickle.dump(state, open( pickleName, "wb"))
+
+            else:
+                state = self.executeExploration(state)
+                    
         elif simulatorArgs["reactiveAgent"]:
             agent = ReactiveAgent(1000)
             actions = agent.run(state)
@@ -209,16 +224,53 @@ class RobotSimulator(object):
             #print state.r.pos
 
 
+    def getPickleName (self, action):
+        #pickles file name will be 
+        #action_envName.p
 
+        env = self.extractEnvName()
+        pickleName = str(action) + '_' + str(env) + '.p'
 
+        print pickleName
+
+        return pickleName
+
+    def extractEnvName (self):
+        envName = str(self.envName)
+        #envs are in ..\assets\maps\"envname"  so split 3 \'s to get envname
+        
+        index = envName.find('/')
+        envName = envName[(index+1):]
+        
+        index = envName.find('/')
+        envName = envName[(index+1):]
+        
+        index = envName.find('/')
+        envName = envName[(index+1):]
+
+        index = envName.find('.')
+        envName = envName[:index]
+
+        print envName        
+
+        return envName
 
 if __name__ == "__main__":
     
     
     try: 
-        opts,args = getopt.getopt(sys.argv[1:],"avshfire:")
+        opts,args = getopt.getopt(sys.argv[1:],"pavshfire:")
     except getopt.GetoptError:
-        print "robot.py -e <environmentPath>"
+        
+        print "VROOM Simulator: available options"
+        print "Default to joystick mode. Use arrow keys to explore environment"
+        print "-e <environmentpath> : sets the environment the robot will explore"
+        print "-a : run all options: explore -> classify -> evaluation functions"
+        print "-v : run evaluation functions"
+        print "-f : run classification " 
+        print "-s : run exploration then search function"
+        print "-r : run the reactive agent"
+        print "-p : use pickle files if available"
         sys.exit(2)
         
 
@@ -230,7 +282,8 @@ if __name__ == "__main__":
                       "joyStickMode" : True,
                       "exploreSearch" : False,
                       "runClassification" : False,
-                      "reactiveAgent"  : False }
+                      "reactiveAgent"  : False,
+                      "usePickle"      : False }
 
     for opt,arg in opts:
         if opt == '-h':
@@ -242,6 +295,7 @@ if __name__ == "__main__":
             print "-f : run classification " 
             print "-s : run exploration then search function"
             print "-r : run the reactive agent"
+            print "-p : use pickle files if available"
             sys.exit(0)
             
         if opt == '-e':
@@ -265,6 +319,8 @@ if __name__ == "__main__":
         if opt == '-r':
             simulatorArgs["reactiveAgent"] = True
             simulatorArgs["joyStickMode"] = False
+        if opt == '-p':
+            simulatorArgs["usePickle"] = True
 
 
     r = RobotSimulator(defaultEnvironmentCSV)
