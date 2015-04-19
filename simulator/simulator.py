@@ -233,6 +233,17 @@ if __name__ == "__main__":
                       "reactiveAgent"  : False }
 
     for opt,arg in opts:
+        if opt == '-h':
+            print "VROOM Simulator: available options"
+            print "Default to joystick mode. Use arrow keys to explore environment"
+            print "-e <environmentpath> : sets the environment the robot will explore"
+            print "-a : run all options: explore -> classify -> evaluation functions"
+            print "-v : run evaluation functions"
+            print "-f : run classification " 
+            print "-s : run exploration then search function"
+            print "-r : run the reactive agent"
+            sys.exit(0)
+            
         if opt == '-e':
             defaultEnvironmentCSV = arg
         if opt == '-i':
