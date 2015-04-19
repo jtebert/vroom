@@ -9,8 +9,8 @@ sys.path.insert(0,parentdir)
 from explore_map import *
 from dirt_collection import *
 from search import *
-from evaluation import *
 from classifiers import *
+from evaluation import *
 
 import time
 
@@ -37,7 +37,6 @@ class RobotSimulator(object):
         self.drawLabels = False
 
         self.classifiers = Classifiers()
-
         
     
     def listenControls(self):
@@ -71,84 +70,91 @@ class RobotSimulator(object):
                     self.drawLabels = (not self.drawLabels)
             
 
+    @staticmethod
+    def executeDirtSearch (state):
+        startTime = time.clock()
+        problem = CollectDirtProblem(state)
+        actions = a_star_search(problem, dirt_heuristic)
+        endTime = time.clock()
+        print "a_star_search executed in %d seconds!"%(endTime - startTime)
+        return actions
 
+    @staticmethod
+    def performEvaluation(state):
+        
+        # Calculate and plot classification accuracy
+        actual, classified, labels = classification_accuracy(state.map, state.r.environment)
+        plot_classification_accuracy(actual, classified, labels)
+
+        # Calculate and plot different dirt collection for different methods
+        time_steps, collected = all_dirt_collection_rates(state, state.r.environment)
+        plot_dirt_collection_rates(time_steps, collected)
+    
+    @staticmethod
+    def executeFeatureExtraction (state, classifiers):
+        print "COUNTS"
+        print utils.countLabels(state.r.environment.map)
+        state.featureExtraction(state.map, classifiers)
+        print utils.countLabels(state.r.environment.map)
+
+    @staticmethod
+    def executeExploration (state):
+        initState = state.copy()
+        startTime = time.clock()
+        problem = MapEnvironmentProblem(state)
+        state = depth_first_search(problem)
+        endTime = time.clock()
+        print "exploration executed in %d seconds!"%(endTime - startTime)
+        return state
 
 
     def run(self):
-        
-    
-        self.turning = False
-        self.turningDistance = 0
-        self.turnDirection = None
-        self.bump = None
-        self.cleanDirection = 'Down'
+
+        actions = None
 
         # Set valid actions for the robot's starting position
         # (otherwise no actions to begin with and it stops)
         state = RobotState(self.robot,self.map )
         pos = state.getRobotPosition()
         state.map.map[pos[0]][pos[1]].set_valid_actions(state)
-        print state.map.map[pos[0]][pos[1]].validActions
 
-        
-        agent = None  #TODO replace with agent selection
-
-        #actions = ['East','South','West','North','East','South','West','North','East','South','West','North','East','South','West','North']
-        
-        #TODO defaults to run exploration and then shows results
-
-        #problem = MapEnvironmentProblem(state)
-        #state = depth_first_search(problem)
-
-        startTime = time.clock()
-        problem = MapEnvironmentProblem(state)
-        state = depth_first_search(problem)
-        endTime = time.clock()
-        print "exploration executed in %d seconds!"%(endTime - startTime)
+        state = self.executeExploration(state)
 
         # DIRT COLLECTION PROBLEM
+        # This needs to run if we do not explore the environment
         #state.map = self.environment.copyEnvIntoMap(state.map)
 
-        #print "COUNTS"
-        #print utils.countLabels(state.r.environment.map)
+        self.executeFeatureExtraction(state, self.classifiers)
 
-        #state.featureExtraction(state.map, self.classifiers)
-
-        #print utils.countLabels(state.r.environment.map)
-
-        #reset visited and unvisitedCells
-        #print state
-        state = state.resetMission()
-
-        #print state.getDirt()
-        #print state.getUnvisited()
-        #print state.getVisited()
-
-        # Calculate and plot different dirt collection for different methods
-        #time_steps, collected = all_dirt_collection_rates(state, state.r.environment)
-        #plot_dirt_collection_rates(time_steps, collected)
-        # Calculate and plot classification accuracy
-        #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
-        #plot_classification_accuracy(actual, classified, labels)
-
+        # update environments dirt 
         
-        startTime = time.clock()
-        problem = CollectDirtProblem(state)
-        actions = a_star_search(problem, dirt_heuristic)
-        endTime = time.clock()
-        print "a_star_search executed in %d seconds!"%(endTime - startTime)
-        print actions
-        
+        # update robots prediction of dirt
+
+        #only needed if we explore then search
+        #state = state.resetMission()
+
+        '''
+        try: 
+            self.performEvaluation(state)
+        except ImportError,e:
+            print "module not found: %s"%(e)
+            print "SKIPPING EVALUATION PHASE!"
+            pass
+        except Exception ,e:
+            print "Error running evaluation: %s"%(e)
+            pass
+        '''
+
+        #actions = self.executeDirtSearch(state)        
 
         pygame.init()
         pygame.display.set_mode((700,700), pygame.RESIZABLE)
         pygame.display.update()
-        #actions = ['None']
 
         while(True):
 
-            '''
-            if (agent == None):
+            
+            if (actions == None):
                 self.listenControls()
 
                 if self.updateDirt:
@@ -156,40 +162,30 @@ class RobotSimulator(object):
                     self.environment.updateDirt()
                 #self.action is set directly by self.listenControls
             else:
-                self.action = agent.getAction(state)
-            '''
-
-
-            if len(actions):
-                self.action = actions.pop(0)
-            else:
-                self.action = 'None'
-
-            time.sleep(0.2)
-
-
+                if len(actions):
+                    self.action = actions.pop(0)
+                else:
+                    self.action = 'None'
+                time.sleep(0.2)
+            
             screen = pygame.display.get_surface()
-
             state = state.generateSuccessor(self.action)
 
             #update Screen
             screen.fill((204,204,204))
-
             if self.showEnvironment:
                 state.map.draw(screen,environment = self.environment)
             else:
                 state.map.draw(screen)
-
             state.map.drawRobot(screen,state.r)
-
             if self.drawLabels:
                 state.map.drawLabels(screen)
-
-
             pygame.display.update()
 
             #print state.r.pos
 
+
+        
 
 class Robot(object):
 
@@ -321,7 +317,6 @@ class Robot(object):
                 if self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt > 0:
                     d = self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt
                     dValues.append([self.pos[0]+x,self.pos[1]+y,d])
-                    self.environment.map[self.pos[0]+x][self.pos[1]+y].dirt = 0
 
         return dValues
 
@@ -481,6 +476,7 @@ class RobotState:
             if len(dirtReadings):
                 for dirtReading in dirtReadings:
                     state.map.map[dirtReading[0]][dirtReading[1]].dirt = dirtReading[2]
+                    state.map.map[dirtReading[0]][dirtReading[1]].value = dirtReading[2]
                     state.r.environment.map[dirtReading[0]][dirtReading[1]].dirt = 0
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
@@ -488,6 +484,7 @@ class RobotState:
             if len(proxReadings):
                 for prox in proxReadings:
                     state.map.map[prox[0]][prox[1]].isObstacle = True
+                    state.map.map[prox[0]][prox[1]].value = -1 
 
                     if (prox not in state.map.obstacles):
                         state.map.obstacles.append(prox)
@@ -514,6 +511,7 @@ class RobotState:
             for x in range(-2,3,1):
                 for y in range (-2,3,1):
                     state.map.map[pos[0]+x][pos[1]+y].isVisited = True
+                    state.map.map[pos[0]+x][pos[1]+y].value = 0
 
                     if ([pos[0]+x,pos[1]+y] not in state.map.visitedCells):
                         state.map.visitedCells.append([pos[0]+x,pos[1]+y])
@@ -585,8 +583,6 @@ class RobotState:
         return stateCp
 
     def featureExtraction(self, inputMap, classifiers):
-
-        print "Called featureExtraction"
 
         # to start with, just uses every blocksize x blocksize section
         blockSize = 10
