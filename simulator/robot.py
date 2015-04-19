@@ -126,12 +126,19 @@ class RobotSimulator(object):
 
         self.executeFeatureExtraction(state, self.classifiers)
 
-        # update environments dirt 
+        # update environments dirt
+        # invoke multiple times?
+        #state.r.environment.updateDirt()
+        #state.r.environment.updateDirt()
+        #state.r.environment.updateDirt()
+        
+        # clear robots dirt after feature extraction
+        state.clearDirt()
         
         # update robots prediction of dirt
 
         #only needed if we explore then search
-        #state = state.resetMission()
+        state = state.resetMission()
 
         '''
         try: 
@@ -549,8 +556,6 @@ class RobotState:
             if pos in self.map.visitedCells:
                 removeList.append(dirtCell)
 
-        #print "remove list is :",removeList
-
         dirt = list(self.map.dirtCells)
 
         for cell in removeList:
@@ -558,11 +563,28 @@ class RobotState:
 
         return dirt
 
+    def clearDirt( self ):
+        for x in xrange(0,int(self.map.xCells)):
+            for y in xrange(0,int(self.map.yCells)):
+                if self.map.map[x][y].value > 0:
+                    self.map.map[x][y].value = 0
+                self.map.map[x][y].dirt = 0
+        
+
     def removeUnreachableDirt ( self ):
         #after performing update dirt, or if importing a map with dirt cells
         #we will need to remove dirtCells from the dirt list the robot cannot
         #reach
-        return None
+        dirt = self.getDirt()
+
+        for cell in dirt:
+            pos = [dirt[0],dirt[1]]
+            if pos not in self.getVisited():
+                #unreachable dirt, remove it
+                dirt.remove(cell)
+
+        self.map.dirtCells = list(dirt)
+        return 
 
     def getUnvisited( self ):
         return self.map.unvisitedCells
