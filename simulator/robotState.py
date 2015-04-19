@@ -26,7 +26,7 @@ class RobotState:
 
     def getLegalActions( self, pos):
 
-        possibleActions = ['North','South','East','West','None']
+        possibleActions = ['North','East','South','West','None']
         legalActions = []
 
         for action in possibleActions:
@@ -86,16 +86,17 @@ class RobotState:
 
     def willVisitNewCell( self, pos, action):
         cellCoords = self.r.getBumpCoordinates(action, pos)
-        result = False
+        result = 0
 
         unvisitedCells = self.getUnvisited()
         #print len(unvisitedCells)
 
         for coord in cellCoords:
             if (coord in unvisitedCells):
-                result = True
+                result += 1
 
         return result
+
 
     def generateSuccessor( self, action ):
 

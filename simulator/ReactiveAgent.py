@@ -1,49 +1,51 @@
-       '''
-            time.sleep(0.05)
+  
+from robotState import *
 
-            bumpReadings = self.robot.bumpSensor(self.robot.heading,self.environment)
-            if (self.bump and (not self.turning)):
-                self.bump = False
-                self.turning = True
-                self.turningDistance = 0
 
-                if (self.cleanDirection == 'Down'):
-                    if(self.robot.heading == 'East'):
-                        self.action = "TurnRight"
-                        self.turnDirection = self.action
-                    else: 
-                        self.action = "TurnLeft"
-                        self.turnDirection = self.action
-                else:
-                    if(self.robot.heading == 'East'):
-                        self.action = "TurnLeft"
-                        self.turnDirection = self.action
-                    else: 
-                        self.action = "TurnRight"
-                        self.turnDirection = self.action
 
-            elif ((self.turningDistance == 5)):
-                self.action = self.turnDirection
-                self.turningDistance = 0
-                self.turning = False
-            elif (self.turning):
-                if (self.bump):
-                    
-                    print "bumped while turning!: ,",self.turningDistance
-                    if (self.turningDistance <= 2):
-                        print "changing cleaning direction!"
-                        if self.cleanDirection == 'Down':
-                            self.cleanDirection == 'Up'
+class ReactiveAgent(object):
+# Runs a basic reactive agent for an environment
 
-                    self.action = self.turnDirection
-                    self.turningDistance = 0
-                    self.turning = False
-                    self.bump = False
-                else:
-                    self.turningDistance += 1
-                    self.action = self.robot.heading
 
-            else:
-                self.action = self.robot.heading
+    def __init__(self, maxActions):
+        self.actions = []
+        self.nActions = 0
+        self.maxActions = maxActions
+        self.turning = False
+        self.initPosition = []
+        
+    def run (self, state):
+        self.initPosition = list([state.r.pos[0],state.r.pos[1]])
+        
+        while (len(self.actions) < self.maxActions):
+            action = None
+            bestAction = 0
+            #if an action will explore new space, take it
             
-            '''
+            for option in state.getLegalActions(state.r.pos):
+                newCells = state.willVisitNewCell(state.r.pos, option)
+                if newCells > bestAction:
+                    action = option
+                    bestAction = newCells
+
+      
+            # else take first available action from get legal actions
+            # this should result in the robot going north until it hits a wall
+            # then follows the wall to the east
+            if action == None:
+                
+                if state.r.pos == self.initPosition:
+                    #back at the start...giveup
+                    self.maxActions = len(self.actions)
+                else:
+                    actions = state.getLegalActions(state.r.pos)
+                    action = actions[0]
+
+        
+            self.actions.append(action)
+            state = state.generateSuccessor(action)
+
+        return self.actions
+            
+
+        

@@ -13,6 +13,7 @@ from classifiers import *
 from evaluation import *
 from robotState import *
 from robot import *
+from ReactiveAgent import *
 
 import time
 
@@ -64,6 +65,7 @@ class RobotSimulator(object):
                     self.action = 'East'
                 if self.k == pygame.K_LEFT:
                     self.action = 'West'
+
                 if self.k == pygame.K_e:
                     self.showEnvironment = (not self.showEnvironment)
                 if self.k == pygame.K_d:
@@ -120,9 +122,13 @@ class RobotSimulator(object):
         pos = state.getRobotPosition()
         state.map.map[pos[0]][pos[1]].set_valid_actions(state)
 
-
+    
         if simulatorArgs["exploreSearch"]:
             state = self.executeExploration(state)
+        elif simulatorArgs["reactiveAgent"]:
+            agent = ReactiveAgent(1000)
+            actions = agent.run(state)
+            print actions
         else:
             #like we have explored the map
             if not simulatorArgs["joyStickMode"]:
@@ -184,7 +190,7 @@ class RobotSimulator(object):
                     self.action = actions.pop(0)
                 else:
                     self.action = 'None'
-                time.sleep(0.2)
+                time.sleep(0.1)
             
             screen = pygame.display.get_surface()
             state = state.generateSuccessor(self.action)
@@ -210,7 +216,7 @@ if __name__ == "__main__":
     
     
     try: 
-        opts,args = getopt.getopt(sys.argv[1:],"avshfie:")
+        opts,args = getopt.getopt(sys.argv[1:],"avshfire:")
     except getopt.GetoptError:
         print "robot.py -e <environmentPath>"
         sys.exit(2)
@@ -223,7 +229,8 @@ if __name__ == "__main__":
     simulatorArgs = { "runEvaluation" : False,
                       "joyStickMode" : True,
                       "exploreSearch" : False,
-                      "runClassification" : False }
+                      "runClassification" : False,
+                      "reactiveAgent"  : False }
 
     for opt,arg in opts:
         if opt == '-e':
@@ -232,6 +239,7 @@ if __name__ == "__main__":
             saveMapEnvAtEnd = True
         if opt == '-v':
             simulatorArgs["runEvaluation"] = True
+            simulatorArgs["joyStickMode"] = False
         if opt == '-a':
             simulatorArgs["runEvaluation"] = True
             simulatorArgs["runClassification"] = True
@@ -242,6 +250,9 @@ if __name__ == "__main__":
             simulatorArgs["joyStickMode"] = False
         if opt == '-s':
             simulatorArgs["exploreSearch"] = True
+            simulatorArgs["joyStickMode"] = False
+        if opt == '-r':
+            simulatorArgs["reactiveAgent"] = True
             simulatorArgs["joyStickMode"] = False
 
 
