@@ -10,6 +10,7 @@ from explore_map import *
 from dirt_collection import *
 from search import *
 from evaluation import *
+from classifiers import *
 
 import time
 
@@ -34,6 +35,8 @@ class RobotSimulator(object):
         self.start = False
         self.updateDirt = False
         self.drawLabels = False
+
+        self.classifiers = Classifiers()
 
         
     
@@ -97,46 +100,50 @@ class RobotSimulator(object):
         #problem = MapEnvironmentProblem(state)
         #state = depth_first_search(problem)
 
-        #startTime = time.clock()
-        #problem = MapEnvironmentProblem(state)
-        #state = depth_first_search(problem)
-        #endTime = time.clock()
-        #print "exploration executed in %d seconds!"%(endTime - startTime)
+        startTime = time.clock()
+        problem = MapEnvironmentProblem(state)
+        state = depth_first_search(problem)
+        endTime = time.clock()
+        print "exploration executed in %d seconds!"%(endTime - startTime)
 
         # DIRT COLLECTION PROBLEM
-        state.map = self.environment.copyEnvIntoMap(state.map)
+        #state.map = self.environment.copyEnvIntoMap(state.map)
 
-        print "COUNTS"
-        print utils.countLabels(state.r.environment.map)
+        #print "COUNTS"
+        #print utils.countLabels(state.r.environment.map)
 
-        state.featureExtraction(state.map)
+        #state.featureExtraction(state.map, self.classifiers)
 
-        print utils.countLabels(state.r.environment.map)
+        #print utils.countLabels(state.r.environment.map)
 
         #reset visited and unvisitedCells
         #print state
-        #state = state.resetMission()
+        state = state.resetMission()
 
         #print state.getDirt()
         #print state.getUnvisited()
         #print state.getVisited()
 
         # Calculate and plot different dirt collection for different methods
-        time_steps, collected = all_dirt_collection_rates(state, state.r.environment)
-        plot_dirt_collection_rates(time_steps, collected)
+        #time_steps, collected = all_dirt_collection_rates(state, state.r.environment)
+        #plot_dirt_collection_rates(time_steps, collected)
         # Calculate and plot classification accuracy
-        actual, classified, labels = classification_accuracy(state.map, state.r.environment)
-        plot_classification_accuracy(actual, classified, labels)
+        #actual, classified, labels = classification_accuracy(state.map, state.r.environment)
+        #plot_classification_accuracy(actual, classified, labels)
 
-        '''
+        
         startTime = time.clock()
         problem = CollectDirtProblem(state)
         actions = a_star_search(problem, dirt_heuristic)
         endTime = time.clock()
         print "a_star_search executed in %d seconds!"%(endTime - startTime)
         print actions
-        '''
-        actions = ['None']
+        
+
+        pygame.init()
+        pygame.display.set_mode((700,700), pygame.RESIZABLE)
+        pygame.display.update()
+        #actions = ['None']
 
         while(True):
 
@@ -355,6 +362,11 @@ class Robot(object):
 
 class RobotState:
 
+    def __init__ ( self, robot , robotMap ):
+            
+        self.r = robot
+        self.map = robotMap
+
     def resetMission (self ):
         #swap unvisited with visited
 
@@ -566,21 +578,13 @@ class RobotState:
     def getObstacles( self ):
         return self.map.obstacles
 
-    def __init__ ( self, robot , robotMap, makeClassifier=False ):
-
-        self.r = robot
-        self.map = robotMap
-        from classifiers import Classifiers
-        #if makeClassifier == True:
-        self.classifier = Classifiers()
-
     def copy( self ):
         robotCp = self.r.copy(copyEnv=True)
         mapCp = self.map.copy(copyMap=True)
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 
-    def featureExtraction(self, inputMap):
+    def featureExtraction(self, inputMap, classifiers):
 
         print "Called featureExtraction"
 
@@ -598,7 +602,7 @@ class RobotState:
                 map = inputMap.map
                 submatrix = [[map[i][j].value for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
 
-                bestClassifier = self.classifier.getBestClassifier(submatrix)
+                bestClassifier = classifiers.getBestClassifier(submatrix)
                 print "best classifier:", bestClassifier
                 if bestClassifier != None:
                     for a in xrange(y, y + blockSize):
