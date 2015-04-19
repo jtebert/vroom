@@ -258,6 +258,22 @@ class RobotSimulator(object):
 
         return envName
 
+def printBanner():
+    print("")
+    print("")
+    print("====================================================================================================")
+    print("           '   +++      ++;:++++++++;   '+++++++   :+++++++:  ++       ++' ++                       ")
+    print(" ;+++++++++++  +++     +++ ++++++++++  ++++++++++ ++++++++++  +++     +++  ++       ++++++++++++'   ")
+    print("           ;'   ++    :++         +++  ++     +++ ++;     ++ :+++    '+++ ;++    ++++++++++++++++++ ")
+    print("                ++;   ++          +++ '++     +++ ++      ++ +++++   ++++ +++   ++++++++++++++++++++")
+    print("     ;'+++++++  +++  +++   +++++++++' +++     ++  ++     '++ +++++  +++++ ++:  +++++++++++++++++++++")
+    print("        ,;'+++   ++ +++    +++++++++  ++:     ++ ;++     +++ ++ ++;++++++ ++   +++++++++++++++     '")
+    print("                 ++;++    +++  +++    ++      ++ +++     ++  ++ +++++ ++       ++++++++++++++++     ")
+    print("         ;'++++  ++++'    +++   +++   ++++++++++ ++++++++++ :++ ;+++  ++ ;++   +++++++++++++++++    ")
+    print("      :'+++++++   +++     ++    ;+++  +++++++++  ++++++++++ +++  ++   ++ +++     +++       +++      ")
+    print("====================================================================================================")
+    print("")
+    print("")
 
 def printHelp():
     print "VROOM Simulator: available options"
@@ -268,7 +284,8 @@ def printHelp():
     print "-f : run classification " 
     print "-s : run exploration then search function"
     print "-r : run the reactive agent"
-    print "-p : use pickle files if available"    
+    print "-p : use pickle files if available"   
+    print ""
 
 if __name__ == "__main__":
     
@@ -276,6 +293,7 @@ if __name__ == "__main__":
     try: 
         opts,args = getopt.getopt(sys.argv[1:],"pavshfire:")
     except getopt.GetoptError:
+        printBanner()
         printHelp()
         sys.exit(2)
         
@@ -293,6 +311,7 @@ if __name__ == "__main__":
 
     for opt,arg in opts:
         if opt == '-h':
+            printBanner()
             printHelp()
             sys.exit(0)
             
@@ -347,5 +366,7 @@ if __name__ == "__main__":
 
     else:
         r.run(simulatorArgs)
+
+
 
 
