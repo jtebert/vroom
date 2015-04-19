@@ -139,6 +139,8 @@ class RobotSimulator(object):
 
             else:
                 state = self.executeExploration(state)
+                pickleName = self.getPickleName("explore")
+                pickle.dump(state, open( pickleName, "wb"))
                     
         elif simulatorArgs["reactiveAgent"]:
             agent = ReactiveAgent(1000)
@@ -231,13 +233,14 @@ class RobotSimulator(object):
         env = self.extractEnvName()
         pickleName = str(action) + '_' + str(env) + '.p'
 
-        print pickleName
-
         return pickleName
 
     def extractEnvName (self):
+        #This will break if we move the assets folder...
+
         envName = str(self.envName)
-        #envs are in ..\assets\maps\"envname"  so split 3 \'s to get envname
+        #envs are in ..\assets\maps\"envname"  
+        #so split 3 \'s and .csv to get envname
         
         index = envName.find('/')
         envName = envName[(index+1):]
@@ -255,22 +258,25 @@ class RobotSimulator(object):
 
         return envName
 
+
+def printHelp():
+    print "VROOM Simulator: available options"
+    print "Default to joystick mode. Use arrow keys to explore environment"
+    print "-e <environmentpath> : sets the environment the robot will explore"
+    print "-a : run all options: explore -> classify -> evaluation functions"
+    print "-v : run evaluation functions"
+    print "-f : run classification " 
+    print "-s : run exploration then search function"
+    print "-r : run the reactive agent"
+    print "-p : use pickle files if available"    
+
 if __name__ == "__main__":
     
     
     try: 
         opts,args = getopt.getopt(sys.argv[1:],"pavshfire:")
     except getopt.GetoptError:
-        
-        print "VROOM Simulator: available options"
-        print "Default to joystick mode. Use arrow keys to explore environment"
-        print "-e <environmentpath> : sets the environment the robot will explore"
-        print "-a : run all options: explore -> classify -> evaluation functions"
-        print "-v : run evaluation functions"
-        print "-f : run classification " 
-        print "-s : run exploration then search function"
-        print "-r : run the reactive agent"
-        print "-p : use pickle files if available"
+        printHelp()
         sys.exit(2)
         
 
@@ -287,15 +293,7 @@ if __name__ == "__main__":
 
     for opt,arg in opts:
         if opt == '-h':
-            print "VROOM Simulator: available options"
-            print "Default to joystick mode. Use arrow keys to explore environment"
-            print "-e <environmentpath> : sets the environment the robot will explore"
-            print "-a : run all options: explore -> classify -> evaluation functions"
-            print "-v : run evaluation functions"
-            print "-f : run classification " 
-            print "-s : run exploration then search function"
-            print "-r : run the reactive agent"
-            print "-p : use pickle files if available"
+            printHelp()
             sys.exit(0)
             
         if opt == '-e':
@@ -349,3 +347,5 @@ if __name__ == "__main__":
 
     else:
         r.run(simulatorArgs)
+
+

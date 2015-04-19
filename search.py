@@ -118,20 +118,10 @@ def depth_first_search(problem):
             # move robot to parents state, then update parent
             #if problem.is_goal_state()
 
-            
             if node.parent == None:
                 #kind of a hack, should figure out how to
                 #update the state of the simlator before running 
                 #classification
-                ##print "showing valid actions"
-                '''
-                for row in range(node.fullState.map.yCells):
-                    for col in range(node.fullState.map.xCells):
-                        if node.fullState.map.map[col][row].are_any_valid_actions():
-                            pos = (col,row)
-                            print "Valid action position: ",pos
-                            print node.fullState.map.map[col][row].validActions
-                '''
                 return node.fullState
             
             #print "back tracking: ",node.parent.prev_action
@@ -153,7 +143,5 @@ def depth_first_search(problem):
             #    print node.parent.prev_action
             #    print node.prev_action
 
-
-    
 
     return node.fullState() 

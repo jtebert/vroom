@@ -21,21 +21,26 @@ class MapEnvironmentProblem:
     @staticmethod
     def get_successors(state):
         """
-        Returns successor states (states where you'll explore something new), the actions they require
+        Returns the sucessor state that explores the most new cells
         :param state: Current robot position & exploration grid
         :return: List of (state, action) tuples
         """
         actions = state.getLegalActions(state.getRobotPosition())
         #print state.getRobotPosition()
-        successors = []
+        successor = []
+        max_new_cells = 0
+        max_new_cells_action = None
         for action in actions:
-            if state.willVisitNewCell(state.getRobotPosition(), action):
-                #print action
-                next_state = state.generateSuccessor(action)
-                # Recheck whether new cells will be visited
-                #next_state.map.set_all_valid_actions(state)
-                successors.append((next_state, action))
-        return successors
+            n_new_cells = state.willVisitNewCell(state.getRobotPosition(), action)
+            if n_new_cells > max_new_cells:
+                max_new_cells = n_new_cells
+                max_new_cells_action = action
+
+        if max_new_cells_action != None:
+            next_state = state.generateSuccessor(max_new_cells_action)
+            successor.append((next_state,max_new_cells_action))
+
+        return successor
 
     def get_cost_of_actions(self, actions):
         """
