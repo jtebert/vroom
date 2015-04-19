@@ -56,6 +56,27 @@ class MapNode(object):
         return len(self.validActions) > 0
 
 
+    def copy(self, row, col):
+        nodeCp = MapNode(row,col)
+        nodeCp.isObstacle = bool(self.isObstacle)
+        nodeCp.isVisited = bool(self.isVisited)
+        nodeCp.dirt = int(self.dirt)
+
+        if self.label != None:
+            nodeCp.label = str(self.label)
+        else:
+            nodeCp.label = None
+            
+        if self.value != None:
+            nodeCp.value = int(self.value)
+        else:
+            nodeCp.value = None
+
+        nodeCp.validActions = list(self.validActions)
+        nodeCp.row = row
+        nodeCp.col = col
+        return nodeCp
+
 class RobotMap(object):
     center = (0,0)
 
@@ -235,7 +256,13 @@ class RobotMap(object):
         cellXMax = self.width/self.cellXSize
         cellYMax = self.height/self.cellYSize
 
-        mapcp.map = self.map
+        if copyMap:
+            for x in xrange(0,int(mapcp.xCells)):
+                for y in xrange(0,int(mapcp.yCells)):
+                    mapcp.map[x][y] = self.map[x][y].copy(y,x)
+
+        else:
+            mapcp.map = self.map
         
         
         return mapcp
@@ -275,8 +302,7 @@ class Environment(object):
 
         for x in xrange(0,int(cellXMax)):
             for y in xrange(0,int(cellYMax)):
-                mapcp.map[x][y] = MapNode(y, x)
-                mapcp.map[x][y].dirt = int(self.map[x][y].dirt)
+                mapcp.map[x][y] = self.map[x][y].copy(y,x)
 
         return mapcp
 
@@ -463,7 +489,7 @@ class Environment(object):
         for x in xrange(0,int(mapcp.xCells)):
             for y in xrange(0,int(mapcp.yCells)):
                 #map              environments "map"
-                mapcp.map[x][y] = self.map[x][y] 
+                mapcp.map[x][y] = self.map[x][y].copy(y,x) 
 
                 if self.map[x][y].value > 0:
                     mapcp.dirtCells.append([x,y,self.map[x][y].value])

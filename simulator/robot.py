@@ -348,7 +348,7 @@ class Robot(object):
             environment = self.environment.copy()
         else:
             environment = self.environment
-        r = Robot(self.environment)
+        r = Robot(environment)
         r.pos = list(self.pos)
         r.heading = self.heading
         return r
@@ -575,8 +575,8 @@ class RobotState:
         self.classifier = Classifiers()
 
     def copy( self ):
-        robotCp = self.r.copy()
-        mapCp = self.map.copy()
+        robotCp = self.r.copy(copyEnv=True)
+        mapCp = self.map.copy(copyMap=True)
         stateCp = RobotState(robotCp, mapCp )
         return stateCp
 
