@@ -122,7 +122,7 @@ class RobotState:
             if len(dirtReadings):
                 for dirtReading in dirtReadings:
                     state.map.map[dirtReading[0]][dirtReading[1]].dirt = dirtReading[2]
-                    state.map.map[dirtReading[0]][dirtReading[1]].value = dirtReading[2]
+                    state.map.map[dirtReading[0]][dirtReading[1]].value = int(dirtReading[2])
                     state.r.environment.map[dirtReading[0]][dirtReading[1]].dirt = 0
                     if (dirtReading not in state.map.dirtCells):
                         state.map.dirtCells.append(dirtReading)
@@ -157,7 +157,8 @@ class RobotState:
             for x in range(-2,3,1):
                 for y in range (-2,3,1):
                     state.map.map[pos[0]+x][pos[1]+y].isVisited = True
-                    state.map.map[pos[0]+x][pos[1]+y].value = 0
+                    if (state.map.map[pos[0]+x][pos[1]+y].value <= 0) or (state.map.map[pos[0]+x][pos[1]+y].value == None):
+                        state.map.map[pos[0]+x][pos[1]+y].value = 0
 
                     if ([pos[0]+x,pos[1]+y] not in state.map.visitedCells):
                         state.map.visitedCells.append([pos[0]+x,pos[1]+y])

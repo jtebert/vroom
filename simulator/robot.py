@@ -2,7 +2,7 @@
         
 class Robot(object):
 
-    def __init__(self,environment, pos=[5,4],heading='East'):
+    def __init__(self,environment, pos=[5,7],heading='East'):
 
         self.size = 50   #5x5 cells
         self.pos = pos
