@@ -90,6 +90,7 @@ def a_star_search(problem, heuristic):
             frontier_costs.append(n[2].cost)
         for next_state in next_states:
             next_node = Node(next_state[0], next_state[1], next_state[2], node, problem,True, heuristic)
+            #print next_state[0]
             if (next_node.state not in explored and next_node.state not in frontier_states) or \
                     (next_node.state in frontier_states and frontier_costs[
                         frontier_states.index(next_node.state)] > next_node.cost):

@@ -5,6 +5,7 @@
 import matplotlib.pyplot as plt
 from dirt_collection import *
 from search import *
+from ReactiveAgent import *
 import utils
 
 
@@ -94,12 +95,15 @@ def get_collection_actions(state, environment):
      - Naive robot (reactive agent) [lower limit]
      - Ideal search (A* using actual generated dirt) [upper limit]
      """
+    worst_state = state.copy()
+    agent = ReactiveAgent(1000)
+    worst_actions = agent.run(worst_state)
+    print worst_actions
+    
     actual_state = state.copy()
     problem = CollectDirtProblem(actual_state)
     actual_actions = a_star_search(problem, dirt_heuristic)
-    
-    # TODO: Use reactive agent
-    worst_actions = []
+
 
     ideal_state = state.copy()
     ideal_state.map = environment.copyEnvIntoMap(state.map)
