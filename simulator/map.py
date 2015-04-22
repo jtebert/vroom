@@ -498,9 +498,33 @@ class Environment(object):
             reader = csv.reader(csvFile)
             for row in reader:
                 for column in row:
-                    if j > (self.width/self.cellXSize):
+                    if i > ((self.width/self.cellXSize)-1):
                         break
                     if(column != ''):
+                        if '"' in column:
+                            print column
+                            print i
+                            print j
+                
+                            column = column.replace('[','')
+                            column = column.replace(']','')
+                            column = column.replace('"','')
+                            column = column.replace('"','')
+                            column = column.split(',')
+
+                            value = int(column[0])
+                            if value >= 0:
+                                if value > 3:
+                                    value = 3
+                                self.map[i][j].dirt = value
+                            else:
+                                self.map[i][j].isObstacle = True
+
+                            print column
+                            self.map[i][j].value = int(column[0])
+                            self.map[i][j].label = str(column[1])
+                            #print self.map[i][j].label
+
                         if '[' in column:
                             column = column.replace('[','')
                             column = column.replace(']','')
@@ -533,7 +557,7 @@ class Environment(object):
                 i = 0
                 j += 1
 
-                if j > (self.height/self.cellYSize):
+                if j > ((self.height/self.cellYSize)-1):
                     break
             return
                 
