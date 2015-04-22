@@ -4,7 +4,7 @@ class Classifiers(object):
 
     def __init__(self, row = 10, column = 10):
         # Threshold for classifier prediction
-        self.THRESHOLD = .982
+        self.THRESHOLD = 0.75            # .792 is good for test
         self.classifiers = dict()
         self.sampleRowSize = row
         self.sampleColumnSize = column
@@ -25,7 +25,7 @@ class Classifiers(object):
             self.normalizedClassifiers[str(name)] = [[cellValue.copy() for x in range(self.sampleColumnSize)]
                                         for y in range(self.sampleRowSize)]
         self.train_with_files()
-        self.laplaceSmoothing(20)
+        self.laplaceSmoothing(55)
 
     def importClassifers(self):
         from os import listdir
@@ -134,8 +134,8 @@ class Classifiers(object):
             probs.append((classifier, maxValue))
 
         # Gets yes probabilites
-        #probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
-        #print probs
+        probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
+        print probs
         # Calculates new probabilities
         from operator import itemgetter
         maxClassifier = max(probs, key=itemgetter(1))

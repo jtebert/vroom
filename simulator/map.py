@@ -215,9 +215,13 @@ class RobotMap(object):
                         # apply it to text on a label
                         #print self.map[col][row].label
                         label = myfont.render(str(self.map[col][row].label), 1, (0,0,0))
-                        labelPos = ((col+5)*self.cellYSize, (row)*self.cellXSize)
+                        labelPos = ((col+2)*self.cellYSize, (row+3)*self.cellXSize)
                         screen.blit(label, labelPos)
+
+                        r = pygame.Rect((col)*self.cellYSize,(row)*self.cellXSize, 100, 100)
+                        pygame.draw.rect(screen,(255,0,0),r, 2)
                         
+
                         for i in range(10):
                             for j in range(10):
                                 isDrawn.append([col+i,row+j])
