@@ -23,6 +23,7 @@ labelDict = { "openCell": openCellDist,
               "garbagecan": garbageCanDist,
               "chair": chairDist, 
               "litterBox": litterBoxDist, 
+              "litterbox": litterBoxDist, 
               "closet" : closetDist,
               "corner" : cornerDist,
               "None" : openCellDist }

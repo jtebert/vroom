@@ -15,6 +15,8 @@ class ReactiveAgent(object):
         self.initPosition = []
         
     def run (self, state):
+
+        
         self.initPosition = list([state.r.pos[0],state.r.pos[1]])
         
         while (len(self.actions) < self.maxActions):
@@ -26,12 +28,14 @@ class ReactiveAgent(object):
                 newCells = state.willVisitNewCell(state.r.pos, option)
                 if newCells > bestAction:
                     action = option
+                    #print action
                     bestAction = newCells
 
       
             # else take first available action from get legal actions
             # this should result in the robot going north until it hits a wall
             # then follows the wall to the east
+
             if action == None:
                 
                 if state.r.pos == self.initPosition:
@@ -40,11 +44,11 @@ class ReactiveAgent(object):
                 else:
                     actions = state.getLegalActions(state.r.pos)
                     action = actions[0]
-
         
             self.actions.append(action)
             state = state.generateSuccessor(action)
 
+        print "done with reactive agent"
         return self.actions
             
 
