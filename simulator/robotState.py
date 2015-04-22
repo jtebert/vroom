@@ -269,14 +269,14 @@ class RobotState:
         #print "xRange:", xRange, "yRange:", yRange
         for y in xrange(0, yRange):
             for x in xrange(0, xRange):
-                print "fE", x, y
+                #print "fE", x, y
                 # Run classifier on block
                 # Limits of this block are [x, x+blockSize] and [y, y+blockSize]
                 map = inputMap.map
                 submatrix = [[map[i][j].value for i in range(x, x+blockSize)] for j in range(y, y+blockSize)]
 
                 bestClassifier = classifiers.getBestClassifier(submatrix)
-                print "best classifier:", bestClassifier
+                #print "best classifier:", bestClassifier
                 if bestClassifier != None:
                     for a in xrange(y, y + blockSize):
                         for b in xrange(x, x + blockSize):

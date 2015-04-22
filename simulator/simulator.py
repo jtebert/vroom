@@ -98,10 +98,10 @@ class RobotSimulator(object):
     
     @staticmethod
     def executeFeatureExtraction (state, classifiers):
-        print "COUNTS"
-        print utils.countLabels(state.r.environment.map)
+        #print "COUNTS"
+        #print utils.countLabels(state.r.environment.map)
         state.featureExtraction(state.map, classifiers)
-        print utils.countLabels(state.r.environment.map)
+        #print utils.countLabels(state.r.environment.map)
 
     @staticmethod
     def executeExploration (state):
