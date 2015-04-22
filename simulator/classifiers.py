@@ -4,7 +4,7 @@ class Classifiers(object):
 
     def __init__(self, row = 10, column = 10):
         # Threshold for classifier prediction
-        self.THRESHOLD = .9
+        self.THRESHOLD = .982
         self.classifiers = dict()
         self.sampleRowSize = row
         self.sampleColumnSize = column

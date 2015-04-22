@@ -10,18 +10,22 @@ MAX_DIRT = 3
 #Probalistic Distributions per dirt level based on obstacle label
 # "dirtValue" : [ p(accum. dirt) , p(spreading) ]
 openCellDist = { "0" : [.001,0] , "1" : [.10,.01] , "2" : [.10, .05] , "3" : [.0,.1] }
-doorwayDist =  { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
-garbageCanDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
-chairDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
-litterBoxDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
-houseEntranceDist = { "0" : [.8,0] , "1" : [.20,0] , "2" : [.20, .05] , "3" : [.0,.2] }
+doorwayDist =  { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
+garbageCanDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
+chairDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
+litterBoxDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
+closetDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
+cornerDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
 
 labelDict = { "openCell": openCellDist, 
               "doorway": doorwayDist, 
               "garbageCan": garbageCanDist, 
+              "garbagecan": garbageCanDist,
               "chair": chairDist, 
               "litterBox": litterBoxDist, 
-              "houseEntrance" : houseEntranceDist }
+              "closet" : closetDist,
+              "corner" : cornerDist,
+              "None" : openCellDist }
 
 class MapNode(object):
     
@@ -267,6 +271,94 @@ class RobotMap(object):
         
         return mapcp
 
+
+
+    def adjacent(self, x, y):
+    # Returns the adjacent cells to one cell (the other ones that will impact the amount of dirt in a given cell)
+        try:
+            adjCells = [(self.map[x + 1][y]), (self.map[x - 1][y]), (self.map[x][y + 1]), (self.map[x][y - 1])]
+        except:
+            print x
+            print y
+            raise
+
+        return adjCells
+
+    def addDirt(self, currentDirt, newDirt):
+        # Returns amount of dirt after adding newDirt to currentDirt
+        return min(MAX_DIRT, currentDirt + newDirt)
+
+    def updateDirt(self, useRobotMap=False):
+        # Updates dirt by adding more based on however much is there to begin with and the adjacent cells
+        #Todo: seeding
+        import random
+
+        mapCopy = self.copy(copyMap = True) #Check copy so dirt doesn't cascade across the map from earlier checks
+
+
+        for y in xrange(0,int(mapCopy.yCells-1)):
+            for x in xrange(0,int(mapCopy.xCells-1)):
+
+                if mapCopy.map[x][y].isObstacle:
+                    #Obstacle that can't be cleaned
+                    continue
+
+                elif mapCopy.map[x][y].value == None:
+                    #It's a cell not in the environment
+                    continue
+
+
+                elif mapCopy.map[x][y].label == None or mapCopy.map[x][y].label == '' or mapCopy.map[x][y].label == 'None':
+                    randomVal = random.random()
+                    cellDist = openCellDist[str(mapCopy.map[x][y].dirt)]
+                    
+                    #Own cell: default dirt generation
+                    if randomVal < cellDist[0]:
+                        self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+                
+
+                else:
+                    #Own cell: Generation based on label
+                    randomVal = random.random()
+                    labelDist = labelDict[str(mapCopy.map[x][y].label)]
+                    cellDist = labelDist[str(mapCopy.map[x][y].dirt)]
+                    if randomVal < cellDist[0]:
+                        self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+
+
+                #for i in mapCopy.adjacent(x, y):
+                #    print i.dirt, i.isObstacle, i.isVisited, i.label, i.value
+
+                #Dirt generation from adjacent cells
+                for cell in mapCopy.adjacent(x, y):
+                    if cell.isObstacle:
+                        #print "Skipping: obstacle"
+                        continue
+
+                    elif cell.value == None:
+                        #print "Skipping: none cell value"
+                        continue
+
+                    elif cell.label == None or (cell.label == 'None'):
+                        randomVal = random.random()
+                        cellDist = openCellDist[str(cell.dirt)]
+                        #print "No cell label", x, y, cellDist, randomVal, randomVal < cellDist[1], self.map[x][y].dirt, self.map[x][y].value
+                    
+                        #Adjacent cell: default dirt generation
+                        if randomVal < cellDist[1]:
+                            self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+
+                    else:
+                        #print "Cell label"
+                        #Adjacent cell: Generation based on label
+                        randomVal = random.random()
+                        labelDist = labelDict[str(mapCopy.map[x][y].label)]
+                        cellDist = labelDist[str(mapCopy.map[x][y].dirt)]
+                        if randomVal < cellDist[1]:
+                            self.map[x][y].dirt = self.addDirt(self.map[x][y].dirt, 1)
+
+                self.map[x][y].value = self.map[x][y].dirt
+
 class Environment(object):
     center = (0,0)
 
@@ -352,6 +444,7 @@ class Environment(object):
 
                 else:
                     #Own cell: Generation based on label
+                    #print "cell label: ",(mapCopy.map[x][y].label)
                     randomVal = random.random()
                     labelDist = labelDict[str(mapCopy.map[x][y].label)]
                     cellDist = labelDist[str(mapCopy.map[x][y].dirt)]
@@ -417,7 +510,8 @@ class Environment(object):
                                 self.map[i][j].isObstacle = True
 
                             self.map[i][j].value = int(column[0])
-                            self.map[i][j].label = column[1]
+                            self.map[i][j].label = str(column[1])
+                            #print self.map[i][j].label
                         else:
                             
                             value = int(column)
@@ -427,7 +521,6 @@ class Environment(object):
                                 self.map[i][j].dirt = value
                             else:
                                 self.map[i][j].isObstacle = True
-
                             self.map[i][j].value = int(column)
                     else:
                         self.map[i][j].value = None
@@ -503,8 +596,7 @@ class Environment(object):
                 if self.map[x][y].label != None:
                     mapcp.map[x][y].label = self.map[x][y].label
                     
-                    
-                #mapcp.visitedCells.append([x,y])
+                    #mapcp.visitedCells.append([x,y])
 
         #print mapcp.visitedCells 
         return mapcp

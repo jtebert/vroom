@@ -208,21 +208,37 @@ class RobotState:
                 if self.map.map[x][y].value > 0:
                     self.map.map[x][y].value = 0
                 self.map.map[x][y].dirt = 0
-        
+
+        self.map.dirtCells = []
+    
+    def updateDirtList(self):
+        for x in xrange(0,int(self.map.xCells)):
+            for y in xrange(0,int(self.map.yCells)):
+                if self.map.map[x][y].dirt > 0:
+                    self.map.dirtCells.append([x,y,self.map.map[x][y].dirt])
+        print "updating dirt list: ",len(self.map.dirtCells)
 
     def removeUnreachableDirt ( self ):
         #after performing update dirt, or if importing a map with dirt cells
         #we will need to remove dirtCells from the dirt list the robot cannot
         #reach
-        dirt = self.getDirt()
+        dirt = self.map.dirtCells
+        visitedCells = self.getVisited()
+        print "have we visited cells? : ",len(visitedCells)
+
+        #print dirt
+        #print "" 
+        #print ""
+        #print visitedCells
 
         for cell in dirt:
             pos = [dirt[0],dirt[1]]
-            if pos not in self.getVisited():
+            if pos not in visitedCells:
                 #unreachable dirt, remove it
                 dirt.remove(cell)
 
         self.map.dirtCells = list(dirt)
+        print "after removing unreachable dirt: ",len(dirt)
         return 
 
     def getUnvisited( self ):
@@ -264,5 +280,5 @@ class RobotState:
                 if bestClassifier != None:
                     for a in xrange(y, y + blockSize):
                         for b in xrange(x, x + blockSize):
-                            map[b][a].label = bestClassifier
+                            map[b][a].label = str(bestClassifier)
                             #print "fe updatelabel", a, b

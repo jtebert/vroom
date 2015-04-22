@@ -160,14 +160,19 @@ class RobotSimulator(object):
 
         # update environments dirt
         # invoke multiple times?
-        #state.r.environment.updateDirt()
-        #state.r.environment.updateDirt()
-        #state.r.environment.updateDirt()
+        state.r.environment.updateDirt()
         
         # clear robots dirt after feature extraction
         state.clearDirt()
         
+        afterDirtUpdateState = state.copy()
+
         # update robots prediction of dirt
+        print "before updating dirt predictons: ",state.getDirt()
+        state.map.updateDirt()
+        state.updateDirtList()
+        state.removeUnreachableDirt()
+        #print "after updating dirt predictions: ",state.getDirt()
 
         #only needed if we explore then search
         if simulatorArgs["exploreSearch"] == True:
@@ -187,6 +192,8 @@ class RobotSimulator(object):
 
         if simulatorArgs["exploreSearch"]:
             actions = self.executeDirtSearch(state)        
+            state = afterDirtUpdateState
+
 
         pygame.init()
         pygame.display.set_mode((700,700), pygame.RESIZABLE)
@@ -215,7 +222,7 @@ class RobotSimulator(object):
             #update Screen
             screen.fill((204,204,204))
             if self.showEnvironment:
-                state.map.draw(screen,environment = self.environment)
+                state.map.draw(screen,environment = state.r.environment)
             else:
                 state.map.draw(screen)
             state.map.drawRobot(screen,state.r)
