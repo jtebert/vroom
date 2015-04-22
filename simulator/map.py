@@ -12,7 +12,7 @@ MAX_DIRT = 3
 openCellDist = { "0" : [.001,0] , "1" : [.10,.01] , "2" : [.10, .05] , "3" : [.0,.1] }
 doorwayDist =  { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
 garbageCanDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
-chairDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
+tableDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
 litterBoxDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
 closetDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
 cornerDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
@@ -21,7 +21,7 @@ labelDict = { "openCell": openCellDist,
               "doorway": doorwayDist, 
               "garbageCan": garbageCanDist, 
               "garbagecan": garbageCanDist,
-              "chair": chairDist, 
+              "table": tableDist,
               "litterBox": litterBoxDist, 
               "litterbox": litterBoxDist, 
               "closet" : closetDist,
