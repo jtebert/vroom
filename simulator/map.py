@@ -627,6 +627,7 @@ class Environment(object):
                 mapcp.map[x][y] = self.map[x][y].copy(y,x)
                 mapcp.map[x][y].label = None 
 
+
                 if self.map[x][y].value > 0:
                     mapcp.dirtCells.append([x,y,self.map[x][y].value])
 
@@ -635,8 +636,7 @@ class Environment(object):
 
                 if self.map[x][y].value == 0:
                     mapcp.map[x][y].isVisited = True
-                    
-                    #mapcp.visitedCells.append([x,y])
+
 
         #print mapcp.visitedCells 
         return mapcp
