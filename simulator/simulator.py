@@ -166,7 +166,7 @@ class RobotSimulator(object):
         # update environments dirt
         # invoke multiple times?
         state.r.environment.updateDirt()
-        #state.r.environment.updateDirt()
+        state.r.environment.updateDirt()
         
         # clear robots dirt after feature extraction
         state.clearDirt()
@@ -176,7 +176,7 @@ class RobotSimulator(object):
         # update robots prediction of dirt
         print "before updating dirt predictons: ",state.getDirt()
         state.map.updateDirt()
-        #state.map.updateDirt()
+        state.map.updateDirt()
         state.updateDirtList()
         state.removeUnreachableDirt()
         #print "after updating dirt predictions: ",state.getDirt()
@@ -217,10 +217,6 @@ class RobotSimulator(object):
                     self.environment.updateDirt()
                 #self.action is set directly by self.listenControls
             else:
-                
-                while(self.start == False):
-                    pygame.display.update()
-                    self.listenControls()
                 
                 if len(actions):
                     self.action = actions.pop(0)
@@ -319,8 +315,7 @@ if __name__ == "__main__":
         sys.exit(2)
         
 
-    #defaultEnvironmentCSV = './../assets/maps/basement.csv'
-    defaultEnvironmentCSV = './../assets/maps/roomwithcloset1.csv'
+    defaultEnvironmentCSV = '../assets/maps/test.csv'
     saveMapEnvAtEnd = False
 
     simulatorArgs = { "runEvaluation" : False,

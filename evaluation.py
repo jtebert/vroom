@@ -98,17 +98,19 @@ def get_collection_actions(state, environment):
     worst_state = state.copy()
     agent = ReactiveAgent(1000)
     worst_actions = agent.run(worst_state)
-    print worst_actions
+    #print worst_actions
     
+    ideal_state = state.copy()
+    ideal_state.map = environment.copyEnvIntoMap(state.map)
+    problem = CollectDirtProblem(ideal_state)
+    ideal_actions = a_star_search(problem, dirt_heuristic)
+
+
     actual_state = state.copy()
     problem = CollectDirtProblem(actual_state)
     actual_actions = a_star_search(problem, dirt_heuristic)
 
 
-    ideal_state = state.copy()
-    ideal_state.map = environment.copyEnvIntoMap(state.map)
-    problem = CollectDirtProblem(ideal_state)
-    ideal_actions = a_star_search(problem, dirt_heuristic)
 
     return actual_actions, worst_actions, ideal_actions
 

@@ -159,7 +159,6 @@ class Robot(object):
 
     def copy(self, copyEnv = False):
         if copyEnv:
-            print "copy environment fully"
             environment = self.environment.copy()
         else:
             environment = self.environment
