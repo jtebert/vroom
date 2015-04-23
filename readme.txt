@@ -74,3 +74,10 @@ The same comments apply to the above option though this time the robot will atte
 with its own classifier as opposed to just copying over the true classifications. Since the classification
 accuracy is poor, the actual dirt collection rate will not reach the ideal rate as it is not cleaning 
 all of the obstacles in the environment.
+
+> python simulator.py (any above option) -e "../assets/maps/"other test map"  
+
+If you provide an input to another one of our test maps you can see the robot explore different environments.
+
+Another good example is "../assets/maps/newHouse.csv". This map has multiple rooms and obstacles for the robot 
+to clean. But note, this is a larger map and can take up to 3-5 minutes to perform the search algorithm.
