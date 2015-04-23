@@ -9,7 +9,7 @@ MAX_DIRT = 3
 
 #Probalistic Distributions per dirt level based on obstacle label
 # "dirtValue" : [ p(accum. dirt) , p(spreading) ]
-openCellDist = { "0" : [.001,0] , "1" : [.10,.01] , "2" : [.10, .05] , "3" : [.0,.1] }
+openCellDist = { "0" : [.000,0] , "1" : [.00,.01] , "2" : [.10, .05] , "3" : [.0,.1] }
 doorwayDist =  { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
 garbageCanDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
 tableDist = { "0" : [.4,0] , "1" : [.1,0] , "2" : [.1, .05] , "3" : [.0,.2] }
@@ -364,6 +364,19 @@ class RobotMap(object):
 
                 self.map[x][y].value = self.map[x][y].dirt
 
+
+    def autoClassify( self, environment ):
+        #take in an environment and copy in the labels
+        
+        mapcp = self.copy()
+
+        for x in xrange(0,int(mapcp.xCells)):
+            for y in xrange(0,int(mapcp.yCells)):
+                #map              environments "map"
+                mapcp.map[x][y].label = environment.map[x][y].label
+
+        return mapcp
+
 class Environment(object):
     center = (0,0)
 
@@ -611,7 +624,8 @@ class Environment(object):
         for x in xrange(0,int(mapcp.xCells)):
             for y in xrange(0,int(mapcp.yCells)):
                 #map              environments "map"
-                mapcp.map[x][y] = self.map[x][y].copy(y,x) 
+                mapcp.map[x][y] = self.map[x][y].copy(y,x)
+                mapcp.map[x][y].label = None 
 
                 if self.map[x][y].value > 0:
                     mapcp.dirtCells.append([x,y,self.map[x][y].value])
@@ -621,9 +635,6 @@ class Environment(object):
 
                 if self.map[x][y].value == 0:
                     mapcp.map[x][y].isVisited = True
-                    
-                if self.map[x][y].label != None:
-                    mapcp.map[x][y].label = self.map[x][y].label
                     
                     #mapcp.visitedCells.append([x,y])
 

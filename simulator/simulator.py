@@ -74,6 +74,8 @@ class RobotSimulator(object):
                     self.updateDirt = True
                 if self.k == pygame.K_l:
                     self.drawLabels = (not self.drawLabels)
+                if self.k == pygame.K_q:
+                    self.start = True
             
 
     @staticmethod
@@ -157,10 +159,14 @@ class RobotSimulator(object):
 
         if simulatorArgs["runClassification"] == True:
             self.executeFeatureExtraction(state, self.classifiers)
+        else:
+            #auto classify
+            state.map =  state.map.autoClassify(state.r.environment)
 
         # update environments dirt
         # invoke multiple times?
         state.r.environment.updateDirt()
+        #state.r.environment.updateDirt()
         
         # clear robots dirt after feature extraction
         state.clearDirt()
@@ -170,6 +176,7 @@ class RobotSimulator(object):
         # update robots prediction of dirt
         print "before updating dirt predictons: ",state.getDirt()
         state.map.updateDirt()
+        #state.map.updateDirt()
         state.updateDirtList()
         state.removeUnreachableDirt()
         #print "after updating dirt predictions: ",state.getDirt()
@@ -210,12 +217,19 @@ class RobotSimulator(object):
                     self.environment.updateDirt()
                 #self.action is set directly by self.listenControls
             else:
+                
+                while(self.start == False):
+                    pygame.display.update()
+                    self.listenControls()
+                
                 if len(actions):
                     self.action = actions.pop(0)
                 else:
                     self.action = 'None'
                 time.sleep(0.1)
             
+                
+
             screen = pygame.display.get_surface()
             state = state.generateSuccessor(self.action)
 

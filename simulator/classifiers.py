@@ -4,7 +4,7 @@ class Classifiers(object):
 
     def __init__(self, row = 10, column = 10):
         # Threshold for classifier prediction
-        self.THRESHOLD = 0.90            # .792 is good for test, .88 is good  for goodhouse
+        self.THRESHOLD = 0.792            # .792 is good for test, .88 is good  for goodhouse
         self.classifiers = dict()
         self.sampleRowSize = row
         self.sampleColumnSize = column
@@ -129,9 +129,11 @@ class Classifiers(object):
         probs = list()
 
         for classifier in self.classifierNames:
-            values = [self.getLikelyhood(classifier, inputGrid)[0] for inputGrid in all_possible_grids]
-            maxValue = max(values)
-            probs.append((classifier, maxValue))
+            value = (self.getLikelyhood(classifier, all_possible_grids[0])[0])
+        #for classifier in self.classifierNames:
+        #    values = [self.getLikelyhood(classifier, inputGrid)[0] for inputGrid in all_possible_grids]
+        #    maxValue = max(values)
+        #    probs.append((classifier, maxValue))
 
         # Gets yes probabilites
         probs = [(classifier, self.getLikelyhood(classifier, inputGrid)[0]) for classifier in self.classifierNames]
