@@ -34,6 +34,12 @@ viewing the environment, you can press "l" to view the ground truth labels.
 As the robot cleans it will add dirt readings to the map (blue) and remove the
 dirt from the environment.
 
+> python simulator.py -x
+
+This will demo the robot exploring an environment using depth first search + back tracking. 
+Normally this step is done in the background, but this option provides a visualization of the search
+algorithm.
+
 > python simulator.py -s
 
 This will perform the exploration phase, update the environment with dirt,

@@ -123,6 +123,7 @@ class RobotSimulator(object):
         # Set valid actions for the robot's starting position
         # (otherwise no actions to begin with and it stops)
         state = RobotState(self.robot,self.map )
+        startState = state.copy()
         pos = state.getRobotPosition()
         state.map.map[pos[0]][pos[1]].set_valid_actions(state)
 
@@ -136,11 +137,11 @@ class RobotSimulator(object):
                     print "skipping exploration phase...."
                     state = pickle.load( open( pickleName, "rb"))
                 else:
-                    state = self.executeExploration(state)
+                    state,exploreActions = self.executeExploration(state)
                     pickle.dump(state, open( pickleName, "wb"))
 
             else:
-                state = self.executeExploration(state)
+                state,exploreActions = self.executeExploration(state)
                 pickleName = self.getPickleName("explore")
                 pickle.dump(state, open( pickleName, "wb"))
                     
@@ -148,6 +149,9 @@ class RobotSimulator(object):
             agent = ReactiveAgent(1000)
             actions = agent.run(state)
             print actions
+        elif simulatorArgs["exploreOnly"]:
+            state, actions = self.executeExploration(state)
+            state = startState
         else:
             #like we have explored the map
             if not simulatorArgs["joyStickMode"]:
@@ -163,25 +167,27 @@ class RobotSimulator(object):
             #auto classify
             state.map =  state.map.autoClassify(state.r.environment)
 
-        # update environments dirt
-        # invoke multiple times?
-        state.r.environment.updateDirt()
-        state.r.environment.updateDirt()
+        if simulatorArgs["exploreOnly"] == False:
+            # update environments dirt
+            # invoke multiple times?
+            state.r.environment.updateDirt()
+            state.r.environment.updateDirt()
         
-        # clear robots dirt after feature extraction
-        state.clearDirt()
+            # clear robots dirt after feature extraction
+            state.clearDirt()
         
-        afterDirtUpdateState = state.copy()
+            afterDirtUpdateState = state.copy()
 
-        # update robots prediction of dirt
-        print "before updating dirt predictons: ",state.getDirt()
-        state.map.updateDirt()
-        state.map.updateDirt()
-        state.updateDirtList()
-        state.removeUnreachableDirt()
-        #print "after updating dirt predictions: ",state.getDirt()
+            # update robots prediction of dirt
+            print "before updating dirt predictons: ",state.getDirt()
+            state.map.updateDirt()
+            state.map.updateDirt()
+            state.updateDirtList()
+            state.removeUnreachableDirt()
+            #print "after updating dirt predictions: ",state.getDirt()
 
-        #only needed if we explore then search
+            #only needed if we explore then search
+
         if simulatorArgs["exploreSearch"] == True:
             state = state.resetMission()
 
@@ -308,7 +314,7 @@ if __name__ == "__main__":
     
     
     try: 
-        opts,args = getopt.getopt(sys.argv[1:],"pavshfire:")
+        opts,args = getopt.getopt(sys.argv[1:],"xpavshfire:")
     except getopt.GetoptError:
         printBanner()
         printHelp()
@@ -320,6 +326,7 @@ if __name__ == "__main__":
 
     simulatorArgs = { "runEvaluation" : False,
                       "joyStickMode" : True,
+                      "exploreOnly"   : False,
                       "exploreSearch" : False,
                       "runClassification" : False,
                       "reactiveAgent"  : False,
@@ -330,7 +337,7 @@ if __name__ == "__main__":
             printBanner()
             printHelp()
             sys.exit(0)
-            
+        
         if opt == '-e':
             defaultEnvironmentCSV = arg
         if opt == '-i':
@@ -354,6 +361,8 @@ if __name__ == "__main__":
             simulatorArgs["joyStickMode"] = False
         if opt == '-p':
             simulatorArgs["usePickle"] = True
+        if opt == '-x':
+            simulatorArgs["exploreOnly"] = True
 
 
     r = RobotSimulator(defaultEnvironmentCSV)

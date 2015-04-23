@@ -109,6 +109,7 @@ def depth_first_search(problem):
 
     smallState = problem.start.extractSmallState()
     node = Node(smallState,problem.start, None, None, problem, costNeeded=False)
+    actions = []
     while not problem.is_goal_state(node.fullState):
         #print ""
         #print "Getting next states:"
@@ -120,13 +121,11 @@ def depth_first_search(problem):
             #if problem.is_goal_state()
 
             if node.parent == None:
-                #kind of a hack, should figure out how to
-                #update the state of the simlator before running 
-                #classification
-                return node.fullState
+                return (node.fullState,actions)
             
             #print "back tracking: ",node.parent.prev_action
             new_action = utils.reverse_action(node.prev_action)
+            actions.append(new_action)
             new_robot_state = node.fullState.generateSuccessor(new_action)
             node.parent.fullState = new_robot_state
             node.parent.state = node.parent.fullState.extractSmallState()
@@ -134,15 +133,7 @@ def depth_first_search(problem):
 
         else:
             next_state = next_states[0]
-            #print "GO:", next_state[1]
-            #print next_state[0].map.robotPositions
-        
-        
+            actions.append(next_state[1])
             node = Node(next_state[0].extractSmallState(), next_state[0], next_state[1], node, problem, costNeeded=False)
 
-            #if node.parent != None:
-            #    print node.parent.prev_action
-            #    print node.prev_action
-
-
-    return node.fullState() 
+    return (node.fullState,actions)
