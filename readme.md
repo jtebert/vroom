@@ -2,4 +2,4 @@
 
 ## Vacuum Robot Overcoming Obstacles and Messes
 
-![Vacuum Overlords](https://raw.githubusercontent.com/butane-/robotoverlords/master/assets/vroom_logo.png)
+![Vacuum Overlords](assets/vroom_logo.png)
